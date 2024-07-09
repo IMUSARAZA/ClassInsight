@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "901255983048",
+    "project_id": "classinsight-e7577",
+    "storage_bucket": "classinsight-e7577.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:901255983048:android:18542d69c052b7fe161afd",
+        "android_client_info": {
+          "package_name": "com.example.classinsight"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY5wUsbeWDRf5WsTENAkx_DH2qVSf_6Vk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
