@@ -1,13 +1,27 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:classinsight/Model/StudentModel.dart';
+import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
+import 'package:classinsight/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:classinsight/Const/AppColors.dart';
 
-void main() {
-  runApp(AddStudent());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+    runApp(AddStudent());
+    setupFirebaseMessaging();
+  } catch (e) {
+    print('Error initializing Firebase: $e');
+  }
 }
+
+void setupFirebaseMessaging() {}
 
 class AddStudent extends StatefulWidget {
   const AddStudent({Key? key}) : super(key: key);
@@ -17,6 +31,23 @@ class AddStudent extends StatefulWidget {
 }
 
 class _AddStudentState extends State<AddStudent> {
+  TextEditingController nameController = TextEditingController();
+    TextEditingController bForm_challanIdController = TextEditingController();
+    TextEditingController fatherNameController = TextEditingController();
+    TextEditingController fatherPhoneNoController = TextEditingController();
+    TextEditingController fatherCNICController = TextEditingController();
+    TextEditingController studentRollNoController = TextEditingController();
+
+    bool nameValid = true;
+    bool genderValid = true;
+    bool bForm_challanIdValid = true;
+    bool fatherNameValid = true;
+    bool fatherPhoneNoValid = true;
+    bool fatherCNICValid = true;
+    bool studentRollNoValid = true;
+
+    String selectedGender = '';
+
   double addStdFontSize = 16;
   double headingFontSize = 30;
 
@@ -24,9 +55,6 @@ class _AddStudentState extends State<AddStudent> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-
-    TextEditingController nameController = TextEditingController();
-    bool nameValid = true;
 
     if (screenWidth < 350) {
       addStdFontSize = 14;
@@ -127,47 +155,128 @@ class _AddStudentState extends State<AddStudent> {
                                 labelText: 'Name',
                                 isValid: nameValid)),
                         Padding(
+                          padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              canvasColor:
+                                  Colors.white, // Dropdown background color
+                            ),
+                            child: DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                hintStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
+                                hintText: "Select your gender",
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
+                                floatingLabelStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
+                                labelText: "Gender",
+                                disabledBorder: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                      color: Colors.black, width: 1.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                      color: Appcolors.appLightBlue,
+                                      width: 1.0),
+                                ),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  borderSide: BorderSide(
+                                      color: Colors.black, width: 1.0),
+                                ),
+                              ),
+                              value: selectedGender.isEmpty
+                                  ? null
+                                  : selectedGender,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  selectedGender = newValue!;
+                                });
+                              },
+                              items: <String>[
+                                'Male',
+                                'Female',
+                                'Other'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(
+                                    value,
+                                    style: TextStyle(
+                                      color:
+                                          Colors.black, // Dropdown text color
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                        Padding(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
                             child: CustomTextField(
-                                controller: nameController,
+                                controller: bForm_challanIdController,
                                 hintText: '35202xxxxxx78',
                                 labelText: 'B-Form/Challan ID',
-                                isValid: nameValid)),
+                                isValid: bForm_challanIdValid)),
                         Padding(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
                             child: CustomTextField(
-                                controller: nameController,
+                                controller: fatherNameController,
                                 hintText: "Father's name",
                                 labelText: "Father's name",
-                                isValid: nameValid)),
+                                isValid: fatherNameValid)),
                         Padding(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
                             child: CustomTextField(
-                                controller: nameController,
+                                controller: fatherPhoneNoController,
                                 hintText: "Father's phone no.",
                                 labelText: "Father's phone no.",
-                                isValid: nameValid)),
+                                isValid: fatherPhoneNoValid)),
                         Padding(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
                             child: CustomTextField(
-                                controller: nameController,
+                                controller: fatherCNICController,
                                 hintText: "Father's CNIC",
                                 labelText: "35202xxxxxx78",
-                                isValid: nameValid)),
+                                isValid: fatherCNICValid)),
                         Padding(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
                             child: CustomTextField(
-                                controller: nameController,
+                                controller: studentRollNoController,
                                 hintText: "Student's Roll no. (given by Admin)",
                                 labelText: "Student's Roll no.",
-                                isValid: nameValid)),
+                                isValid: studentRollNoValid)),
                         Padding(
                           padding: EdgeInsets.fromLTRB(30, 30, 30, 20),
                           child: CustomBlueButton(
                             buttonText: 'Add',
-                            onPressed: () {
+                            onPressed: () async {
                               // Define the action when the button is pressed
                               print('Button pressed!');
+                              print(nameController.text);
+                              print(selectedGender);
+                              final student = Student(
+                                name: nameController.text,
+                                gender: selectedGender,
+                                bForm_challanId: bForm_challanIdController.text,
+                                fatherName: fatherNameController.text,
+                                fatherPhoneNo: fatherPhoneNoController.text,
+                                fatherCNIC: fatherCNICController.text,
+                                studentRollNo: studentRollNoController.text,
+                                studentID:
+                                    '', // This will be set by the Database_Service
+                              );
+                              await Database_Service.saveStudent(student);
                             },
                           ),
                         ),

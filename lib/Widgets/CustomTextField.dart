@@ -36,15 +36,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
           borderSide: BorderSide(
-            color: widget.isValid ? Appcolors.appLightBlue : Colors.red,
-            width: 2.0,
+            color: widget.isValid ? Colors.black : Colors.red,
+            width: 1.0,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
           borderSide: BorderSide(
-            color: Colors.black, // Use your AppColors.appLightBlue here
-            width: 1.0,
+            color: Appcolors.appLightBlue, // Use your AppColors.appLightBlue here
+            width: 2.0,
           ),
         ),
       ),
