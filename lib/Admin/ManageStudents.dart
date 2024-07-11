@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(ManageStudents());
+  runApp(const ManageStudents());
 }
 
 class ManageStudents extends StatelessWidget {
@@ -42,7 +42,7 @@ class ManageStudents extends StatelessWidget {
             TextButton(
               onPressed: () {},
               child: Padding(
-                padding: EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(4.0),
                 child: Text(
                   'Add Student',
                   style: TextStyle(
@@ -61,7 +61,7 @@ class ManageStudents extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
                 child: Text(
                   'Students',
                   style: TextStyle(
@@ -71,7 +71,7 @@ class ManageStudents extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
                 child: Text(
                   'Class',
                   style:
@@ -79,15 +79,15 @@ class ManageStudents extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
                 child: DropdownButtonFormField<String>(
                   value: '2A',
                   decoration: InputDecoration(
                     contentPadding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
-                      borderSide: BorderSide(color: Colors.grey),
+                      borderSide: const BorderSide(color: Colors.grey),
                     ),
                   ),
                   items: <String>['2A', '1C', '3B', '3D', '4A']
@@ -103,7 +103,7 @@ class ManageStudents extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
                 child: Text(
                   'Search',
                   style:
@@ -111,32 +111,32 @@ class ManageStudents extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: 'Search Student', // Placeholder text
-                    hintStyle: TextStyle(
+                    hintStyle: const TextStyle(
                         color: Colors.grey), // Style for the placeholder
                     labelText: 'Student', // Label for the text field
                     labelStyle:
-                        TextStyle(color: Colors.black), // Style for the label
-                    contentPadding: EdgeInsets.symmetric(
+                        const TextStyle(color: Colors.black), // Style for the label
+                    contentPadding: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 10), // Padding inside the text field
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide:
-                          BorderSide(color: Colors.black), // Border color
+                          const BorderSide(color: Colors.black), // Border color
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                           color: Colors.black,
                           width: 1), // Border color and width when focused
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                           color: Colors.grey), // Border color when enabled
                     ),
                   ),
