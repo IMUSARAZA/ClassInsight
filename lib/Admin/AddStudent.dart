@@ -49,7 +49,7 @@ class _AddStudentState extends State<AddStudent> {
   String selectedClass = '';
 
   double addStdFontSize = 16;
-  double headingFontSize = 30;
+  double headingFontSize = 33;
 
   @override
   Widget build(BuildContext context) {
@@ -58,19 +58,19 @@ class _AddStudentState extends State<AddStudent> {
 
     if (screenWidth < 350) {
       addStdFontSize = 14;
-      headingFontSize = 25;
+      headingFontSize = 27;
     }
     if (screenWidth < 300) {
       addStdFontSize = 14;
-      headingFontSize = 23;
+      headingFontSize = 24;
     }
     if (screenWidth < 250) {
       addStdFontSize = 11;
-      headingFontSize = 18;
+      headingFontSize = 20;
     }
     if (screenWidth < 230) {
       addStdFontSize = 8;
-      headingFontSize = 14;
+      headingFontSize = 15;
     }
 
     return MaterialApp(
@@ -169,15 +169,15 @@ class _AddStudentState extends State<AddStudent> {
                                     hintText: "Select your gender",
                                     labelText: "Gender",
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10)),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
                                       borderSide: BorderSide(
                                           color: Appcolors.appLightBlue,
                                           width: 2.0),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10)),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
                                       borderSide: BorderSide(
                                           color: Colors.black, width: 1.0),
                                     ),
@@ -190,12 +190,9 @@ class _AddStudentState extends State<AddStudent> {
                                       selectedGender = newValue!;
                                     });
                                   },
-                                  items: <String>[
-                                    'Male',
-                                    'Female',
-                                    'Other'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
+                                  items: <String>['Male', 'Female', 'Other']
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(value),
@@ -260,15 +257,15 @@ class _AddStudentState extends State<AddStudent> {
                                     hintText: "Select section of student",
                                     labelText: "Section",
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(15)),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
                                       borderSide: BorderSide(
                                           color: Appcolors.appLightBlue,
                                           width: 1.0),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(15)),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
                                       borderSide: BorderSide(
                                           color: Colors.black, width: 1.0),
                                     ),
@@ -281,12 +278,9 @@ class _AddStudentState extends State<AddStudent> {
                                       selectedClass = newValue!;
                                     });
                                   },
-                                  items: <String>[
-                                    '2A',
-                                    '3B',
-                                    '4D'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
+                                  items: <String>['2A', '3B', '4D']
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(value),
@@ -300,6 +294,20 @@ class _AddStudentState extends State<AddStudent> {
                               child: CustomBlueButton(
                                 buttonText: 'Add',
                                 onPressed: () async {
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Appcolors.appLightBlue),
+                                        ),
+                                      );
+                                    },
+                                  );
+
                                   print('Button pressed!');
                                   print(nameController.text);
                                   print(selectedGender);
@@ -309,16 +317,17 @@ class _AddStudentState extends State<AddStudent> {
                                     bForm_challanId:
                                         bForm_challanIdController.text,
                                     fatherName: fatherNameController.text,
-                                    fatherPhoneNo:
-                                        fatherPhoneNoController.text,
+                                    fatherPhoneNo: fatherPhoneNoController.text,
                                     fatherCNIC: fatherCNICController.text,
-                                    studentRollNo:
-                                        studentRollNoController.text,
+                                    studentRollNo: studentRollNoController.text,
                                     studentID: '', // Set by Database_Service
                                     classSection: selectedClass,
                                   );
                                   await Database_Service.saveStudent(
                                       'School1', student);
+
+                                  Navigator.of(context)
+                                      .pop(); // Hide the progress indicator
                                 },
                               ),
                             ),

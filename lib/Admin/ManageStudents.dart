@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:classinsight/Const/Appcolors.dart';
 import 'package:classinsight/Model/StudentModel.dart';
 import 'package:classinsight/Services/Database_Service.dart';
@@ -111,8 +113,8 @@ class _ManageStudentsState extends State<ManageStudents> {
                         BorderSide(color: Appcolors.appLightBlue, width: 2.0),
                   ),
                 ),
-                items: <String>['2A', '1C', '3B', '3D', '4A']
-                    .map((String value) {
+                items:
+                    <String>['2A', '1C', '3B', '3D', '4A'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -166,7 +168,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                     child: Text(
                       'No Students found',
                       style: TextStyle(
-                        color: Appcolors.appLightBlue,
+                        color: Colors.black,
                         fontSize: MediaQuery.of(context).size.width * 0.04,
                         fontWeight: FontWeight.w600,
                       ),
@@ -223,10 +225,43 @@ class _ManageStudentsState extends State<ManageStudents> {
                             ),
                           ),
                         ),
+                        DataColumn(
+                          label: Text(
+                            'Result',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.03,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Edit',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.03,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Delete',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.03,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ],
                       rows: snapshot.data!
                           .map((Student student) => DataRow(
-                                color: MaterialStateColor.resolveWith(
+                                color: WidgetStateColor.resolveWith(
                                     (states) => Appcolors.appDarkBlue),
                                 cells: [
                                   DataCell(
@@ -234,10 +269,9 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       student.studentRollNo,
                                       style: TextStyle(
                                         color: Colors.black,
-                                        fontSize: MediaQuery.of(context)
-                                                .size
-                                                .width *
-                                            0.03,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -247,10 +281,9 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       student.name,
                                       style: TextStyle(
                                         color: Colors.black,
-                                        fontSize: MediaQuery.of(context)
-                                                .size
-                                                .width *
-                                            0.03,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -260,10 +293,9 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       student.gender,
                                       style: TextStyle(
                                         color: Colors.black,
-                                        fontSize: MediaQuery.of(context)
-                                                .size
-                                                .width *
-                                            0.03,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -273,11 +305,67 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       student.fatherName,
                                       style: TextStyle(
                                         color: Colors.black,
-                                        fontSize: MediaQuery.of(context)
-                                                .size
-                                                .width *
-                                            0.03,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
                                         fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    GestureDetector(
+                                      onTap: () {
+                                        print(
+                                            "Result button pressed for student: ${student.name}");
+                                        // Replace with your logic to handle edit action
+                                      },
+                                      child: Image.asset(
+                                        "lib/Assets/result.png",
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    GestureDetector(
+                                      onTap: () {
+                                        print(
+                                            "Edit button pressed for student: ${student.name}");
+                                        // Replace with your logic to handle edit action
+                                      },
+                                      child: Image.asset(
+                                        "lib/Assets/edit.png",
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    GestureDetector(
+                                      onTap: () {
+                                        print(
+                                            "Delete button pressed for student: ${student.name}");
+                                        // Replace with your logic to handle edit action
+                                      },
+                                      child: Image.asset(
+                                        "lib/Assets/delete.png",
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                        color: Colors.red,
                                       ),
                                     ),
                                   ),
