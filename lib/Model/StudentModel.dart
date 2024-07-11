@@ -10,6 +10,7 @@ class Student {
   late String fatherCNIC;
   late String studentRollNo;
   late String studentID;
+  late String classSection;
 
   Student({
     required this.name,
@@ -20,6 +21,7 @@ class Student {
     required this.fatherCNIC,
     required this.studentRollNo,
     required this.studentID,
+    required this.classSection,
   });
 
   factory Student.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class Student {
       fatherCNIC: json['FatherCNIC'] ?? '',
       studentRollNo: json['StudentRollNo'] ?? '',
       studentID: json['StudentID'] ?? '',
+      classSection: json['ClassSection'] ?? '',
     );
   }
 
@@ -45,6 +48,7 @@ class Student {
       'FatherCNIC': fatherCNIC,
       'StudentRollNo': studentRollNo,
       'StudentID': studentID,
+      'ClassSection': classSection,
     };
   }
 }

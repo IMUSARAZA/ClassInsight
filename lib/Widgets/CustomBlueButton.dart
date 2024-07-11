@@ -14,10 +14,13 @@ class CustomBlueButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     double buttonWidth = screenWidth * 0.75; // 75% of screen width
 
     return Container(
       width: buttonWidth,
+      height: 0.05*screenHeight,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
