@@ -13,15 +13,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     runApp(AddStudent());
-    setupFirebaseMessaging();
   } catch (e) {
     print('Error initializing Firebase: $e');
   }
 }
-
-void setupFirebaseMessaging() {}
 
 class AddStudent extends StatefulWidget {
   const AddStudent({Key? key}) : super(key: key);
@@ -32,24 +30,26 @@ class AddStudent extends StatefulWidget {
 
 class _AddStudentState extends State<AddStudent> {
   TextEditingController nameController = TextEditingController();
-    TextEditingController bForm_challanIdController = TextEditingController();
-    TextEditingController fatherNameController = TextEditingController();
-    TextEditingController fatherPhoneNoController = TextEditingController();
-    TextEditingController fatherCNICController = TextEditingController();
-    TextEditingController studentRollNoController = TextEditingController();
+  TextEditingController bForm_challanIdController = TextEditingController();
+  TextEditingController fatherNameController = TextEditingController();
+  TextEditingController fatherPhoneNoController = TextEditingController();
+  TextEditingController fatherCNICController = TextEditingController();
+  TextEditingController studentRollNoController = TextEditingController();
 
-    bool nameValid = true;
-    bool genderValid = true;
-    bool bForm_challanIdValid = true;
-    bool fatherNameValid = true;
-    bool fatherPhoneNoValid = true;
-    bool fatherCNICValid = true;
-    bool studentRollNoValid = true;
+  bool nameValid = true;
+  bool genderValid = true;
+  bool bForm_challanIdValid = true;
+  bool fatherNameValid = true;
+  bool fatherPhoneNoValid = true;
+  bool fatherCNICValid = true;
+  bool studentRollNoValid = true;
+  bool selectedClassValid = true;
 
-    String selectedGender = '';
+  String selectedGender = '';
+  String selectedClass = '';
 
   double addStdFontSize = 16;
-  double headingFontSize = 30;
+  double headingFontSize = 33;
 
   @override
   Widget build(BuildContext context) {
@@ -58,233 +58,286 @@ class _AddStudentState extends State<AddStudent> {
 
     if (screenWidth < 350) {
       addStdFontSize = 14;
-      headingFontSize = 25;
+      headingFontSize = 27;
     }
     if (screenWidth < 300) {
       addStdFontSize = 14;
-      headingFontSize = 23;
+      headingFontSize = 24;
     }
     if (screenWidth < 250) {
       addStdFontSize = 11;
-      headingFontSize = 18;
+      headingFontSize = 20;
     }
     if (screenWidth < 230) {
       addStdFontSize = 8;
-      headingFontSize = 14;
+      headingFontSize = 15;
     }
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Appcolors.appLightBlue,
-        body: Container(
-          height: screenHeight,
-          width: screenWidth,
-          child: Center(
-            child: Column(
-              children: [
-                Container(
-                  height: screenHeight * 0.12,
-                  width: screenWidth,
-                  child: AppBar(
-                    backgroundColor: Appcolors.appLightBlue,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    title: Center(
-                      child: Text(
-                        'Add Student',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: addStdFontSize,
-                          fontWeight: FontWeight.w600,
+        body: SingleChildScrollView(
+          child: Container(
+            height: screenHeight,
+            width: screenWidth,
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: screenHeight * 0.10,
+                    width: screenWidth,
+                    child: AppBar(
+                      backgroundColor: Appcolors.appLightBlue,
+                      elevation: 0,
+                      leading: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      title: Center(
+                        child: Text(
+                          'Add Student',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: addStdFontSize,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                    actions: <Widget>[
-                      Container(
-                        width: 48.0, // Adjust as needed
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 0.08 * screenHeight,
-                  width: screenWidth,
-                  margin: EdgeInsets.only(bottom: 10.0),
-                  child: Text(
-                    'Add New Student',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: headingFontSize,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    height: 0.80 * screenHeight,
-                    width: screenWidth,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20.0),
-                        topRight: Radius.circular(20.0),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey
-                              .withOpacity(0.5), // Shadow color with opacity
-                          spreadRadius: 4,
-                          blurRadius: 5,
-                          offset: Offset(0, 3), // Changes position of shadow
+                      actions: <Widget>[
+                        Container(
+                          width: 48.0, // Adjust as needed
                         ),
                       ],
                     ),
-                    child: Column(
-                      children: [
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(30, 40, 30, 30),
-                            child: CustomTextField(
+                  ),
+                  Container(
+                    height: 0.05 * screenHeight,
+                    width: screenWidth,
+                    margin: EdgeInsets.only(bottom: 10.0),
+                    child: Text(
+                      'Add New Student',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: headingFontSize,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      width: screenWidth,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 4,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 40, 30, 20),
+                              child: CustomTextField(
                                 controller: nameController,
-                                hintText: 'name',
+                                hintText: 'Name',
                                 labelText: 'Name',
-                                isValid: nameValid)),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
-                          child: Theme(
-                            data: Theme.of(context).copyWith(
-                              canvasColor:
-                                  Colors.white, // Dropdown background color
-                            ),
-                            child: DropdownButtonFormField<String>(
-                              decoration: InputDecoration(
-                                hintStyle: TextStyle(
-                                  color: Colors.black,
-                                ),
-                                hintText: "Select your gender",
-                                labelStyle: TextStyle(
-                                  color: Colors.black,
-                                ),
-                                floatingLabelStyle: TextStyle(
-                                  color: Colors.black,
-                                ),
-                                labelText: "Gender",
-                                disabledBorder: const OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                  borderSide: BorderSide(
-                                      color: Colors.black, width: 1.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(15)),
-                                  borderSide: BorderSide(
-                                      color: Appcolors.appLightBlue,
-                                      width: 1.0),
-                                ),
-                                enabledBorder: const OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                  borderSide: BorderSide(
-                                      color: Colors.black, width: 1.0),
-                                ),
+                                isValid: nameValid,
                               ),
-                              value: selectedGender.isEmpty
-                                  ? null
-                                  : selectedGender,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  selectedGender = newValue!;
-                                });
-                              },
-                              items: <String>[
-                                'Male',
-                                'Female',
-                                'Other'
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(
-                                    value,
-                                    style: TextStyle(
-                                      color:
-                                          Colors.black, // Dropdown text color
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  canvasColor: Colors.white,
+                                ),
+                                child: DropdownButtonFormField<String>(
+                                  decoration: InputDecoration(
+                                    hintText: "Select your gender",
+                                    labelText: "Gender",
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
+                                      borderSide: BorderSide(
+                                          color: Appcolors.appLightBlue,
+                                          width: 2.0),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
+                                      borderSide: BorderSide(
+                                          color: Colors.black, width: 1.0),
                                     ),
                                   ),
-                                );
-                              }).toList(),
+                                  value: selectedGender.isEmpty
+                                      ? null
+                                      : selectedGender,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      selectedGender = newValue!;
+                                    });
+                                  },
+                                  items: <String>['Male', 'Female', 'Other']
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
-                            child: CustomTextField(
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                              child: CustomTextField(
                                 controller: bForm_challanIdController,
-                                hintText: '35202xxxxxx78',
+                                hintText: 'B-Form/Challan ID',
                                 labelText: 'B-Form/Challan ID',
-                                isValid: bForm_challanIdValid)),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
-                            child: CustomTextField(
+                                isValid: bForm_challanIdValid,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                              child: CustomTextField(
                                 controller: fatherNameController,
                                 hintText: "Father's name",
                                 labelText: "Father's name",
-                                isValid: fatherNameValid)),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
-                            child: CustomTextField(
+                                isValid: fatherNameValid,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                              child: CustomTextField(
                                 controller: fatherPhoneNoController,
                                 hintText: "Father's phone no.",
                                 labelText: "Father's phone no.",
-                                isValid: fatherPhoneNoValid)),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
-                            child: CustomTextField(
+                                isValid: fatherPhoneNoValid,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                              child: CustomTextField(
                                 controller: fatherCNICController,
                                 hintText: "Father's CNIC",
-                                labelText: "35202xxxxxx78",
-                                isValid: fatherCNICValid)),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(30, 0, 30, 30),
-                            child: CustomTextField(
+                                labelText: "Father's CNIC",
+                                isValid: fatherCNICValid,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                              child: CustomTextField(
                                 controller: studentRollNoController,
-                                hintText: "Student's Roll no. (given by Admin)",
+                                hintText: "Student's Roll no.",
                                 labelText: "Student's Roll no.",
-                                isValid: studentRollNoValid)),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(30, 30, 30, 20),
-                          child: CustomBlueButton(
-                            buttonText: 'Add',
-                            onPressed: () async {
-                              // Define the action when the button is pressed
-                              print('Button pressed!');
-                              print(nameController.text);
-                              print(selectedGender);
-                              final student = Student(
-                                name: nameController.text,
-                                gender: selectedGender,
-                                bForm_challanId: bForm_challanIdController.text,
-                                fatherName: fatherNameController.text,
-                                fatherPhoneNo: fatherPhoneNoController.text,
-                                fatherCNIC: fatherCNICController.text,
-                                studentRollNo: studentRollNoController.text,
-                                studentID:
-                                    '', // This will be set by the Database_Service
-                              );
-                              await Database_Service.saveStudent(student);
-                            },
-                          ),
+                                isValid: studentRollNoValid,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  canvasColor: Colors.white,
+                                ),
+                                child: DropdownButtonFormField<String>(
+                                  decoration: InputDecoration(
+                                    hintText: "Select section of student",
+                                    labelText: "Section",
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      borderSide: BorderSide(
+                                          color: Appcolors.appLightBlue,
+                                          width: 1.0),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      borderSide: BorderSide(
+                                          color: Colors.black, width: 1.0),
+                                    ),
+                                  ),
+                                  value: selectedClass.isEmpty
+                                      ? null
+                                      : selectedClass,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      selectedClass = newValue!;
+                                    });
+                                  },
+                                  items: <String>['2A', '3B', '4D']
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 20, 30, 20),
+                              child: CustomBlueButton(
+                                buttonText: 'Add',
+                                onPressed: () async {
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Appcolors.appLightBlue),
+                                        ),
+                                      );
+                                    },
+                                  );
+
+                                  print('Button pressed!');
+                                  print(nameController.text);
+                                  print(selectedGender);
+                                  final student = Student(
+                                    name: nameController.text,
+                                    gender: selectedGender,
+                                    bForm_challanId:
+                                        bForm_challanIdController.text,
+                                    fatherName: fatherNameController.text,
+                                    fatherPhoneNo: fatherPhoneNoController.text,
+                                    fatherCNIC: fatherCNICController.text,
+                                    studentRollNo: studentRollNoController.text,
+                                    studentID: '', // Set by Database_Service
+                                    classSection: selectedClass,
+                                  );
+                                  await Database_Service.saveStudent(
+                                      'School1', student);
+
+                                  Navigator.of(context)
+                                      .pop(); // Hide the progress indicator
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                )
-              ],
+                ],
+              ),
             ),
           ),
         ),
