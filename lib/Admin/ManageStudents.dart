@@ -5,6 +5,7 @@ import 'package:classinsight/Model/StudentModel.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/Admin/AddStudent.dart';
+import 'package:classinsight/Admin/EditStudent.dart';
 import 'package:classinsight/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ void main() async {
     runApp(MaterialApp(
       routes: {
         '/AddStudent': (context) => AddStudent(),
+        '/EditStudent': (context) => EditStudent(),
       },
       home: ManageStudents(),
       debugShowCheckedModeBanner: false,
@@ -317,7 +319,6 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       onTap: () {
                                         print(
                                             "Result button pressed for student: ${student.name}");
-                                        // Replace with your logic to handle edit action
                                       },
                                       child: Image.asset(
                                         "lib/Assets/result.png",
@@ -336,7 +337,12 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       onTap: () {
                                         print(
                                             "Edit button pressed for student: ${student.name}");
-                                        // Replace with your logic to handle edit action
+
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/EditStudent',
+                                          arguments: student.studentID,
+                                        );
                                       },
                                       child: Image.asset(
                                         "lib/Assets/edit.png",
@@ -355,7 +361,6 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       onTap: () {
                                         print(
                                             "Delete button pressed for student: ${student.name}");
-                                        // Replace with your logic to handle edit action
                                       },
                                       child: Image.asset(
                                         "lib/Assets/delete.png",
