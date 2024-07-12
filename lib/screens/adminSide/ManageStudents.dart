@@ -2,9 +2,10 @@
 
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
+import 'package:classinsight/screens/adminSide/AddStudent.dart';
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/models/StudentModel.dart';
-import 'package:classinsight/screens/adminSide/AddStudent.dart';
+import 'package:classinsight/screens/adminSide/EditStudent.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +21,7 @@ void main() async {
     runApp(MaterialApp(
       routes: {
         '/AddStudent': (context) => AddStudent(),
+        '/EditStudent': (context) => EditStudent(),
       },
       home: ManageStudents(),
       debugShowCheckedModeBanner: false,
@@ -319,7 +321,6 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       onTap: () {
                                         print(
                                             "Result button pressed for student: ${student.name}");
-                                        // Replace with your logic to handle edit action
                                       },
                                       child: Icon(Icons.text_snippet_outlined, color: Colors.white,)
                                     ),
@@ -329,7 +330,25 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       onTap: () {
                                         print(
                                             "Edit button pressed for student: ${student.name}");
-                                        // Replace with your logic to handle edit action
+
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/EditStudent',
+                                          arguments: Student(
+                                            studentID: student.studentID,
+                                            name: student.name,
+                                            gender: student.gender,
+                                            bForm_challanId:
+                                                student.bForm_challanId,
+                                            fatherName: student.fatherName,
+                                            fatherPhoneNo:
+                                                student.fatherPhoneNo,
+                                            fatherCNIC: student.fatherCNIC,
+                                            studentRollNo:
+                                                student.studentRollNo,
+                                            classSection: student.classSection,
+                                          ),
+                                        );
                                       },
                                       child:Icon(FontAwesomeIcons.edit)
                                     ),
@@ -339,7 +358,6 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       onTap: () {
                                         print(
                                             "Delete button pressed for student: ${student.name}");
-                                        // Replace with your logic to handle edit action
                                       },
                                       child: Icon(Icons.delete, color: Colors.red,)
                                     ),

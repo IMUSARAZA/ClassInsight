@@ -53,8 +53,8 @@ class Database_Service extends GetxService{
     return students;
   }
 
-  static Future<List<Student>> getStudentsOfASpecificClass(String school, 
-      String classSection) async {
+  static Future<List<Student>> getStudentsOfASpecificClass(
+      String school, String classSection) async {
     List<Student> students = [];
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -74,6 +74,47 @@ class Database_Service extends GetxService{
   }
 
 
+  static Future<List<Student>> searchStudentsByRollNo(
+      String school, String classSection, String rollNo) async {
+    List<Student> students = [];
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(school)
+          .collection('Students')
+          .where('ClassSection', isEqualTo: classSection)
+          .where('RollNo', isEqualTo: rollNo)
+          .get();
 
-  
+      for (var doc in querySnapshot.docs) {
+        students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
+      }
+    } catch (e) {
+      print(
+          'Error searching students by roll number $rollNo in class $classSection: $e');
+    }
+    return students;
+  }
+
+  static Future<Student?> getStudentByID(String school, String studentID) async {
+    Student? student;
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(school)
+          .collection('Students')
+          .where('StudentID', isEqualTo: studentID)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        student = Student.fromJson(
+            querySnapshot.docs.first.data() as Map<String, dynamic>);
+      } else {
+        print('Student not found for ID: $studentID');
+      }
+    } catch (e) {
+      print('Error searching students by ID $studentID: $e');
+    }
+    return student;
+  }
 }
