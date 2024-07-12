@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:classinsight/Const/AppColors.dart';
+import 'package:classinsight/utils/AppColors.dart';
 
 class CustomBlueButton extends StatelessWidget {
   final String buttonText;
@@ -24,7 +24,7 @@ class CustomBlueButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.black, backgroundColor: Appcolors.appLightBlue,
+          foregroundColor: Colors.black, backgroundColor: AppColors.appLightBlue,
           elevation: 5, // Adjust the elevation for the shadow
           shadowColor: Colors.grey.withOpacity(0.5), // Shadow color with opacity
           shape: RoundedRectangleBorder(
