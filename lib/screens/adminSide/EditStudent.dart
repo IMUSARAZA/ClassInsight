@@ -1,9 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:classinsight/Widgets/CustomTextField.dart';
+import 'package:classinsight/models/StudentModel.dart';
+import 'package:classinsight/utils/AppColors.dart';
 import 'package:flutter/material.dart';
-import 'package:classinsight/Const/AppColors.dart';
-import 'package:classinsight/Model/StudentModel.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -80,7 +80,7 @@ class _EditStudentState extends State<EditStudent> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Appcolors.appLightBlue,
+        backgroundColor: AppColors.appLightBlue,
         body: Container(
             height: screenHeight,
             width: screenWidth,
@@ -92,7 +92,7 @@ class _EditStudentState extends State<EditStudent> {
                     height: screenHeight * 0.05,
                     width: screenWidth,
                     decoration: BoxDecoration(
-                      color: Appcolors.appLightBlue,
+                      color: AppColors.appLightBlue,
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
@@ -207,7 +207,7 @@ class _EditStudentState extends State<EditStudent> {
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(10)),
                                             borderSide: BorderSide(
-                                                color: Appcolors.appLightBlue,
+                                                color: AppColors.appLightBlue,
                                                 width: 2.0),
                                           ),
                                           enabledBorder: OutlineInputBorder(
@@ -246,7 +246,7 @@ class _EditStudentState extends State<EditStudent> {
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(10)),
                                             borderSide: BorderSide(
-                                                color: Appcolors.appLightBlue,
+                                                color: AppColors.appLightBlue,
                                                 width: 2.0),
                                           ),
                                           enabledBorder: OutlineInputBorder(

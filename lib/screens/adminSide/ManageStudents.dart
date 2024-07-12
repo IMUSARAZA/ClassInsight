@@ -1,14 +1,16 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:classinsight/Const/Appcolors.dart';
-import 'package:classinsight/Model/StudentModel.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
-import 'package:classinsight/Admin/AddStudent.dart';
-import 'package:classinsight/Admin/EditStudent.dart';
+import 'package:classinsight/screens/adminSide/AddStudent.dart';
 import 'package:classinsight/firebase_options.dart';
+import 'package:classinsight/models/StudentModel.dart';
+import 'package:classinsight/screens/adminSide/EditStudent.dart';
+import 'package:classinsight/utils/AppColors.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -112,7 +114,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide:
-                        BorderSide(color: Appcolors.appLightBlue, width: 2.0),
+                        BorderSide(color: AppColors.appLightBlue, width: 2.0),
                   ),
                 ),
                 items:
@@ -149,7 +151,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
                     child: CircularProgressIndicator(
-                      color: Appcolors.appLightBlue,
+                      color: AppColors.appLightBlue,
                     ),
                   );
                 } else if (snapshot.hasError) {
@@ -263,8 +265,8 @@ class _ManageStudentsState extends State<ManageStudents> {
                       ],
                       rows: snapshot.data!
                           .map((Student student) => DataRow(
-                                color: WidgetStateColor.resolveWith(
-                                    (states) => Appcolors.appDarkBlue),
+                                color: MaterialStateColor.resolveWith(
+                                    (states) => AppColors.appDarkBlue),
                                 cells: [
                                   DataCell(
                                     Text(
@@ -320,16 +322,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                                         print(
                                             "Result button pressed for student: ${student.name}");
                                       },
-                                      child: Image.asset(
-                                        "lib/Assets/result.png",
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        height:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        color: Colors.black,
-                                      ),
+                                      child: Icon(Icons.text_snippet_outlined, color: Colors.white,)
                                     ),
                                   ),
                                   DataCell(
@@ -357,16 +350,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                                           ),
                                         );
                                       },
-                                      child: Image.asset(
-                                        "lib/Assets/edit.png",
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        height:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        color: Colors.black,
-                                      ),
+                                      child:Icon(FontAwesomeIcons.edit)
                                     ),
                                   ),
                                   DataCell(
@@ -375,16 +359,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                                         print(
                                             "Delete button pressed for student: ${student.name}");
                                       },
-                                      child: Image.asset(
-                                        "lib/Assets/delete.png",
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        height:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        color: Colors.red,
-                                      ),
+                                      child: Icon(Icons.delete, color: Colors.red,)
                                     ),
                                   ),
                                 ],

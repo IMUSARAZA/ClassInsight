@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:classinsight/Model/StudentModel.dart';
+import 'package:classinsight/models/StudentModel.dart';
+import 'package:get/get.dart';
 
-class Database_Service {
+
+class Database_Service extends GetxService{
   static Future<void> saveStudent(String school, Student student) async {
     try {
       // Reference to the school's collection of students
@@ -70,6 +72,7 @@ class Database_Service {
     }
     return students;
   }
+
 
   static Future<List<Student>> searchStudentsByRollNo(
       String school, String classSection, String rollNo) async {
