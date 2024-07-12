@@ -341,7 +341,20 @@ class _ManageStudentsState extends State<ManageStudents> {
                                         Navigator.pushNamed(
                                           context,
                                           '/EditStudent',
-                                          arguments: student.studentID,
+                                          arguments: Student(
+                                            studentID: student.studentID,
+                                            name: student.name,
+                                            gender: student.gender,
+                                            bForm_challanId:
+                                                student.bForm_challanId,
+                                            fatherName: student.fatherName,
+                                            fatherPhoneNo:
+                                                student.fatherPhoneNo,
+                                            fatherCNIC: student.fatherCNIC,
+                                            studentRollNo:
+                                                student.studentRollNo,
+                                            classSection: student.classSection,
+                                          ),
                                         );
                                       },
                                       child: Image.asset(
