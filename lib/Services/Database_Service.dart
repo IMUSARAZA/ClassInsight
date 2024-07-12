@@ -114,4 +114,17 @@ class Database_Service {
     }
     return student;
   }
+
+  static Future<void> updateStudent(String school, String studentID, Map<String, dynamic> data) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(school)
+          .collection('Students')
+          .doc(studentID)
+          .update(data);
+    } catch (e) {
+      print('Error updating student: $e');
+    }
+  }
 }
