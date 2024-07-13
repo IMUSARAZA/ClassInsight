@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:classinsight/Services/Database_Service.dart';
+import 'package:classinsight/services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/screens/adminSide/AddStudent.dart';
 import 'package:classinsight/firebase_options.dart';
