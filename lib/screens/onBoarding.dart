@@ -5,8 +5,24 @@ import 'package:get/get.dart';
 
 import '../widgets/BaseScreen.dart';
 
+class SchoolController extends GetxController {
+  var school = ''.obs;
+
+  void setSchool(String value) {
+    school.value = value;
+  }
+
+  String getSchool() {
+    return school.value;
+  }
+}
+
+
 class OnBoarding extends StatelessWidget {
   OnBoarding({Key? key}) : super(key: key);
+
+  final SchoolController schoolController = Get.put(SchoolController());
+
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +53,7 @@ class OnBoarding extends StatelessWidget {
             onBoardDropDown(
               items: ["Campus 1", "Campus 2"],
               onChanged: (item) {
+                schoolController.setSchool(item.toString());
                 Get.toNamed("/loginAs");
               },
             ),
