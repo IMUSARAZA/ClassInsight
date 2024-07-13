@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:classinsight/Const/AppColors.dart';
+import 'package:classinsight/utils/AppColors.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -43,7 +43,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
           borderSide: BorderSide(
-            color: Appcolors.appLightBlue, // Use your AppColors.appLightBlue here
+            color: AppColors.appLightBlue, // Use your AppColors.appLightBlue here
             width: 2.0,
           ),
         ),

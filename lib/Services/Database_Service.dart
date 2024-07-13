@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:classinsight/Model/StudentModel.dart';
+import 'package:classinsight/models/StudentModel.dart';
+import 'package:get/get.dart';
 
-class Database_Service {
+class Database_Service extends GetxService {
   static Future<void> saveStudent(String school, Student student) async {
     try {
       // Reference to the school's collection of students
@@ -93,7 +94,8 @@ class Database_Service {
     return students;
   }
 
-  static Future<Student?> getStudentByID(String school, String studentID) async {
+  static Future<Student?> getStudentByID(
+      String school, String studentID) async {
     Student? student;
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -115,7 +117,8 @@ class Database_Service {
     return student;
   }
 
-  static Future<void> updateStudent(String school, String studentID, Map<String, dynamic> data) async {
+  static Future<void> updateStudent(
+      String school, String studentID, Map<String, dynamic> data) async {
     try {
       await FirebaseFirestore.instance
           .collection('Schools')
@@ -123,8 +126,29 @@ class Database_Service {
           .collection('Students')
           .doc(studentID)
           .update(data);
+      print('Student updated successfully');
     } catch (e) {
       print('Error updating student: $e');
     }
   }
+
+  static Future<void> deleteStudent(String schoolID, String studentID) async {
+    try {
+      // Reference to the specific student document
+      DocumentReference studentRef = FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolID)
+          .collection('Students')
+          .doc(studentID);
+
+      // Delete the student document
+      await studentRef.delete();
+      print('Student deleted successfully');
+    } catch (e) {
+      print('Error deleting student: $e');
+    }
+  }
 }
+
+
+

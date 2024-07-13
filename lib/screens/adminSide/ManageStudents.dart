@@ -1,14 +1,16 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:classinsight/Const/Appcolors.dart';
-import 'package:classinsight/Model/StudentModel.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
-import 'package:classinsight/Admin/AddStudent.dart';
-import 'package:classinsight/Admin/EditStudent.dart';
+import 'package:classinsight/screens/adminSide/AddStudent.dart';
 import 'package:classinsight/firebase_options.dart';
+import 'package:classinsight/models/StudentModel.dart';
+import 'package:classinsight/screens/adminSide/EditStudent.dart';
+import 'package:classinsight/utils/AppColors.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +43,82 @@ class _ManageStudentsState extends State<ManageStudents> {
   String selectedClass = '2A';
   TextEditingController searchController = TextEditingController();
   bool searchValid = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load initial student list
+    studentsList =
+        Database_Service.getStudentsOfASpecificClass('School1', selectedClass);
+  }
+
+  void refreshStudentList() {
+    setState(() {
+      studentsList =
+          Database_Service.getStudentsOfASpecificClass('School1', selectedClass);
+    });
+  }
+
+  void deleteStudent(BuildContext context, String schoolID, String studentID) async {
+    bool confirmDelete = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure?'),
+          content: Text('This will delete this student permanently'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // Return false when cancel button is pressed
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // Return true when delete button is pressed
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Delete student if confirmed
+    if (confirmDelete ?? false) {
+      try {
+        // Show loading indicator while deleting
+        showDialog(
+          context: context,
+          barrierDismissible: false, // Prevent dismiss on tap outside
+          builder: (BuildContext context) {
+            return Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+              ),
+            );
+          },
+        );
+
+        // Perform deletion
+        await Database_Service.deleteStudent(schoolID, studentID);
+
+        // Close loading indicator dialog
+        Navigator.of(context).pop();
+
+        // Refresh student list after deletion
+        refreshStudentList();
+
+      } catch (e) {
+        // Handle errors
+        print('Error deleting student: $e');
+        Navigator.of(context).pop(); // Close the loading indicator dialog on error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete student')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +190,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide:
-                        BorderSide(color: Appcolors.appLightBlue, width: 2.0),
+                        BorderSide(color: AppColors.appLightBlue, width: 2.0),
                   ),
                 ),
                 items:
@@ -125,9 +203,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                 onChanged: (String? newValue) {
                   setState(() {
                     selectedClass = newValue!;
-                    studentsList = Database_Service.getStudentsOfASpecificClass(
-                        'School1', selectedClass);
-                    print(selectedClass);
+                    refreshStudentList();
                   });
                 },
               ),
@@ -149,7 +225,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
                     child: CircularProgressIndicator(
-                      color: Appcolors.appLightBlue,
+                      color: AppColors.appLightBlue,
                     ),
                   );
                 } else if (snapshot.hasError) {
@@ -263,8 +339,8 @@ class _ManageStudentsState extends State<ManageStudents> {
                       ],
                       rows: snapshot.data!
                           .map((Student student) => DataRow(
-                                color: WidgetStateColor.resolveWith(
-                                    (states) => Appcolors.appDarkBlue),
+                                color: MaterialStateColor.resolveWith(
+                                    (states) => AppColors.appDarkBlue),
                                 cells: [
                                   DataCell(
                                     Text(
@@ -316,73 +392,53 @@ class _ManageStudentsState extends State<ManageStudents> {
                                   ),
                                   DataCell(
                                     GestureDetector(
-                                      onTap: () {
-                                        print(
-                                            "Result button pressed for student: ${student.name}");
-                                      },
-                                      child: Image.asset(
-                                        "lib/Assets/result.png",
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        height:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        color: Colors.black,
-                                      ),
-                                    ),
+                                        onTap: () {
+                                          print(
+                                              "Result button pressed for student: ${student.name}");
+                                        },
+                                        child: Icon(
+                                          Icons.text_snippet_outlined,
+                                          color: Colors.white,
+                                        )),
                                   ),
                                   DataCell(
                                     GestureDetector(
-                                      onTap: () {
-                                        print(
-                                            "Edit button pressed for student: ${student.name}");
+                                        onTap: () {
+                                          print(
+                                              "Edit button pressed for student: ${student.name}");
 
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/EditStudent',
-                                          arguments: Student(
-                                            studentID: student.studentID,
-                                            name: student.name,
-                                            gender: student.gender,
-                                            bForm_challanId:
-                                                student.bForm_challanId,
-                                            fatherName: student.fatherName,
-                                            fatherPhoneNo:
-                                                student.fatherPhoneNo,
-                                            fatherCNIC: student.fatherCNIC,
-                                            studentRollNo:
-                                                student.studentRollNo,
-                                            classSection: student.classSection,
-                                          ),
-                                        );
-                                      },
-                                      child: Image.asset(
-                                        "lib/Assets/edit.png",
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        height:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        color: Colors.black,
-                                      ),
-                                    ),
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/EditStudent',
+                                            arguments: Student(
+                                              studentID: student.studentID,
+                                              name: student.name,
+                                              gender: student.gender,
+                                              bForm_challanId:
+                                                  student.bForm_challanId,
+                                              fatherName: student.fatherName,
+                                              fatherPhoneNo:
+                                                  student.fatherPhoneNo,
+                                              fatherCNIC: student.fatherCNIC,
+                                              studentRollNo:
+                                                  student.studentRollNo,
+                                              classSection:
+                                                  student.classSection,
+                                            ),
+                                          ).then((_) => refreshStudentList());
+                                        },
+                                        child: Icon(FontAwesomeIcons.edit)),
                                   ),
                                   DataCell(
                                     GestureDetector(
                                       onTap: () {
                                         print(
                                             "Delete button pressed for student: ${student.name}");
+                                        deleteStudent(context, 'School1',
+                                            student.studentID);
                                       },
-                                      child: Image.asset(
-                                        "lib/Assets/delete.png",
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        height:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
+                                      child: Icon(
+                                        Icons.delete,
                                         color: Colors.red,
                                       ),
                                     ),
@@ -398,6 +454,38 @@ class _ManageStudentsState extends State<ManageStudents> {
           ],
         ),
       ),
+    );
+  }
+}
+
+void deleteStudent(
+    BuildContext context, String schoolID, String studentID) async {
+  try {
+    // Show the progress indicator dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismiss on tap outside
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+          ),
+        );
+      },
+    );
+
+    // Delete student
+    await Database_Service.deleteStudent(schoolID, studentID);
+
+    // Close the dialog once deletion is complete
+    Navigator.of(context).pop();
+
+  } catch (e) {
+    // Handle errors
+    print('Error deleting student: $e');
+    Navigator.of(context).pop(); // Close the dialog on error
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to delete student')),
     );
   }
 }
