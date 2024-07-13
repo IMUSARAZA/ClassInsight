@@ -95,7 +95,11 @@ class LoginScreen extends StatelessWidget {
                         onTap: (){
                             _controller.isDisabled.value = !_controller.isDisabled.value;
                         },
-                        child: Icon(CupertinoIcons.eye,color: Colors.black,)),
+                        child: _controller.isDisabled.value?
+                        Icon(CupertinoIcons.eye_fill,color: Colors.black,):
+                        Icon(CupertinoIcons.eye_slash_fill,color: Colors.black,),
+                        
+                        ),
                         contentPadding: EdgeInsets.symmetric(
                         vertical: 15.0,
                         horizontal: 10.0,

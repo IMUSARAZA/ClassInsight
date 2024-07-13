@@ -117,8 +117,7 @@ class Database_Service extends GetxService {
     return student;
   }
 
-  static Future<void> updateStudent(
-      String school, String studentID, Map<String, dynamic> data) async {
+  static Future<void> updateStudent(String school, String studentID, Map<String, dynamic> data, void pop) async {
     try {
       await FirebaseFirestore.instance
           .collection('Schools')
@@ -126,29 +125,10 @@ class Database_Service extends GetxService {
           .collection('Students')
           .doc(studentID)
           .update(data);
-      print('Student updated successfully');
+
+      
     } catch (e) {
       print('Error updating student: $e');
     }
   }
-
-  static Future<void> deleteStudent(String schoolID, String studentID) async {
-    try {
-      // Reference to the specific student document
-      DocumentReference studentRef = FirebaseFirestore.instance
-          .collection('Schools')
-          .doc(schoolID)
-          .collection('Students')
-          .doc(studentID);
-
-      // Delete the student document
-      await studentRef.delete();
-      print('Student deleted successfully');
-    } catch (e) {
-      print('Error deleting student: $e');
-    }
-  }
 }
-
-
-
