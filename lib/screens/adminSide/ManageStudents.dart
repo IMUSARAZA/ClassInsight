@@ -69,13 +69,13 @@ class _ManageStudentsState extends State<ManageStudents> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false); // Return false when cancel button is pressed
+                Navigator.of(context).pop(false); 
               },
               child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(true); // Return true when delete button is pressed
+                Navigator.of(context).pop(true); 
               },
               child: Text('Delete'),
             ),
@@ -85,7 +85,7 @@ class _ManageStudentsState extends State<ManageStudents> {
     );
 
     // Delete student if confirmed
-    if (confirmDelete ?? false) {
+    if (confirmDelete) {
       try {
         // Show loading indicator while deleting
         showDialog(

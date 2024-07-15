@@ -5,7 +5,7 @@ class Teacher {
   late String cnic;
   late String fatherName;
   late List<String> classes;
-  late List<String> subjects;
+  late Map<String, List<String>> subjects;
   late String classTeacher;
 
   Teacher({
@@ -27,7 +27,9 @@ class Teacher {
       cnic: json['CNIC'] ?? '',
       fatherName: json['FatherName'] ?? '',
       classes: List<String>.from(json['Classes'] ?? []),
-      subjects: List<String>.from(json['Subjects'] ?? []),
+      subjects: (json['Subjects'] ?? {}).map<String, List<String>>(
+        (key, value) => MapEntry(key, List<String>.from(value)),
+      ),
       classTeacher: json['ClassTeacher'] ?? '',
     );
   }

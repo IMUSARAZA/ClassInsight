@@ -15,7 +15,7 @@ void main() async{
   );
   await GetStorage.init();
   } catch (e) {
-    print(e.toString());
+  print(e.toString());
   }
   runApp(const MyApp());
 }

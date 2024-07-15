@@ -7,8 +7,6 @@ import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 
-
-
 class AddSubjectsController extends GetxController {
   RxList<String> subjects = <String>[].obs;
   TextEditingController subjectsController = TextEditingController();
@@ -21,7 +19,6 @@ class AddSubjectsController extends GetxController {
     classForm = Get.arguments;
     print(classForm);
   }
-  
 
   void addSubject() {
     if (subjectsController.text.isNotEmpty) {
@@ -34,7 +31,6 @@ class AddSubjectsController extends GetxController {
     subjects.remove(subject);
   }
 }
-
 
 // ignore: must_be_immutable
 class AddSubjects extends StatelessWidget {
@@ -68,24 +64,24 @@ class AddSubjects extends StatelessWidget {
     }
 
     return Scaffold(
-        backgroundColor: AppColors.appLightBlue,
-        body: SingleChildScrollView(
-          child: Container(
-            height: screenHeight,
-            width: screenWidth,
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: screenHeight * 0.10,
-                    width: screenWidth,
-                    child: AppBar(
+      backgroundColor: AppColors.appLightBlue,
+      body: SingleChildScrollView(
+        child: Container(
+          height: screenHeight,
+          width: screenWidth,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  height: screenHeight * 0.10,
+                  width: screenWidth,
+                  child: AppBar(
                     backgroundColor: AppColors.appLightBlue,
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        Get.back(); 
+                        Get.back();
                       },
                     ),
                     title: Text(
@@ -95,21 +91,19 @@ class AddSubjects extends StatelessWidget {
                     centerTitle: true,
                     actions: <Widget>[
                       Container(
-                        width: 48.0, 
+                        width: 48.0,
                       ),
                       TextButton(
                         onPressed: () {
-                           if (controller.subjects.isNotEmpty) {
-
-                            
-                            Get.toNamed("/AddExamSystem", arguments: {'classForm': controller.classForm, 'subjects': controller.subjects});                          
-                            } else {
+                          if (controller.subjects.isNotEmpty) {
+                            Get.toNamed("/AddExamSystem", arguments: {
+                              'classForm': controller.classForm,
+                              'subjects': controller.subjects
+                            });
+                          } else {
                             Get.snackbar("Invalid Input",
                                 "Check whether all the inputs are filled with correct data");
                           }
-
-                        
-
                         },
                         child: Text(
                           "Add",
@@ -118,90 +112,90 @@ class AddSubjects extends StatelessWidget {
                       ),
                     ],
                   ),
-                  ),
-                  Container(
-                    height: 0.05 * screenHeight,
-                    width: screenWidth,
-                    margin: const EdgeInsets.only(bottom: 10.0),
-                    child: Text(
-                      'Add New Subjects',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: headingFontSize,
-                        fontWeight: FontWeight.w700,
-                      ),
+                ),
+                Container(
+                  height: 0.05 * screenHeight,
+                  width: screenWidth,
+                  margin: const EdgeInsets.only(bottom: 10.0),
+                  child: Text(
+                    'Add New Subjects',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: headingFontSize,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(
-                    height: screenHeight * 0.1,
-                  ),
-                  Expanded(
-                    child: Container(
-                      width: screenWidth,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          topRight: Radius.circular(20.0),
+                ),
+                SizedBox(
+                  height: screenHeight * 0.1,
+                ),
+                Expanded(
+                  child: Container(
+                    width: screenWidth,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 4,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 4,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
+                      ],
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 40, 30, 0),
+                            child: CustomTextField(
+                              controller: controller.subjectsController,
+                              hintText: 'e.g Physics',
+                              labelText: 'Add Subjects',
+                              isValid: true,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
+                            child: Obx(() => Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 4.0,
+                                  children: controller.subjects.map((subject) {
+                                    return Chip(
+                                      label: Text(subject),
+                                      deleteIcon: const Icon(Icons.close),
+                                      onDeleted: () {
+                                        controller.removeSubject(subject);
+                                      },
+                                    );
+                                  }).toList(),
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(
+                                30, screenHeight * 0.5, 30, 0),
+                            child: CustomBlueButton(
+                              buttonText: 'Add',
+                              onPressed: () {
+                                controller.addSubject();
+                              },
+                            ),
                           ),
                         ],
                       ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 40, 30, 0),
-                              child: CustomTextField(
-                                controller: controller.subjectsController,
-                                hintText: 'e.g Physics',
-                                labelText: 'Add Subjects',
-                                isValid: true,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
-                              child: Obx(() => Wrap(
-                                    spacing: 8.0,
-                                    runSpacing: 4.0,
-                                    children: controller.subjects.map((subject) {
-                                      return Chip(
-                                        label: Text(subject),
-                                        deleteIcon: const Icon(Icons.close),
-                                        onDeleted: () {
-                                          controller.removeSubject(subject);
-                                        },
-                                      );
-                                    }).toList(),
-                                  )),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                  30, screenHeight * 0.5, 30, 0),
-                              child: CustomBlueButton(
-                                buttonText: 'Add',
-                                onPressed: () {
-                                  controller.addSubject();
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
+      ),
     );
   }
 }
