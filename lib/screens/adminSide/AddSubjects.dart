@@ -1,39 +1,52 @@
-import 'package:classinsight/Const/AppColors.dart';
+// ignore_for_file: sized_box_for_whitespace
+
+import 'package:classinsight/utils/fontStyles.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
-import 'package:classinsight/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    runApp(const AddSubjects());
-  } catch (e) {
-    print('Error initializing Firebase: $e');
+
+
+class AddSubjectsController extends GetxController {
+  RxList<String> subjects = <String>[].obs;
+  TextEditingController subjectsController = TextEditingController();
+  RxBool subjectsValid = true.obs;
+  List<String>? classForm;
+
+  @override
+  void onInit() {
+    super.onInit();
+    classForm = Get.arguments;
+    print(classForm);
+  }
+  
+
+  void addSubject() {
+    if (subjectsController.text.isNotEmpty) {
+      subjects.add(subjectsController.text);
+      subjectsController.clear();
+    }
+  }
+
+  void removeSubject(String subject) {
+    subjects.remove(subject);
   }
 }
 
-class AddSubjects extends StatefulWidget {
-  const AddSubjects({super.key});
 
-  @override
-  State<AddSubjects> createState() => _AddSubjectsState();
-}
-
-class _AddSubjectsState extends State<AddSubjects> {
+// ignore: must_be_immutable
+class AddSubjects extends StatelessWidget {
   double addStdFontSize = 16;
   double headingFontSize = 33;
-  List<String> subjects = [];
-  TextEditingController subjectsController = TextEditingController();
-  bool subjectsValid = true;
+
+  final AddSubjectsController controller = Get.put(AddSubjectsController());
+
+  AddSubjects({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
@@ -54,10 +67,8 @@ class _AddSubjectsState extends State<AddSubjects> {
       headingFontSize = 15;
     }
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Appcolors.appLightBlue,
+    return Scaffold(
+        backgroundColor: AppColors.appLightBlue,
         body: SingleChildScrollView(
           child: Container(
             height: screenHeight,
@@ -70,51 +81,43 @@ class _AddSubjectsState extends State<AddSubjects> {
                     height: screenHeight * 0.10,
                     width: screenWidth,
                     child: AppBar(
-  backgroundColor: Appcolors.appLightBlue,
-  elevation: 0,
-  leading: IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () {
-      Navigator.of(context).pop();
-    },
-  ),
-  title: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Spacer(),  // To push the title to the center
-      Text(
-        'Add Subjects',
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: addStdFontSize,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      Spacer(),  // To push the title to the center
-    ],
-  ),
-  actions: <Widget>[
-    TextButton(
-      onPressed: () {
-        // Implement your save logic here
-      },
-      child: Text(
-        'Save',
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: addStdFontSize,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-    Container(
-      width: 16.0, // Adjusted for better spacing
-    ),
-  ],
-),
+                    backgroundColor: AppColors.appLightBlue,
+                    leading: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () {
+                        Get.back(); 
+                      },
+                    ),
+                    title: Text(
+                      'Add Subjects',
+                      style: Font_Styles.labelHeadingLight(context),
+                    ),
+                    centerTitle: true,
+                    actions: <Widget>[
+                      Container(
+                        width: 48.0, 
+                      ),
+                      TextButton(
+                        onPressed: () {
+                           if (controller.subjects.isNotEmpty) {
 
+                            
+                            Get.toNamed("/AddExamSystem", arguments: {'classForm': controller.classForm, 'subjects': controller.subjects});                          
+                            } else {
+                            Get.snackbar("Invalid Input",
+                                "Check whether all the inputs are filled with correct data");
+                          }
 
+                        
 
+                        },
+                        child: Text(
+                          "Add",
+                          style: Font_Styles.labelHeadingLight(context),
+                        ),
+                      ),
+                    ],
+                  ),
                   ),
                   Container(
                     height: 0.05 * screenHeight,
@@ -157,42 +160,35 @@ class _AddSubjectsState extends State<AddSubjects> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(30, 40, 30, 0),
                               child: CustomTextField(
-                                controller: subjectsController,
+                                controller: controller.subjectsController,
                                 hintText: 'e.g Physics',
                                 labelText: 'Add Subjects',
-                                isValid: subjectsValid,
+                                isValid: true,
                               ),
                             ),
-                            
                             Padding(
                               padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
-                              child: Wrap(
-                                spacing: 8.0,
-                                runSpacing: 4.0,
-                                children: subjects.map((subject) {
-                                  return Chip(
-                                    label: Text(subject),
-                                    deleteIcon: Icon(Icons.close),
-                                    onDeleted: () {
-                                      setState(() {
-                                        subjects.remove(subject);
-                                      });
-                                    },
-                                  );
-                                }).toList(),
-                              ),
+                              child: Obx(() => Wrap(
+                                    spacing: 8.0,
+                                    runSpacing: 4.0,
+                                    children: controller.subjects.map((subject) {
+                                      return Chip(
+                                        label: Text(subject),
+                                        deleteIcon: const Icon(Icons.close),
+                                        onDeleted: () {
+                                          controller.removeSubject(subject);
+                                        },
+                                      );
+                                    }).toList(),
+                                  )),
                             ),
                             Padding(
-                              padding: EdgeInsets.fromLTRB(30, screenHeight*0.5, 30, 0),
+                              padding: EdgeInsets.fromLTRB(
+                                  30, screenHeight * 0.5, 30, 0),
                               child: CustomBlueButton(
                                 buttonText: 'Add',
                                 onPressed: () {
-                                  setState(() {
-                                    if (subjectsController.text.isNotEmpty) {
-                                      subjects.add(subjectsController.text);
-                                      subjectsController.clear();
-                                    }
-                                  });
+                                  controller.addSubject();
                                 },
                               ),
                             ),
@@ -206,7 +202,6 @@ class _AddSubjectsState extends State<AddSubjects> {
             ),
           ),
         ),
-      ),
     );
   }
 }

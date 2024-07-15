@@ -18,7 +18,7 @@ class Student {
     required this.fatherCNIC,
     required this.studentRollNo,
     required this.studentID,
-    required this.classSection,
+    required this.classSection,   
   });
 
   factory Student.fromJson(Map<String, dynamic> json) {

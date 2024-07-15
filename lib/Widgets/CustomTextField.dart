@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:classinsight/Const/AppColors.dart';
+import 'package:classinsight/utils/AppColors.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -7,6 +7,7 @@ class CustomTextField extends StatefulWidget {
   final String labelText;
   final bool isValid;
   final ValueChanged<String>? onChanged;
+  final String? helperText;
 
   const CustomTextField({
     Key? key,
@@ -14,6 +15,7 @@ class CustomTextField extends StatefulWidget {
     required this.hintText,
     required this.labelText,
     required this.isValid,
+    this.helperText,
     this.onChanged,
   }) : super(key: key);
 
@@ -30,6 +32,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       style: TextStyle(color: Colors.black),
       decoration: InputDecoration(
         hintText: widget.hintText,
+        helperText: widget.helperText,
         labelText: widget.labelText,
         labelStyle: TextStyle(color: Colors.black),
         floatingLabelStyle: TextStyle(color: Colors.black),
@@ -43,7 +46,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
           borderSide: BorderSide(
-            color: Appcolors.appLightBlue, // Use your AppColors.appLightBlue here
+            color: AppColors.appLightBlue, // Use your AppColors.appLightBlue here
             width: 2.0,
           ),
         ),

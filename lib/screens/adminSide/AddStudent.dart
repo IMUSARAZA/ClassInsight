@@ -1,13 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:classinsight/Model/StudentModel.dart';
+import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/firebase_options.dart';
+import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:classinsight/Const/AppColors.dart';
+import 'package:classinsight/utils/AppColors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -76,7 +77,7 @@ class _AddStudentState extends State<AddStudent> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Appcolors.appLightBlue,
+        backgroundColor: AppColors.appLightBlue,
         body: SingleChildScrollView(
           child: Container(
             height: screenHeight,
@@ -89,7 +90,7 @@ class _AddStudentState extends State<AddStudent> {
                     height: screenHeight * 0.10,
                     width: screenWidth,
                     child: AppBar(
-                      backgroundColor: Appcolors.appLightBlue,
+                      backgroundColor: AppColors.appLightBlue,
                       elevation: 0,
                       leading: IconButton(
                         icon: const Icon(Icons.arrow_back),
@@ -172,7 +173,7 @@ class _AddStudentState extends State<AddStudent> {
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(10)),
                                       borderSide: BorderSide(
-                                          color: Appcolors.appLightBlue,
+                                          color: AppColors.appLightBlue,
                                           width: 2.0),
                                     ),
                                     enabledBorder: OutlineInputBorder(
@@ -260,7 +261,7 @@ class _AddStudentState extends State<AddStudent> {
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(15)),
                                       borderSide: BorderSide(
-                                          color: Appcolors.appLightBlue,
+                                          color: AppColors.appLightBlue,
                                           width: 1.0),
                                     ),
                                     enabledBorder: OutlineInputBorder(
@@ -278,7 +279,7 @@ class _AddStudentState extends State<AddStudent> {
                                       selectedClass = newValue!;
                                     });
                                   },
-                                  items: <String>['2A', '3B', '4D']
+                                  items: <String>['2A', '1C', '3B', '3D', '4A']
                                       .map<DropdownMenuItem<String>>(
                                           (String value) {
                                     return DropdownMenuItem<String>(
@@ -302,7 +303,7 @@ class _AddStudentState extends State<AddStudent> {
                                         child: CircularProgressIndicator(
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                                  Appcolors.appLightBlue),
+                                                  AppColors.appLightBlue),
                                         ),
                                       );
                                     },
@@ -328,6 +329,11 @@ class _AddStudentState extends State<AddStudent> {
 
                                   Navigator.of(context)
                                       .pop(); // Hide the progress indicator
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ManageStudents()),
+                                  );
                                 },
                               ),
                             ),
