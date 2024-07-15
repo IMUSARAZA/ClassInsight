@@ -160,7 +160,7 @@ class _EditStudentState extends State<EditStudent> {
                           print("updated data: $updatedData");
 
                           await Database_Service.updateStudent(
-                            'School1',
+                            'buwF2J4lkLCdIVrHfgkP',
                             studentID,
                             updatedData,
                           );

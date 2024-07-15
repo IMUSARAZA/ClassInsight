@@ -49,13 +49,13 @@ class _ManageStudentsState extends State<ManageStudents> {
     super.initState();
     // Load initial student list
     studentsList =
-        Database_Service.getStudentsOfASpecificClass('School1', selectedClass);
+        Database_Service.getStudentsOfASpecificClass('buwF2J4lkLCdIVrHfgkP', selectedClass);
   }
 
   void refreshStudentList() {
     setState(() {
       studentsList =
-          Database_Service.getStudentsOfASpecificClass('School1', selectedClass);
+          Database_Service.getStudentsOfASpecificClass('buwF2J4lkLCdIVrHfgkP', selectedClass);
     });
   }
 
@@ -434,7 +434,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       onTap: () {
                                         print(
                                             "Delete button pressed for student: ${student.name}");
-                                        deleteStudent(context, 'School1',
+                                        deleteStudent(context, 'buwF2J4lkLCdIVrHfgkP',
                                             student.studentID);
                                       },
                                       child: Icon(

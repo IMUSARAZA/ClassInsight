@@ -59,11 +59,11 @@ class _AddStudentState extends State<AddStudent> {
 
     if (screenWidth < 350) {
       addStdFontSize = 14;
-      headingFontSize = 27;
+      headingFontSize = 25;
     }
     if (screenWidth < 300) {
       addStdFontSize = 14;
-      headingFontSize = 24;
+      headingFontSize = 23;
     }
     if (screenWidth < 250) {
       addStdFontSize = 11;
@@ -71,7 +71,7 @@ class _AddStudentState extends State<AddStudent> {
     }
     if (screenWidth < 230) {
       addStdFontSize = 8;
-      headingFontSize = 15;
+      headingFontSize = 17;
     }
 
     return MaterialApp(
@@ -325,10 +325,9 @@ class _AddStudentState extends State<AddStudent> {
                                     classSection: selectedClass,
                                   );
                                   await Database_Service.saveStudent(
-                                      'School1', student);
+                                      'buwF2J4lkLCdIVrHfgkP', student);
 
-                                  Navigator.of(context)
-                                      .pop(); // Hide the progress indicator
+                                  Navigator.of(context).pop(); // Hide the progress indicator
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
