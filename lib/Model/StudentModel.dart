@@ -1,6 +1,3 @@
-// ignore_for_file: non_constant_identifier_names
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Student {
   late String name;
   late String gender;

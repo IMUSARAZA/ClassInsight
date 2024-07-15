@@ -1,9 +1,15 @@
+import 'package:classinsight/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 void main() async{
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+  WidgetsFlutterBinding.ensureInitialized();
+  try { 
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    runApp(const MyApp());
+  } catch (e) {
+    print('Error initializing Firebase: $e');
+  }
   // ignore: prefer_const_constructors
   runApp(MyApp());
 }

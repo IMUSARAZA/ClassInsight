@@ -261,8 +261,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                       ],
                       rows: snapshot.data!
                           .map((Student student) => DataRow(
-                                color: WidgetStateColor.resolveWith(
-                                    (states) => Appcolors.appDarkBlue),
+                            color: MaterialStateColor.resolveWith((states) => Appcolors.appDarkBlue),
                                 cells: [
                                   DataCell(
                                     Text(
