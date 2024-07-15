@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:classinsight/models/SchoolModel.dart';
+import 'package:classinsight/screens/onBoarding.dart';
 import 'package:classinsight/services/Auth_Service.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
@@ -10,8 +12,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {
-   Rx<TextEditingController> emailController = TextEditingController().obs;
-   Rx<TextEditingController> passwordController= TextEditingController().obs;
+  Rx<TextEditingController> emailController = TextEditingController().obs;
+  Rx<TextEditingController> passwordController= TextEditingController().obs;
   Rx<bool> isDisabled = true.obs;
 
 
@@ -19,6 +21,8 @@ class LoginController extends GetxController {
 
 class LoginScreen extends StatelessWidget {
   final LoginController _controller = Get.put(LoginController());
+  static School schools = Get.arguments;
+
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +115,11 @@ class LoginScreen extends StatelessWidget {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        Auth_Service.login(_controller.emailController.value.text,_controller.passwordController.value.text);
+                        Auth_Service.login(
+                          _controller.emailController.value.text,
+                          _controller.passwordController.value.text,
+                          schools
+                          );
                       },
                       child: Text(
                         "Login",

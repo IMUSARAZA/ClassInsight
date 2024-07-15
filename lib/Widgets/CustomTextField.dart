@@ -7,6 +7,7 @@ class CustomTextField extends StatefulWidget {
   final String labelText;
   final bool isValid;
   final ValueChanged<String>? onChanged;
+  final String? helperText;
 
   const CustomTextField({
     Key? key,
@@ -14,6 +15,7 @@ class CustomTextField extends StatefulWidget {
     required this.hintText,
     required this.labelText,
     required this.isValid,
+    this.helperText,
     this.onChanged,
   }) : super(key: key);
 
@@ -30,6 +32,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       style: TextStyle(color: Colors.black),
       decoration: InputDecoration(
         hintText: widget.hintText,
+        helperText: widget.helperText,
         labelText: widget.labelText,
         labelStyle: TextStyle(color: Colors.black),
         floatingLabelStyle: TextStyle(color: Colors.black),

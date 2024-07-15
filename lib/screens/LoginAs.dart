@@ -1,3 +1,4 @@
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:classinsight/widgets/BaseScreen.dart';
@@ -7,11 +8,15 @@ import 'package:get/get.dart'; // Import GetX
 class LoginAs extends StatelessWidget {
   LoginAs({Key? key}) : super(key: key);
 
+  School school = Get.arguments as School;
+  
+  
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool parent = false;
+
 
     return Scaffold(
       appBar: AppBar(),
@@ -50,7 +55,7 @@ class LoginAs extends StatelessWidget {
             // Get.toNamed("/")         
             }:
             () {
-            Get.toNamed("/LoginScreen");        
+            Get.toNamed("/LoginScreen",arguments: school);        
             }
             ,
           style: TextButton.styleFrom(

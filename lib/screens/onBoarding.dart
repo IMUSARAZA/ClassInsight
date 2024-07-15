@@ -1,3 +1,5 @@
+import 'package:classinsight/Services/Database_Service.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:classinsight/widgets/onBoardDropDown.dart';
 import 'package:flutter/material.dart';
@@ -17,18 +19,23 @@ class SchoolController extends GetxController {
   }
 }
 
-
 class OnBoarding extends StatelessWidget {
   OnBoarding({Key? key}) : super(key: key);
 
   final SchoolController schoolController = Get.put(SchoolController());
+  List<School> schools = [];
 
+  void getSchools() async {
+    schools = await Database_Service.getAllSchools();
+    Get.forceAppUpdate();
+  }
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight =  MediaQuery.of(context).size.height;
-    double screenWidth =  MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
 
+    getSchools();
 
     return Scaffold(
       appBar: AppBar(),
@@ -50,13 +57,13 @@ class OnBoarding extends StatelessWidget {
               style: Font_Styles.labelHeadingLight(context),
             ),
             SizedBox(height: screenHeight * 0.01),
-            onBoardDropDown(
-              items: ["Campus 1", "Campus 2"],
-              onChanged: (item) {
-                schoolController.setSchool(item.toString());
-                Get.toNamed("/loginAs");
-              },
-            ),
+            // Display dropdown only if schools are fetched
+              OnBoardDropDown(
+                items: schools,
+                onChanged: (item) {
+                  Get.toNamed("/loginAs", arguments: item);
+                },
+              ),
           ],
         ),
       ),
