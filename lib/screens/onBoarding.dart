@@ -1,11 +1,11 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/fontStyles.dart';
-import 'package:classinsight/widgets/onBoardDropDown.dart';
+import 'package:classinsight/Widgets/onBoardDropDown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../widgets/BaseScreen.dart';
+import '../Widgets/BaseScreen.dart';
 
 class SchoolController extends GetxController {
   var school = ''.obs;

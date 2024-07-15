@@ -1,7 +1,7 @@
 import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
-import 'package:classinsight/widgets/BaseScreen.dart';
+import 'package:classinsight/Widgets/BaseScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; // Import GetX
 

@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:classinsight/models/SchoolModel.dart';
-import 'package:classinsight/services/Auth_Service.dart';
+import 'package:classinsight/Services/Auth_Service.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
-import 'package:classinsight/widgets/shadowButton.dart';
+import 'package:classinsight/Widgets/shadowButton.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
