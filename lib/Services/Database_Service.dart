@@ -1,5 +1,7 @@
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:classinsight/models/StudentModel.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 class Database_Service extends GetxService {
@@ -148,4 +150,37 @@ class Database_Service extends GetxService {
       print('Error deleting student: $e');
     }
   }
+
+
+ static Future<List<School>> getAllSchools() async {
+    List<School> schools = [];
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Schools')
+          .get();
+          
+      for (var doc in querySnapshot.docs) {
+        schools.add(School.fromJson(doc.data() as Map<String, dynamic>));
+        print(doc.data());
+      }
+    } catch (e) {
+      print('Error getting schools: $e');
+    }
+    return schools;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+

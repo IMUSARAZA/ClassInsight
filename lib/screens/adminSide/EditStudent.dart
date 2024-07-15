@@ -5,7 +5,7 @@ import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:flutter/material.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
-import 'package:classinsight/services/Database_Service.dart';
+import 'package:classinsight/Services/Database_Service.dart';
 
 class EditStudent extends StatefulWidget {
   const EditStudent({Key? key}) : super(key: key);

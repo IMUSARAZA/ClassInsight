@@ -1,6 +1,9 @@
+import 'package:classinsight/screens/adminSide/AddClassSections.dart';
 import 'package:classinsight/screens/adminSide/AddStudent.dart';
 import 'package:classinsight/screens/LoginAs.dart';
+import 'package:classinsight/screens/adminSide/AddSubjects.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
+import 'package:classinsight/screens/adminSide/ClassSections.dart';
 import 'package:classinsight/screens/adminSide/EditStudent.dart';
 import 'package:classinsight/screens/adminSide/LoginScreen.dart';
 import 'package:classinsight/screens/adminSide/ManageStudents.dart';
@@ -36,6 +39,18 @@ class MainRoutes{
     GetPage(
       name: "/EditStudent",
       page: () => EditStudent(),
+    ),
+    GetPage(
+      name: "/ClassSections",
+      page: () => ClassSections(),
+    ),
+    GetPage(
+      name: "/AddClassSections",
+      page: () => AddClassSections(),
+    ),
+    GetPage(
+      name: "/AddSubjects",
+      page: () => AddSubjects(),
     ),
     
   ];

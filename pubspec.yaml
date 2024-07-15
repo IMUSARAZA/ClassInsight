@@ -37,6 +37,7 @@ dependencies:
   firebase_core_web:
   get:
   google_fonts:
+  get_storage:
     
 
 

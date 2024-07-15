@@ -1,4 +1,7 @@
+import 'package:classinsight/Services/Database_Service.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,28 +9,38 @@ import 'package:get/get.dart';
 
 
 class Auth_Service {
-    
-  static FirebaseAuth auth = FirebaseAuth.instance;
   
-  static Future<void> login(String email, String password) async {
+static FirebaseAuth auth = FirebaseAuth.instance;
 
-    try {
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+static Future<void> login(String email, String password, School school) async {
+
+  try {
       
-      
-      Get.snackbar('LoggedIn',"Welcome, Admin",backgroundColor:Colors.white);
-      Get.offNamed('/AdminHome',arguments: {'email': email});
+      if (school.adminEmail == email) {
+        print(school.adminEmail);
+        UserCredential userCredential = await auth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
 
+        Get.snackbar('Logged in Successfully', "Welcome, Admin - ${school.name}");
+        Get.offNamed('/AdminHome', arguments: school);
 
-      print("Logged IN");
-    } on FirebaseAuthException catch (e) {
-      // Handle authentication error
-      Get.snackbar('Login Error', e.message ?? 'An error occurred');
-    }
+        print("Logged IN");
+      } else {
+        // Email does not match
+        Get.snackbar('Login Error', 'Email does not match the admin email for the school');
+      }
+    
+  } on FirebaseAuthException catch (e) {
+    // Handle authentication error
+    Get.snackbar('Login Error', e.message ?? 'An error occurred');
+  } catch (e) {
+    // Handle other errors
+    Get.snackbar('Error', e.toString());
   }
+}
+
 
 static Future<void> logout(BuildContext context) async {
     try {
