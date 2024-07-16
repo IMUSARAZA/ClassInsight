@@ -189,7 +189,12 @@ class _ManageStudentsState extends State<ManageStudents> {
                 future: classesList,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(
+                        child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.appLightBlue,
+                      ),
+                    ));
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -418,6 +423,26 @@ class _ManageStudentsState extends State<ManageStudents> {
                                         onTap: () {
                                           print(
                                               "Result button pressed for student: ${student.name}");
+
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/StudentResult',
+                                            arguments: Student(
+                                              studentID: student.studentID,
+                                              name: student.name,
+                                              gender: student.gender,
+                                              bFormChallanId:
+                                                  student.bFormChallanId,
+                                              fatherName: student.fatherName,
+                                              fatherPhoneNo:
+                                                  student.fatherPhoneNo,
+                                              fatherCNIC: student.fatherCNIC,
+                                              studentRollNo:
+                                                  student.studentRollNo,
+                                              classSection:
+                                                  student.classSection,
+                                            ),
+                                          ).then((_) => refreshStudentList());
                                         },
                                         child: Icon(
                                           Icons.text_snippet_outlined,

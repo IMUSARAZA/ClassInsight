@@ -16,19 +16,24 @@ class Database_Service extends GetxService {
           .collection('Students');
 
       DocumentReference studentDoc = await studentsRef.add(student.toMap());
-      student.studentID =
-          studentDoc.id; 
+      student.studentID = studentDoc.id;
       await studentDoc.update({
-        'StudentID': student.studentID
+        'StudentID': student.studentID,
       }); // Update studentID in Firestore document
+
+      // Fetch subjects for the selected class
+      List<String> subjects = await fetchSubjects(schoolID, classSection);
 
       // Fetch exam types for the selected class
       List<String> examTypes = await fetchExamStructure(schoolID, classSection);
 
-      // Initialize resultMap based on fetched exam types
-      Map<String, String> resultMap = {};
-      for (String exam in examTypes) {
-        resultMap[exam] = '-';
+      // Initialize resultMap with subjects and exam types
+      Map<String, Map<String, dynamic>> resultMap = {};
+      for (String subject in subjects) {
+        resultMap[subject] = {};
+        for (String examType in examTypes) {
+          resultMap[subject]![examType] = '-';
+        }
       }
 
       // Update the student document with resultMap
@@ -38,6 +43,29 @@ class Database_Service extends GetxService {
     } catch (e) {
       print('Error saving student: $e');
       // Handle errors appropriately, e.g., show error message
+    }
+  }
+
+  Future<Map<String, Map<String, String>>> fetchStudentResultMap(
+      String schoolID, String studentID) async {
+    try {
+      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolID)
+          .collection('Students')
+          .doc(studentID)
+          .get();
+
+      if (studentDoc.exists) {
+        Map<String, dynamic> resultMap = studentDoc['resultMap'];
+        return resultMap.map(
+            (key, value) => MapEntry(key, Map<String, String>.from(value)));
+      } else {
+        return {};
+      }
+    } catch (e) {
+      print('Error fetching resultMap: $e');
+      return {};
     }
   }
 

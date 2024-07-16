@@ -347,9 +347,7 @@ class _AddStudentState extends State<AddStudent> {
                                       },
                                     );
 
-                                    Database_Service databaseService =
-                                        Database_Service();
-
+                                    // Create a new Student object
                                     final student = Student(
                                       name: nameController.text,
                                       gender: selectedGender,
@@ -362,15 +360,18 @@ class _AddStudentState extends State<AddStudent> {
                                       studentRollNo:
                                           studentRollNoController.text,
                                       studentID:
-                                          '', 
+                                          '', // This will be assigned by Firestore
                                       classSection: selectedClass,
-                                      resultMap: {}, // No need to initialize resultMap here
+                                      resultMap: {}, // Initialize resultMap here as an empty map
                                     );
 
+                                    // Call the database service to save the student
+                                    Database_Service databaseService =
+                                        Database_Service();
                                     await databaseService.saveStudent(
-                                      'buwF2J4lkLCdIVrHfgkP', 
-                                      selectedClass,
-                                      student,
+                                      'buwF2J4lkLCdIVrHfgkP', // Replace with your actual school ID
+                                      selectedClass, // Pass selected class section
+                                      student, // Pass the student object
                                     );
 
                                     Navigator.of(context)

@@ -10,6 +10,7 @@ import 'package:classinsight/screens/adminSide/EditStudent.dart';
 import 'package:classinsight/screens/adminSide/LoginScreen.dart';
 import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:classinsight/screens/adminSide/ManageTeachers.dart';
+import 'package:classinsight/screens/adminSide/StudentResult.dart';
 import 'package:classinsight/screens/onBoarding.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
@@ -66,6 +67,10 @@ class MainRoutes{
     GetPage(
       name: "/AddTeacher",
       page: () => AddTeacher(),
+    ),
+    GetPage(
+      name: "/StudentResult",
+      page: () => StudentResult(),
     ),
   ];
 }
