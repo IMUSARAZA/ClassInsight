@@ -1,14 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:classinsight/models/SchoolModel.dart';
-import 'package:classinsight/screens/onBoarding.dart';
 import 'package:classinsight/Services/Auth_Service.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
-import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {

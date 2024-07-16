@@ -1,12 +1,15 @@
 import 'package:classinsight/screens/adminSide/AddClassSections.dart';
+import 'package:classinsight/screens/adminSide/AddExamSystem.dart';
 import 'package:classinsight/screens/adminSide/AddStudent.dart';
 import 'package:classinsight/screens/LoginAs.dart';
 import 'package:classinsight/screens/adminSide/AddSubjects.dart';
+import 'package:classinsight/screens/adminSide/AddTeacher.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/screens/adminSide/ClassSections.dart';
 import 'package:classinsight/screens/adminSide/EditStudent.dart';
 import 'package:classinsight/screens/adminSide/LoginScreen.dart';
 import 'package:classinsight/screens/adminSide/ManageStudents.dart';
+import 'package:classinsight/screens/adminSide/ManageTeachers.dart';
 import 'package:classinsight/screens/onBoarding.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
@@ -52,6 +55,17 @@ class MainRoutes{
       name: "/AddSubjects",
       page: () => AddSubjects(),
     ),
-    
+    GetPage(
+      name: "/AddExamSystem",
+      page: () => AddExamSystem(),
+    ),
+    GetPage(
+      name: "/ManageTeachers",
+      page: () => ManageTeachers(),
+    ),
+    GetPage(
+      name: "/AddTeacher",
+      page: () => AddTeacher(),
+    ),
   ];
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';

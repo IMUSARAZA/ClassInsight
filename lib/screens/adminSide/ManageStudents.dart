@@ -5,6 +5,7 @@ import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/screens/adminSide/AddStudent.dart';
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/models/StudentModel.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/screens/adminSide/EditStudent.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -40,6 +41,7 @@ class ManageStudents extends StatefulWidget {
 
 class _ManageStudentsState extends State<ManageStudents> {
   Future<List<Student>>? studentsList;
+  Future<List<String>>? classesList;
   String selectedClass = '2A';
   TextEditingController searchController = TextEditingController();
   bool searchValid = true;
@@ -48,18 +50,20 @@ class _ManageStudentsState extends State<ManageStudents> {
   void initState() {
     super.initState();
     // Load initial student list
-    studentsList =
-        Database_Service.getStudentsOfASpecificClass('buwF2J4lkLCdIVrHfgkP', selectedClass);
+    studentsList = Database_Service.getStudentsOfASpecificClass(
+        'buwF2J4lkLCdIVrHfgkP', selectedClass);
+    classesList = Database_Service.fetchAllClasses('buwF2J4lkLCdIVrHfgkP');
   }
 
   void refreshStudentList() {
     setState(() {
-      studentsList =
-          Database_Service.getStudentsOfASpecificClass('buwF2J4lkLCdIVrHfgkP', selectedClass);
+      studentsList = Database_Service.getStudentsOfASpecificClass(
+          'buwF2J4lkLCdIVrHfgkP', selectedClass);
     });
   }
 
-  void deleteStudent(BuildContext context, String schoolID, String studentID) async {
+  void deleteStudent(
+      BuildContext context, String schoolID, String studentID) async {
     bool confirmDelete = await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -69,13 +73,13 @@ class _ManageStudentsState extends State<ManageStudents> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false); // Return false when cancel button is pressed
+                Navigator.of(context).pop(false);
               },
               child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(true); // Return true when delete button is pressed
+                Navigator.of(context).pop(true);
               },
               child: Text('Delete'),
             ),
@@ -85,7 +89,7 @@ class _ManageStudentsState extends State<ManageStudents> {
     );
 
     // Delete student if confirmed
-    if (confirmDelete ?? false) {
+    if (confirmDelete) {
       try {
         // Show loading indicator while deleting
         showDialog(
@@ -108,11 +112,11 @@ class _ManageStudentsState extends State<ManageStudents> {
 
         // Refresh student list after deletion
         refreshStudentList();
-
       } catch (e) {
         // Handle errors
         print('Error deleting student: $e');
-        Navigator.of(context).pop(); // Close the loading indicator dialog on error
+        Navigator.of(context)
+            .pop(); // Close the loading indicator dialog on error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to delete student')),
         );
@@ -129,7 +133,10 @@ class _ManageStudentsState extends State<ManageStudents> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => AdminHome()),
+            );
           },
         ),
         actions: [
@@ -178,33 +185,49 @@ class _ManageStudentsState extends State<ManageStudents> {
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
-              child: DropdownButtonFormField<String>(
-                value: selectedClass,
-                decoration: InputDecoration(
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.black),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        BorderSide(color: AppColors.appLightBlue, width: 2.0),
-                  ),
-                ),
-                items:
-                    <String>['2A', '1C', '3B', '3D', '4A'].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedClass = newValue!;
-                    refreshStudentList();
-                  });
+              child: FutureBuilder<List<String>>(
+                future: classesList,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No classes found'));
+                  } else {
+                    List<String> classes = snapshot.data!;
+                    if (!classes.contains(selectedClass)) {
+                      selectedClass = classes[0];
+                    }
+                    return DropdownButtonFormField<String>(
+                      value: selectedClass,
+                      decoration: InputDecoration(
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                              color: AppColors.appLightBlue, width: 2.0),
+                        ),
+                      ),
+                      items: classes.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedClass = newValue!;
+                          refreshStudentList();
+                        });
+                      },
+                    );
+                  }
                 },
               ),
             ),
@@ -414,8 +437,8 @@ class _ManageStudentsState extends State<ManageStudents> {
                                               studentID: student.studentID,
                                               name: student.name,
                                               gender: student.gender,
-                                              bForm_challanId:
-                                                  student.bForm_challanId,
+                                              bFormChallanId:
+                                                  student.bFormChallanId,
                                               fatherName: student.fatherName,
                                               fatherPhoneNo:
                                                   student.fatherPhoneNo,
@@ -434,7 +457,9 @@ class _ManageStudentsState extends State<ManageStudents> {
                                       onTap: () {
                                         print(
                                             "Delete button pressed for student: ${student.name}");
-                                        deleteStudent(context, 'buwF2J4lkLCdIVrHfgkP',
+                                        deleteStudent(
+                                            context,
+                                            'buwF2J4lkLCdIVrHfgkP',
                                             student.studentID);
                                       },
                                       child: Icon(
@@ -479,7 +504,6 @@ void deleteStudent(
 
     // Close the dialog once deletion is complete
     Navigator.of(context).pop();
-
   } catch (e) {
     // Handle errors
     print('Error deleting student: $e');

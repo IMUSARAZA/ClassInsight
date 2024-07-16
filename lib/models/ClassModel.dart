@@ -1,5 +1,3 @@
-
-
 class Class{
   final String className,classId;
   final List<String> subjects, examTypes;

@@ -1,40 +1,42 @@
-// ignore_for_file: non_constant_identifier_names
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:classinsight/services/database_service.dart';
 
 class Student {
   late String name;
   late String gender;
-  late String bForm_challanId;
+  late String bFormChallanId;
   late String fatherName;
   late String fatherPhoneNo;
   late String fatherCNIC;
   late String studentRollNo;
   late String studentID;
   late String classSection;
+  late Map<String, String> resultMap;
 
   Student({
     required this.name,
     required this.gender,
-    required this.bForm_challanId,
+    required this.bFormChallanId,
     required this.fatherName,
     required this.fatherPhoneNo,
     required this.fatherCNIC,
     required this.studentRollNo,
     required this.studentID,
-    required this.classSection,   
-  });
+    required this.classSection,
+    Map<String, String>? resultMap,
+  }) : resultMap = resultMap ?? {};
 
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
       name: json['Name'] ?? '',
       gender: json['Gender'] ?? '',
-      bForm_challanId: json['BForm_challanId'] ?? '',
+      bFormChallanId: json['BForm_challanId'] ?? '',
       fatherName: json['FatherName'] ?? '',
       fatherPhoneNo: json['FatherPhoneNo'] ?? '',
       fatherCNIC: json['FatherCNIC'] ?? '',
       studentRollNo: json['StudentRollNo'] ?? '',
       studentID: json['StudentID'] ?? '',
       classSection: json['ClassSection'] ?? '',
+      resultMap: Map<String, String>.from(json['ResultMap'] ?? {}),
     );
   }
 
@@ -42,13 +44,29 @@ class Student {
     return {
       'Name': name,
       'Gender': gender,
-      'BForm_challanId': bForm_challanId,
+      'BForm_challanId': bFormChallanId,
       'FatherName': fatherName,
       'FatherPhoneNo': fatherPhoneNo,
       'FatherCNIC': fatherCNIC,
       'StudentRollNo': studentRollNo,
       'StudentID': studentID,
       'ClassSection': classSection,
+      'ResultMap': resultMap,
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Name': name,
+      'Gender': gender,
+      'BForm_challanId': bFormChallanId,
+      'FatherName': fatherName,
+      'FatherPhoneNo': fatherPhoneNo,
+      'FatherCNIC': fatherCNIC,
+      'StudentRollNo': studentRollNo,
+      'StudentID': studentID,
+      'ClassSection': classSection,
+      // Add other fields as needed
     };
   }
 }

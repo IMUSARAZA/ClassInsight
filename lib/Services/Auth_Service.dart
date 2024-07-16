@@ -1,7 +1,7 @@
-import 'package:classinsight/Services/Database_Service.dart';
+// ignore_for_file: unused_local_variable
+
 import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

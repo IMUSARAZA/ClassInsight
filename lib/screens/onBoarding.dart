@@ -8,7 +8,24 @@ import 'package:get/get.dart';
 import '../Widgets/BaseScreen.dart';
 
 class SchoolController extends GetxController {
+
+    List<School> schools = [];
+
+
+  @override
+  void onInit() {
+    super.onInit();
+    getSchools();
+  }
+
+  
+
   var school = ''.obs;
+
+  void getSchools() async {
+    schools = await Database_Service.getAllSchools();
+    Get.forceAppUpdate();
+  }
 
   void setSchool(String value) {
     school.value = value;
@@ -27,15 +44,12 @@ class OnBoarding extends StatelessWidget {
 
   void getSchools() async {
     schools = await Database_Service.getAllSchools();
-    // Get.forceAppUpdate();
+    Get.forceAppUpdate();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    getSchools();
 
     return Scaffold(
       appBar: AppBar(),
@@ -59,7 +73,7 @@ class OnBoarding extends StatelessWidget {
             SizedBox(height: screenHeight * 0.01),
             // Display dropdown only if schools are fetched
               OnBoardDropDown(
-                items: schools,
+                items: schoolController.schools,
                 onChanged: (item) {
                   Get.toNamed("/loginAs", arguments: item);
                 },

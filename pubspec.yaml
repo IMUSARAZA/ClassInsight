@@ -35,8 +35,9 @@ dependencies:
   firebase_auth:
   cloud_firestore:
   firebase_core_web:
+  multi_select_flutter:
   get:
-  google_fonts:
+  google_fonts: 6.1.0
   get_storage:
     
 

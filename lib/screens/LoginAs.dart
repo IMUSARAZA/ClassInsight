@@ -1,10 +1,12 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:classinsight/models/SchoolModel.dart';
-import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:classinsight/Widgets/BaseScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; // Import GetX
 
+// ignore: must_be_immutable
 class LoginAs extends StatelessWidget {
   LoginAs({Key? key}) : super(key: key);
 

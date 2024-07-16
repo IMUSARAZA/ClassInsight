@@ -15,7 +15,6 @@ class AdminHomeController extends GetxController {
   RxString totalTeachers = '24'.obs;
   RxInt height = 120.obs;
   Rx<School?> school = Rx<School?>(null);
-
   final GetStorage _storage = GetStorage();
 
   @override
