@@ -27,7 +27,7 @@ class OnBoarding extends StatelessWidget {
 
   void getSchools() async {
     schools = await Database_Service.getAllSchools();
-    Get.forceAppUpdate();
+    // Get.forceAppUpdate();
   }
 
   @override
