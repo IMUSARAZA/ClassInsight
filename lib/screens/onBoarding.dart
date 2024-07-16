@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/fontStyles.dart';
@@ -40,8 +42,12 @@ class OnBoarding extends StatelessWidget {
   OnBoarding({Key? key}) : super(key: key);
 
   final SchoolController schoolController = Get.put(SchoolController());
+  List<School> schools = [];
 
-  
+  void getSchools() async {
+    schools = await Database_Service.getAllSchools();
+    Get.forceAppUpdate();
+  }
 
   @override
   Widget build(BuildContext context) {

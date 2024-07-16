@@ -36,6 +36,7 @@ class _AddStudentState extends State<AddStudent> {
   TextEditingController fatherPhoneNoController = TextEditingController();
   TextEditingController fatherCNICController = TextEditingController();
   TextEditingController studentRollNoController = TextEditingController();
+  Future<List<String>>? classesList;
 
   bool nameValid = true;
   bool genderValid = true;
@@ -53,17 +54,23 @@ class _AddStudentState extends State<AddStudent> {
   double headingFontSize = 33;
 
   @override
+  void initState() {
+    super.initState();
+    classesList = Database_Service.fetchAllClasses('buwF2J4lkLCdIVrHfgkP');
+  }
+
+  @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
     if (screenWidth < 350) {
       addStdFontSize = 14;
-      headingFontSize = 27;
+      headingFontSize = 25;
     }
     if (screenWidth < 300) {
       addStdFontSize = 14;
-      headingFontSize = 24;
+      headingFontSize = 23;
     }
     if (screenWidth < 250) {
       addStdFontSize = 11;
@@ -71,7 +78,7 @@ class _AddStudentState extends State<AddStudent> {
     }
     if (screenWidth < 230) {
       addStdFontSize = 8;
-      headingFontSize = 15;
+      headingFontSize = 17;
     }
 
     return MaterialApp(
@@ -95,7 +102,11 @@ class _AddStudentState extends State<AddStudent> {
                       leading: IconButton(
                         icon: const Icon(Icons.arrow_back),
                         onPressed: () {
-                          Navigator.of(context).pop();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ManageStudents()),
+                          );
                         },
                       ),
                       title: Center(
@@ -248,46 +259,70 @@ class _AddStudentState extends State<AddStudent> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  canvasColor: Colors.white,
+                              padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+                              child: Text(
+                                'Class',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15, // Adjust as needed
                                 ),
-                                child: DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    hintText: "Select section of student",
-                                    labelText: "Section",
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(15)),
-                                      borderSide: BorderSide(
-                                          color: AppColors.appLightBlue,
-                                          width: 1.0),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(15)),
-                                      borderSide: BorderSide(
-                                          color: Colors.black, width: 1.0),
-                                    ),
-                                  ),
-                                  value: selectedClass.isEmpty
-                                      ? null
-                                      : selectedClass,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      selectedClass = newValue!;
-                                    });
-                                  },
-                                  items: <String>['2A', '1C', '3B', '3D', '4A']
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
+                              child: FutureBuilder<List<String>>(
+                                future: classesList,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                        child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return Center(
+                                        child:
+                                            Text('Error: ${snapshot.error}'));
+                                  } else if (!snapshot.hasData ||
+                                      snapshot.data!.isEmpty) {
+                                    return Center(
+                                        child: Text('No classes found'));
+                                  } else {
+                                    List<String> classes = snapshot.data!;
+                                    if (!classes.contains(selectedClass)) {
+                                      selectedClass = classes[0];
+                                    }
+                                    return DropdownButtonFormField<String>(
+                                      value: selectedClass,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide:
+                                              BorderSide(color: Colors.black),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                              color: AppColors.appLightBlue,
+                                              width: 2.0),
+                                        ),
+                                      ),
+                                      items: classes.map((String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          selectedClass = newValue!;
+                                        });
+                                      },
                                     );
-                                  }).toList(),
-                                ),
+                                  }
+                                },
                               ),
                             ),
                             Padding(
@@ -295,45 +330,58 @@ class _AddStudentState extends State<AddStudent> {
                               child: CustomBlueButton(
                                 buttonText: 'Add',
                                 onPressed: () async {
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (BuildContext context) {
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  AppColors.appLightBlue),
-                                        ),
-                                      );
-                                    },
-                                  );
+                                  if (_validateInputs()) {
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext context) {
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              AppColors.appLightBlue,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
 
-                                  print('Button pressed!');
-                                  print(nameController.text);
-                                  print(selectedGender);
-                                  final student = Student(
-                                    name: nameController.text,
-                                    gender: selectedGender,
-                                    bForm_challanId:
-                                        bForm_challanIdController.text,
-                                    fatherName: fatherNameController.text,
-                                    fatherPhoneNo: fatherPhoneNoController.text,
-                                    fatherCNIC: fatherCNICController.text,
-                                    studentRollNo: studentRollNoController.text,
-                                    studentID: '', // Set by Database_Service
-                                    classSection: selectedClass,
-                                  );
-                                  await Database_Service.saveStudent(
-                                      'School1', student);
+                                    // Create a new Student object
+                                    final student = Student(
+                                      name: nameController.text,
+                                      gender: selectedGender,
+                                      bFormChallanId:
+                                          bForm_challanIdController.text,
+                                      fatherName: fatherNameController.text,
+                                      fatherPhoneNo:
+                                          fatherPhoneNoController.text,
+                                      fatherCNIC: fatherCNICController.text,
+                                      studentRollNo:
+                                          studentRollNoController.text,
+                                      studentID:
+                                          '', // This will be assigned by Firestore
+                                      classSection: selectedClass,
+                                      resultMap: {}, // Initialize resultMap here as an empty map
+                                    );
 
-                                  Navigator.of(context)
-                                      .pop(); // Hide the progress indicator
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ManageStudents()),
-                                  );
+                                    // Call the database service to save the student
+                                    Database_Service databaseService =
+                                        Database_Service();
+                                    await databaseService.saveStudent(
+                                      'buwF2J4lkLCdIVrHfgkP', // Replace with your actual school ID
+                                      selectedClass, // Pass selected class section
+                                      student, // Pass the student object
+                                    );
+
+                                    Navigator.of(context)
+                                        .pop(); // Hide the progress indicator
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ManageStudents(),
+                                      ),
+                                    );
+                                  }
                                 },
                               ),
                             ),
@@ -349,5 +397,27 @@ class _AddStudentState extends State<AddStudent> {
         ),
       ),
     );
+  }
+
+  bool _validateInputs() {
+    setState(() {
+      nameValid = nameController.text.isNotEmpty;
+      genderValid = selectedGender.isNotEmpty;
+      bForm_challanIdValid = bForm_challanIdController.text.isNotEmpty;
+      fatherNameValid = fatherNameController.text.isNotEmpty;
+      fatherPhoneNoValid = fatherPhoneNoController.text.isNotEmpty;
+      fatherCNICValid = fatherCNICController.text.isNotEmpty;
+      studentRollNoValid = studentRollNoController.text.isNotEmpty;
+      selectedClassValid = selectedClass.isNotEmpty;
+    });
+
+    return nameValid &&
+        genderValid &&
+        bForm_challanIdValid &&
+        fatherNameValid &&
+        fatherPhoneNoValid &&
+        fatherCNICValid &&
+        studentRollNoValid &&
+        selectedClassValid;
   }
 }

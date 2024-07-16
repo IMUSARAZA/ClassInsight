@@ -1,14 +1,13 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/TeacherModel.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
-
-
 
 class ManageTeachers extends StatefulWidget {
   const ManageTeachers({super.key});
@@ -18,21 +17,17 @@ class ManageTeachers extends StatefulWidget {
 }
 
 class _ManageTeachersState extends State<ManageTeachers> {
-  
-Future<List<Teacher>> teachers = Future<List<Teacher>>.value([]);
-TextEditingController searchTeacherController = TextEditingController();
-bool teachersValid = true;
+  Future<List<Teacher>> teachers = Future<List<Teacher>>.value([]);
+  TextEditingController searchTeacherController = TextEditingController();
+  bool teachersValid = true;
 
-
-@override
-void initState() {
-  super.initState();
-  fetchTeachers();
-}
-
+  @override
+  void initState() {
+    super.initState();
+    fetchTeachers();
+  }
 
   Future<void> fetchTeachers() async {
-
     String schoolID = 'buwF2J4lkLCdIVrHfgkP';
 
     setState(() {
@@ -41,53 +36,44 @@ void initState() {
   }
 
   void refreshTeachersList() {
-        String schoolID = 'buwF2J4lkLCdIVrHfgkP';
- 
-      setState(() {
+    String schoolID = 'buwF2J4lkLCdIVrHfgkP';
+
+    setState(() {
       teachers = Database_Service.fetchTeachers(schoolID);
     });
   }
 
   void searchTeacher(String value, BuildContext context) async {
-
     String schoolID = 'buwF2J4lkLCdIVrHfgkP';
 
-    try{
+    try {
+      // showDialog(
+      //       context: context,
+      //       barrierDismissible: false,
+      //       builder: (BuildContext context) {
+      //         return Center(
+      //           child: CircularProgressIndicator(
+      //             valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+      //           ),
+      //         );
+      //       },
+      //     );
 
-    // showDialog(
-    //       context: context,
-    //       barrierDismissible: false, 
-    //       builder: (BuildContext context) {
-    //         return Center(
-    //           child: CircularProgressIndicator(
-    //             valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-    //           ),
-    //         );
-    //       },
-    //     );
+      // Perform deletion
+      await Database_Service.searchTeachers(schoolID, value);
 
-        // Perform deletion
-        await Database_Service.searchTeachers(schoolID, value);
+      // Close loading indicator dialog
+      // Navigator.of(context).pop();
 
-        // Close loading indicator dialog
-        // Navigator.of(context).pop();
-
-        refreshTeachersList();
-
-      }
-      catch (e) {
-        
-        print('Error deleting teacher: $e');
-        Navigator.of(context).pop(); 
-        Get.snackbar('Error', 'Failed to delete teacher');
-      
-      }
-
+      refreshTeachersList();
+    } catch (e) {
+      print('Error deleting teacher: $e');
+      Navigator.of(context).pop();
+      Get.snackbar('Error', 'Failed to delete teacher');
+    }
   }
-  
 
-
-   void deleteTeacher(BuildContext context,String empID) async {
+  void deleteTeacher(BuildContext context, String empID) async {
     String schoolID = 'buwF2J4lkLCdIVrHfgkP';
 
     bool confirmDelete = await showDialog(
@@ -99,13 +85,13 @@ void initState() {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false); 
+                Navigator.of(context).pop(false);
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(true); 
+                Navigator.of(context).pop(true);
               },
               child: const Text('Delete'),
             ),
@@ -116,10 +102,9 @@ void initState() {
 
     if (confirmDelete) {
       try {
-
         showDialog(
           context: context,
-          barrierDismissible: false, 
+          barrierDismissible: false,
           builder: (BuildContext context) {
             return const Center(
               child: CircularProgressIndicator(
@@ -129,27 +114,18 @@ void initState() {
           },
         );
 
-
         await Database_Service.deleteTeacher(schoolID, empID);
-
 
         Navigator.of(context).pop();
 
         refreshTeachersList();
-
       } catch (e) {
-
         print('Error deleting teacher: $e');
         Navigator.of(context).pop();
         Get.snackbar('Error', 'Failed to delete teacher');
-      
       }
     }
   }
-
-
-
-
 
   double addStdFontSize = 16;
   double headingFontSize = 33;
@@ -161,19 +137,19 @@ void initState() {
 
     if (screenWidth < 350) {
       addStdFontSize = 14;
-      headingFontSize = 27;
+      headingFontSize = 25;
     }
     if (screenWidth < 300) {
       addStdFontSize = 14;
-      headingFontSize = 24;
+      headingFontSize = 23;
     }
     if (screenWidth < 250) {
       addStdFontSize = 11;
       headingFontSize = 20;
     }
     if (screenWidth < 230) {
-      addStdFontSize = 11;
-      headingFontSize = 18;
+      addStdFontSize = 8;
+      headingFontSize = 17;
     }
 
     return Scaffold(
@@ -194,7 +170,10 @@ void initState() {
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        Get.back();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => AdminHome()),
+                        );
                       },
                     ),
                     title: Text(
@@ -208,9 +187,8 @@ void initState() {
                       ),
                       TextButton(
                         onPressed: () {
-                            Get.toNamed("/AddTeacher");
-                          },
-                        
+                          Get.toNamed("/AddTeacher");
+                        },
                         child: Text(
                           "Add",
                           style: Font_Styles.labelHeadingLight(context),
@@ -220,36 +198,35 @@ void initState() {
                   ),
                 ),
                 const Padding(
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
-              child: Text(
-                'Teachers',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 25, 
-                  fontWeight: FontWeight.w900,
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
+                  child: Text(
+                    'Teachers',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 25,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                 ),
-              ),
-            ),     
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30, 10, 30, 20),
-              child: CustomTextField(
-                controller: searchTeacherController,
-                hintText: 'Search by name or employee ID.',
-                labelText: 'Search Teacher',
-                isValid: teachersValid,
-                onChanged: (value) {
-                print('Search teacher value: $value');
-                searchTeacher(value,context);         
-            },
-              ),
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-            FutureBuilder<List<Teacher>>(
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(30, 10, 30, 20),
+                  child: CustomTextField(
+                    controller: searchTeacherController,
+                    hintText: 'Search by name or employee ID.',
+                    labelText: 'Search Teacher',
+                    isValid: teachersValid,
+                    onChanged: (value) {
+                      print('Search teacher value: $value');
+                      searchTeacher(value, context);
+                    },
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                FutureBuilder<List<Teacher>>(
                   future: teachers,
                   builder: (BuildContext context,
                       AsyncSnapshot<List<Teacher>> snapshot) {
-                    if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
                         child: CircularProgressIndicator(
                           color: AppColors.appLightBlue,
@@ -262,8 +239,7 @@ void initState() {
                           'Error: ${snapshot.error}',
                           style: TextStyle(
                             color: Colors.red,
-                            fontSize:
-                                MediaQuery.of(context).size.width * 0.04,
+                            fontSize: MediaQuery.of(context).size.width * 0.04,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -275,8 +251,7 @@ void initState() {
                           'No Teachers found',
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize:
-                                MediaQuery.of(context).size.width * 0.04,
+                            fontSize: MediaQuery.of(context).size.width * 0.04,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -294,8 +269,7 @@ void initState() {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize:
-                                      MediaQuery.of(context).size.width *
-                                          0.03,
+                                      MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -306,8 +280,7 @@ void initState() {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize:
-                                      MediaQuery.of(context).size.width *
-                                          0.03,
+                                      MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -318,8 +291,7 @@ void initState() {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize:
-                                      MediaQuery.of(context).size.width *
-                                          0.03,
+                                      MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -330,8 +302,7 @@ void initState() {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize:
-                                      MediaQuery.of(context).size.width *
-                                          0.03,
+                                      MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -342,8 +313,7 @@ void initState() {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize:
-                                      MediaQuery.of(context).size.width *
-                                          0.03,
+                                      MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -354,8 +324,7 @@ void initState() {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize:
-                                      MediaQuery.of(context).size.width *
-                                          0.03,
+                                      MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -366,8 +335,7 @@ void initState() {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize:
-                                      MediaQuery.of(context).size.width *
-                                          0.03,
+                                      MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -378,8 +346,7 @@ void initState() {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize:
-                                      MediaQuery.of(context).size.width *
-                                          0.03,
+                                      MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -489,37 +456,33 @@ void initState() {
                                         ),
                                       ),
                                     ),
-                                  DataCell(
-                                           GestureDetector(
-                                           onTap: () {
-                                             print( "Delete button pressed for teacher: ${teacher.name}");
-                                             deleteTeacher(context, teacher.empID);
-                                           },
-                                           child: const Icon(
-                                             FontAwesomeIcons.trashAlt,
-                                             color: Colors.black,
-                                           ),
-                                         ),
-                                       ),
-                                     ],
-                                   ),
-                                 )
-                                 .toList(),
-                           ),
-                         );
-                       }
-                     },
-                   ),
-                 ],
-               ),
-             ),
-           ),
-         ),
-       );
-     }
-   }
-
-
-
-
-
+                                    DataCell(
+                                      GestureDetector(
+                                        onTap: () {
+                                          print(
+                                              "Delete button pressed for teacher: ${teacher.name}");
+                                          deleteTeacher(context, teacher.empID);
+                                        },
+                                        child: const Icon(
+                                          FontAwesomeIcons.trashAlt,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -43,7 +43,7 @@ class _EditStudentState extends State<EditStudent> {
       selectedClass = args.classSection;
       changedGender = args.gender;
       changedClass = args.classSection;
-      bForm_challanIdController.text = args.bForm_challanId;
+      bForm_challanIdController.text = args.bFormChallanId;
       fatherNameController.text = args.fatherName;
       fatherPhoneNoController.text = args.fatherPhoneNo;
       fatherCNICController.text = args.fatherCNIC;
@@ -160,7 +160,7 @@ class _EditStudentState extends State<EditStudent> {
                           print("updated data: $updatedData");
 
                           await Database_Service.updateStudent(
-                            'School1',
+                            'buwF2J4lkLCdIVrHfgkP',
                             studentID,
                             updatedData,
                           );
@@ -351,7 +351,7 @@ class _EditStudentState extends State<EditStudent> {
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
                             child: CustomTextField(
                               controller: bForm_challanIdController,
-                              hintText: args.bForm_challanId,
+                              hintText: args.bFormChallanId,
                               labelText: 'B-Form/Challan ID',
                               isValid: bForm_challanIdValid,
                             ),

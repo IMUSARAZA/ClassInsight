@@ -1,3 +1,6 @@
+// ignore_for_file: must_be_immutable
+
+import 'package:classinsight/screens/adminSide/ManageTeachers.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
@@ -63,6 +66,8 @@ class ClassSubject {
 
 class AddTeacher extends StatelessWidget {
   final AddTeacherController controller = Get.put(AddTeacherController());
+  double addStdFontSize = 16;
+  double headingFontSize = 33;
 
   AddTeacher({Key? key}) : super(key: key);
 
@@ -72,20 +77,20 @@ class AddTeacher extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
 
     if (screenWidth < 350) {
-      controller.addStdFontSize = 14.0;
-      controller.headingFontSize = 27.0;
+      addStdFontSize = 14;
+      headingFontSize = 25;
     }
     if (screenWidth < 300) {
-      controller.addStdFontSize = 14.0;
-      controller.headingFontSize = 24.0;
+      addStdFontSize = 14;
+      headingFontSize = 23;
     }
     if (screenWidth < 250) {
-      controller.addStdFontSize = 11.0;
-      controller.headingFontSize = 20.0;
+      addStdFontSize = 11;
+      headingFontSize = 20;
     }
     if (screenWidth < 230) {
-      controller.addStdFontSize = 8.0;
-      controller.headingFontSize = 15.0;
+      addStdFontSize = 8;
+      headingFontSize = 17;
     }
 
     return MaterialApp(
@@ -109,7 +114,11 @@ class AddTeacher extends StatelessWidget {
                       leading: IconButton(
                         icon: const Icon(Icons.arrow_back),
                         onPressed: () {
-                          Navigator.of(context).pop();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ManageTeachers()),
+                          );
                         },
                       ),
                       title: Center(
@@ -117,7 +126,7 @@ class AddTeacher extends StatelessWidget {
                           'Add Teacher',
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: controller.addStdFontSize,
+                            fontSize: addStdFontSize,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -137,7 +146,7 @@ class AddTeacher extends StatelessWidget {
                       'Add New Teacher',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: controller.headingFontSize,
+                        fontSize: headingFontSize,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -456,26 +465,19 @@ class AddTeacher extends StatelessWidget {
                                         controller.schoolId,
                                         controller.empIDController.text,
                                         controller.nameController.text,
-                                        controller.selectedGender
-                                            .value, 
+                                        controller.selectedGender.value,
                                         controller.phoneNoController.text,
                                         controller.cnicController.text,
                                         controller.fatherNameController.text,
-                                        controller.selectedClasses
-                                            .toList(), 
-                                        controller.selectedSubjects
-                                            .toJson(), 
-                                        controller.selectedClassTeacher
-                                            .value, 
+                                        controller.selectedClasses.toList(),
+                                        controller.selectedSubjects.toJson(),
+                                        controller.selectedClassTeacher.value,
                                       );
 
-                                      Navigator.of(context)
-                                          .pop();
+                                      Navigator.of(context).pop();
                                     } catch (e) {
-                                      Navigator.of(context)
-                                          .pop(); 
+                                      Navigator.of(context).pop();
                                       print('Error saving teacher: $e');
-                                     
                                     }
                                   }
                                 },
