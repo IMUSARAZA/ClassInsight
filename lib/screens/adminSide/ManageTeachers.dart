@@ -477,14 +477,11 @@ void initState() {
                                         onTap: () {
                                           print(
                                               "Edit button pressed for teacher: ${teacher.name}");
-
-                                          // Navigate to edit screen
-                                          // Example:
-                                          // Navigator.pushNamed(
-                                          //   context,
-                                          //   '/EditTeacher',
-                                          //   arguments: teacher,
-                                          // ).then((_) => controller.fetchTeachers('your_school_id_here'));
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/EditTeacher',
+                                            arguments: teacher,
+                                          ).then((_) =>fetchTeachers());
                                         },
                                         child: const Icon(
                                           FontAwesomeIcons.penToSquare,

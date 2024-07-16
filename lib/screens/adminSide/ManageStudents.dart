@@ -40,7 +40,7 @@ class ManageStudents extends StatefulWidget {
 
 class _ManageStudentsState extends State<ManageStudents> {
   Future<List<Student>>? studentsList;
-  String selectedClass = '2A';
+  String selectedClass = '2-A';
   TextEditingController searchController = TextEditingController();
   bool searchValid = true;
 
@@ -194,7 +194,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                   ),
                 ),
                 items:
-                    <String>['2A', '1C', '3B', '3D', '4A'].map((String value) {
+                    <String>['2-A', '1-A', '3-B', '3-D', '4-A'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),

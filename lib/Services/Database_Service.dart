@@ -226,6 +226,7 @@ static Future<List<Teacher>> fetchTeachers(String schoolID) async {
           name: data['Name'],
           gender: data['Gender'],
           cnic: data['CNIC'],
+          phoneNo: data['PhoneNo'],
           fatherName: data['FatherName'],
           classes: List<String>.from(data['Classes'] ?? []),
           subjects: (data['Subjects'] as Map<String, dynamic>).map((key, value) {
@@ -313,6 +314,7 @@ static Future<List<Teacher>> fetchTeachers(String schoolID) async {
           name: data['Name'],
           gender: data['Gender'],
           cnic: data['CNIC'],
+          phoneNo: data['PhoneNo'],
           fatherName: data['FatherName'],
           classes: List<String>.from(data['Classes'] ?? []),
           subjects: (data['Subjects'] as Map<String, dynamic>).map((key, value) {
@@ -330,6 +332,57 @@ static Future<List<Teacher>> fetchTeachers(String schoolID) async {
       return [];
     }
   }
+
+  static Future<void> updateTeacher(
+    String schoolID,
+    String empID,
+    String gender,
+    String phoneNo,
+    String cnic,
+    String fatherName,
+    List<String> classes,
+    Map<String, List<String>> subjects,
+    String classTeacher,
+  ) async {
+    try {
+      CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
+
+      QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+
+      if (schoolSnapshot.docs.isEmpty) {
+        print('School with ID $schoolID not found');
+        return;
+      }
+
+      DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+
+      CollectionReference teachersRef = schoolDocRef.collection('Teachers');
+
+      QuerySnapshot teacherSnapshot = await teachersRef.where('EmployeeID', isEqualTo: empID).get();
+
+      if (teacherSnapshot.docs.isEmpty) {
+        print('Teacher with EmployeeID $empID not found');
+        return;
+      }
+
+      DocumentReference teacherDocRef = teacherSnapshot.docs.first.reference;
+
+      await teacherDocRef.update({
+        'Gender': gender,
+        'PhoneNo': phoneNo,
+        'CNIC': cnic,
+        'FatherName': fatherName,
+        'Classes': classes,
+        'Subjects': subjects,
+        'ClassTeacher': classTeacher,
+      });
+
+      print('Teacher updated successfully');
+    } catch (e) {
+      print('Error updating teacher: $e');
+    }
+  }
+
 
 
   static Future<List<Student>> searchStudentsByRollNo(
