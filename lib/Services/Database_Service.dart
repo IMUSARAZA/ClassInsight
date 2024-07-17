@@ -354,61 +354,58 @@ class Database_Service extends GetxService {
     }
   }
 
-  static Future<List<Teacher>> searchTeachers(
-      String schoolID, String searchText) async {
-    try {
-      CollectionReference schoolsRef =
-          FirebaseFirestore.instance.collection('Schools');
+  static Future<List<Teacher>> searchTeachers(String schoolID, String searchText) async {
+  try {
+    CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
 
-      QuerySnapshot schoolSnapshot =
-          await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+    QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
 
-      if (schoolSnapshot.docs.isEmpty) {
-        print('School with ID $schoolID not found');
-        return [];
-      }
-
-      DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
-
-      CollectionReference teachersRef = schoolDocRef.collection('Teachers');
-
-      QuerySnapshot teachersSnapshot;
-
-      if (searchText.isNotEmpty) {
-        teachersSnapshot = await teachersRef
-            .where('Name', isGreaterThanOrEqualTo: searchText.toUpperCase())
-            .where('Name', isLessThan: searchText.toUpperCase() + 'z')
-            .get();
-      } else {
-        teachersSnapshot = await teachersRef.get();
-      }
-
-      List<Teacher> teachers = teachersSnapshot.docs.map((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        return Teacher(
-          empID: data['EmployeeID'],
-          name: data['Name'],
-          gender: data['Gender'],
-          cnic: data['CNIC'],
-          phoneNo: data['PhoneNo'],
-          fatherName: data['FatherName'],
-          classes: List<String>.from(data['Classes'] ?? []),
-          subjects:
-              (data['Subjects'] as Map<String, dynamic>).map((key, value) {
-            return MapEntry(key, List<String>.from(value));
-          }),
-          classTeacher: data['ClassTeacher'],
-        );
-      }).toList();
-
-      print('Teachers found: ${teachers.length}');
-
-      return teachers;
-    } catch (e) {
-      print('Error searching teachers: $e');
+    if (schoolSnapshot.docs.isEmpty) {
+      print('School with ID $schoolID not found');
       return [];
     }
+
+    DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+    CollectionReference teachersRef = schoolDocRef.collection('Teachers');
+
+    QuerySnapshot teachersSnapshot;
+
+    if (searchText.isNotEmpty) {
+      // Perform a substring search (case-insensitive)
+      teachersSnapshot = await teachersRef
+          .where('Name', isGreaterThanOrEqualTo: searchText)
+          .where('Name', isLessThanOrEqualTo: searchText + '\uf8ff')
+          .get();
+    } else {
+      teachersSnapshot = await teachersRef.get();
+    }
+
+    List<Teacher> teachers = teachersSnapshot.docs.map((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      return Teacher(
+        empID: data['EmployeeID'],
+        name: data['Name'],
+        gender: data['Gender'],
+        cnic: data['CNIC'],
+        phoneNo: data['PhoneNo'],
+        fatherName: data['FatherName'],
+        classes: List<String>.from(data['Classes'] ?? []),
+        subjects: (data['Subjects'] as Map<String, dynamic>).map((key, value) {
+          return MapEntry(key, List<String>.from(value));
+        }),
+        classTeacher: data['ClassTeacher'],
+      );
+    }).toList();
+
+    print('Teachers found: ${teachers.length}');
+    return teachers;
+  } catch (e) {
+    print('Error searching teachers: $e');
+    return [];
   }
+}
+
+
 
   static Future<void> updateTeacher(
     String schoolID,
