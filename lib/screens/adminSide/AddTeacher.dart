@@ -1,4 +1,5 @@
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
+// ignore_for_file: must_be_immutable
+
 import 'package:classinsight/screens/adminSide/ManageTeachers.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Services/Database_Service.dart';
@@ -414,14 +415,20 @@ class AddTeacher extends StatelessWidget {
                                       controller.selectedClassTeacher.value =
                                           newValue!;
                                     },
-                                    items: controller.selectedClasses
-                                        .map<DropdownMenuItem<String>>(
-                                            (String className) {
-                                      return DropdownMenuItem<String>(
-                                        value: className,
-                                        child: Text(className),
-                                      );
-                                    }).toList(),
+                                    items: [
+                                      DropdownMenuItem<String>(
+                                        value: '',
+                                        child: Text('None'),
+                                      ),
+                                      ...controller.selectedClasses
+                                          .map<DropdownMenuItem<String>>(
+                                              (String className) {
+                                        return DropdownMenuItem<String>(
+                                          value: className,
+                                          child: Text(className),
+                                        );
+                                      }).toList(),
+                                    ],
                                   )),
                             ),
                             Padding(

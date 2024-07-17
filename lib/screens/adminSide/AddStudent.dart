@@ -5,7 +5,6 @@ import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/firebase_options.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -347,9 +346,7 @@ class _AddStudentState extends State<AddStudent> {
                                       },
                                     );
 
-                                    Database_Service databaseService =
-                                        Database_Service();
-
+                                    // Create a new Student object
                                     final student = Student(
                                       name: nameController.text,
                                       gender: selectedGender,
@@ -362,15 +359,18 @@ class _AddStudentState extends State<AddStudent> {
                                       studentRollNo:
                                           studentRollNoController.text,
                                       studentID:
-                                          '', 
+                                          '', // This will be assigned by Firestore
                                       classSection: selectedClass,
-                                      resultMap: {}, // No need to initialize resultMap here
+                                      resultMap: {}, // Initialize resultMap here as an empty map
                                     );
 
+                                    // Call the database service to save the student
+                                    Database_Service databaseService =
+                                        Database_Service();
                                     await databaseService.saveStudent(
-                                      'buwF2J4lkLCdIVrHfgkP', 
-                                      selectedClass,
-                                      student,
+                                      'buwF2J4lkLCdIVrHfgkP', // Replace with your actual school ID
+                                      selectedClass, // Pass selected class section
+                                      student, // Pass the student object
                                     );
 
                                     Navigator.of(context)

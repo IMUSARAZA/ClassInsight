@@ -1,5 +1,3 @@
-import 'package:classinsight/services/database_service.dart';
-
 class Student {
   late String name;
   late String gender;
@@ -10,7 +8,7 @@ class Student {
   late String studentRollNo;
   late String studentID;
   late String classSection;
-  late Map<String, String> resultMap;
+  late Map<String, Map<String, String>> resultMap;
 
   Student({
     required this.name,
@@ -22,7 +20,7 @@ class Student {
     required this.studentRollNo,
     required this.studentID,
     required this.classSection,
-    Map<String, String>? resultMap,
+    Map<String, Map<String, String>>? resultMap,
   }) : resultMap = resultMap ?? {};
 
   factory Student.fromJson(Map<String, dynamic> json) {
@@ -36,7 +34,7 @@ class Student {
       studentRollNo: json['StudentRollNo'] ?? '',
       studentID: json['StudentID'] ?? '',
       classSection: json['ClassSection'] ?? '',
-      resultMap: Map<String, String>.from(json['ResultMap'] ?? {}),
+      resultMap: Map<String, Map<String, String>>.from(json['ResultMap'] ?? {}),
     );
   }
 
@@ -66,6 +64,7 @@ class Student {
       'StudentRollNo': studentRollNo,
       'StudentID': studentID,
       'ClassSection': classSection,
+      'ResultMap': resultMap,
       // Add other fields as needed
     };
   }

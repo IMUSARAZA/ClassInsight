@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/fontStyles.dart';

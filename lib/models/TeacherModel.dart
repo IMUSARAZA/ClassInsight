@@ -3,6 +3,7 @@ class Teacher {
   late String name;
   late String gender;
   late String cnic;
+  late String phoneNo;
   late String fatherName;
   late List<String> classes;
   late Map<String, List<String>> subjects;
@@ -13,6 +14,7 @@ class Teacher {
     required this.name,
     required this.gender,
     required this.cnic,
+    required this.phoneNo,
     required this.fatherName,
     required this.classes,
     required this.subjects,
@@ -25,6 +27,7 @@ class Teacher {
       name: json['Name'] ?? '',
       gender: json['Gender'] ?? '',
       cnic: json['CNIC'] ?? '',
+      phoneNo: json['PhoneNo'] ?? '',
       fatherName: json['FatherName'] ?? '',
       classes: List<String>.from(json['Classes'] ?? []),
       subjects: (json['Subjects'] ?? {}).map<String, List<String>>(
@@ -40,6 +43,7 @@ class Teacher {
       'Name': name,
       'Gender': gender,
       'CNIC': cnic,
+      'PhoneNo': phoneNo,
       'FatherName': fatherName,
       'Classes': classes,
       'Subjects': subjects,

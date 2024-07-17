@@ -155,7 +155,7 @@ class AddTimetable extends StatelessWidget {
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(10)),
                               borderSide: BorderSide(
-                                color: AppColors.appDarkOrange,
+                                color: AppColors.appOrange,
                                 width: 2.0,
                               ),
                             ),
@@ -191,7 +191,7 @@ class AddTimetable extends StatelessWidget {
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(10)),
                               borderSide: BorderSide(
-                                color: AppColors.appDarkOrange,
+                                color: AppColors.appOrange,
                                 width: 2.0,
                               ),
                             ),
@@ -296,7 +296,7 @@ class AddTimetable extends StatelessWidget {
                       subject,
                       style: TextStyle(
                         fontSize: MediaQuery.of(context).size.width * 0.03,
-                        color: subject == "Break Time" ? AppColors.appDarkOrange : Colors.black, // Special color for "Break Time"
+                        color: subject == "Break Time" ? AppColors.appOrange : Colors.black, // Special color for "Break Time"
                       ),
                     ),
                   ),
