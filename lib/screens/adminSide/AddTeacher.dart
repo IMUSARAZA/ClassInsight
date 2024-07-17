@@ -415,14 +415,20 @@ class AddTeacher extends StatelessWidget {
                                       controller.selectedClassTeacher.value =
                                           newValue!;
                                     },
-                                    items: controller.selectedClasses
-                                        .map<DropdownMenuItem<String>>(
-                                            (String className) {
-                                      return DropdownMenuItem<String>(
-                                        value: className,
-                                        child: Text(className),
-                                      );
-                                    }).toList(),
+                                    items: [
+                                      DropdownMenuItem<String>(
+                                        value: '',
+                                        child: Text('None'),
+                                      ),
+                                      ...controller.selectedClasses
+                                          .map<DropdownMenuItem<String>>(
+                                              (String className) {
+                                        return DropdownMenuItem<String>(
+                                          value: className,
+                                          child: Text(className),
+                                        );
+                                      }).toList(),
+                                    ],
                                   )),
                             ),
                             Padding(

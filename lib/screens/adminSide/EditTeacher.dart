@@ -8,8 +8,6 @@ import 'package:get/get.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 
-
-
 class ClassSubject {
   String className;
   List<String> subjects;
@@ -38,13 +36,15 @@ class EditTeacherController extends GetxController {
   var selectedGender = ''.obs;
   var selectedClassTeacher = ''.obs;
   var existingClassTeacher = ''.obs;
-
+  Teacher? teacher;
   var addStdFontSize = 16.0;
   var headingFontSize = 33.0;
 
   @override
   void onInit() {
     super.onInit();
+    teacher = Get.arguments;
+    initializeData(teacher!);
     fetchClassesAndSubjects();
   }
 
@@ -77,10 +77,7 @@ class EditTeacherController extends GetxController {
 }
 
 class EditTeacher extends StatelessWidget {
-  final Teacher teacher;
-  EditTeacher({required this.teacher, super.key}) {
-    controller.initializeData(teacher);
-  }
+  EditTeacher({Key? key}) : super(key: key);
 
   final EditTeacherController controller = Get.put(EditTeacherController());
 
@@ -152,7 +149,7 @@ class EditTeacher extends StatelessWidget {
                           } else {
                             Database_Service.updateTeacher(
                                 'buwF2J4lkLCdIVrHfgkP',
-                                teacher.empID,
+                                controller.teacher!.empID,
                                 controller.selectedGender.value,
                                 controller.phoneNoController.text,
                                 controller.cnicController.text,
@@ -168,7 +165,7 @@ class EditTeacher extends StatelessWidget {
                           }
                         },
                         child: Text(
-                          "Add",
+                          "Update",
                           style: Font_Styles.labelHeadingLight(context),
                         ),
                       ),
@@ -223,7 +220,7 @@ class EditTeacher extends StatelessWidget {
                                   padding:
                                       const EdgeInsets.fromLTRB(30, 0, 20, 0),
                                   child: Text(
-                                    teacher.name,
+                                    controller.teacher!.name,
                                     style: TextStyle(
                                       fontSize: controller.headingFontSize - 10,
                                       fontWeight: FontWeight.w600,
@@ -234,7 +231,7 @@ class EditTeacher extends StatelessWidget {
                                   padding:
                                       const EdgeInsets.fromLTRB(0, 0, 30, 0),
                                   child: Text(
-                                    teacher.empID,
+                                    controller.teacher!.empID,
                                     style: TextStyle(
                                       fontSize: controller.addStdFontSize,
                                       fontWeight: FontWeight.normal,
@@ -248,7 +245,7 @@ class EditTeacher extends StatelessWidget {
                             padding: EdgeInsets.fromLTRB(
                                 30, 0, 60, screenHeight * 0.01),
                             child: Text(
-                              'Classes Teacher: ${teacher.classTeacher}',
+                              'Classes Teacher: ${controller.teacher!.classTeacher}',
                               style: TextStyle(
                                 fontSize: controller.addStdFontSize,
                                 fontWeight: FontWeight.normal,
@@ -259,7 +256,7 @@ class EditTeacher extends StatelessWidget {
                             padding: EdgeInsets.fromLTRB(
                                 30, 0, 60, screenHeight * 0.04),
                             child: Text(
-                              'Classes & Subjects: ${teacher.subjects}',
+                              'Classes & Subjects: ${controller.teacher!.subjects}',
                               style: TextStyle(
                                 fontSize: controller.addStdFontSize,
                                 fontWeight: FontWeight.normal,
@@ -482,14 +479,20 @@ class EditTeacher extends StatelessWidget {
                                     controller.selectedClassTeacher.value =
                                         newValue!;
                                   },
-                                  items: controller.selectedClasses
-                                      .map<DropdownMenuItem<String>>(
-                                          (String className) {
-                                    return DropdownMenuItem<String>(
-                                      value: className,
-                                      child: Text(className),
-                                    );
-                                  }).toList(),
+                                  items: [
+                                    DropdownMenuItem<String>(
+                                      value: '',
+                                      child: Text('None'),
+                                    ),
+                                    ...controller.selectedClasses
+                                        .map<DropdownMenuItem<String>>(
+                                            (String className) {
+                                      return DropdownMenuItem<String>(
+                                        value: className,
+                                        child: Text(className),
+                                      );
+                                    }).toList(),
+                                  ],
                                 )),
                           ),
                         ],
