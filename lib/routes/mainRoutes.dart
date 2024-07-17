@@ -9,6 +9,7 @@ import 'package:classinsight/screens/adminSide/ClassSections.dart';
 import 'package:classinsight/screens/adminSide/EditStudent.dart';
 import 'package:classinsight/screens/adminSide/EditTeacher.dart';
 import 'package:classinsight/screens/adminSide/LoginScreen.dart';
+import 'package:classinsight/screens/adminSide/MakeAnnouncements.dart';
 import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:classinsight/screens/adminSide/ManageTeachers.dart';
 import 'package:classinsight/screens/adminSide/StudentResult.dart';
@@ -76,6 +77,10 @@ class MainRoutes{
     GetPage(
       name: "/StudentResult",
       page: () => const StudentResult(),
+    ),
+    GetPage(
+      name: "/MakeAnnouncements",
+      page: () => MakeAnnouncements(),
     ),
   ];
 }

@@ -1,3 +1,4 @@
+import 'package:classinsight/models/AnnouncementsModel.dart';
 import 'package:classinsight/models/ClassModel.dart';
 import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
@@ -276,7 +277,6 @@ class Database_Service extends GetxService {
 
   static Future<List<Teacher>> fetchTeachers(String schoolID) async {
     try {
-      // Access Firestore collection reference for 'Schools'
       CollectionReference schoolsRef =
           FirebaseFirestore.instance.collection('Schools');
 
@@ -371,7 +371,6 @@ class Database_Service extends GetxService {
     QuerySnapshot teachersSnapshot;
 
     if (searchText.isNotEmpty) {
-      // Perform a substring search (case-insensitive)
       teachersSnapshot = await teachersRef
           .where('Name', isGreaterThanOrEqualTo: searchText)
           .where('Name', isLessThanOrEqualTo: searchText + '\uf8ff')
@@ -596,14 +595,51 @@ class Database_Service extends GetxService {
       QuerySnapshot querySnapshot = await classesRef.get();
       for (QueryDocumentSnapshot doc in querySnapshot.docs) {
         classNames.add(doc[
-            'className']); // Assuming each class document has a 'className' field
+            'className']); 
       }
 
-      // Sort the class names lexicographically
       classNames.sort();
     } catch (e) {
       print('Error fetching classes: $e');
     }
     return classNames;
+  }
+
+
+
+  static Future<void> createAnnouncement(
+    String schoolID,
+    String studentID,
+    String announcementDescription,
+    String announcementBy,
+    bool adminAnnouncement,
+  ) async {
+    try {
+      CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
+
+      QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+
+      if (schoolSnapshot.docs.isEmpty) {
+        print('School with ID $schoolID not found');
+        return;
+      }
+
+      DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+      CollectionReference announcementsRef = schoolDocRef.collection('Announcements');
+
+      Announcement newAnnouncement = Announcement(
+        announcementBy: announcementBy,
+        announcementDate: Timestamp.now(),
+        announcementDescription: announcementDescription,
+        studentID: studentID,
+        adminAnnouncement: adminAnnouncement,
+      );
+
+      await announcementsRef.add(newAnnouncement.toJson());
+
+      print('Announcement saved successfully');
+    } catch (e) {
+      print('Error saving announcement: $e');
+    }
   }
 }

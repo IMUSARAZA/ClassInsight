@@ -41,6 +41,7 @@ class AdminHomeController extends GetxController {
   }
 
   void updateSchoolData(School school) {
+    school = school;
     email.value = school.adminEmail;
     schoolName.value = school.name;
     totalStudents.value = '100';
