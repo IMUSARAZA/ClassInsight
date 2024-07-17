@@ -380,6 +380,67 @@ class Database_Service extends GetxService {
     }
   }
 
+
+
+static Future<void> deleteClassByName(String schoolName,String className) async {
+  try {
+    QuerySnapshot schoolQuery = await FirebaseFirestore.instance
+        .collection('Schools')
+        .where('SchoolName', isEqualTo: schoolName)
+        .get();
+
+    if (schoolQuery.docs.isEmpty) {
+      print('School not found with name: $schoolName');
+      return;
+    }
+
+    String schoolId = schoolQuery.docs.first.id;
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Schools') 
+        .doc(schoolId)
+        .collection('Classes') 
+        .where('className', isEqualTo: className) 
+        .get();
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    print('Successfully deleted class documents with className: $className');
+  } catch (e) {
+    print("Error deleting class: $e");
+  }
+  }
+
+
+
+
+  static Future<String> fetchCounts(String schoolName, String collectionName) async {
+    try {
+      CollectionReference schoolsRef =
+          FirebaseFirestore.instance.collection('Schools');
+
+      QuerySnapshot schoolSnapshot =
+          await schoolsRef.where('SchoolName', isEqualTo: schoolName).get();
+
+      if (schoolSnapshot.docs.isEmpty) {
+        print('School with ID $schoolName not found');
+        return "-";
+      }
+      DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+
+      CollectionReference teachersRef = schoolDocRef.collection(collectionName);
+
+      QuerySnapshot teachersSnapshot = await teachersRef.get();
+
+      return teachersSnapshot.size.toString();
+    } catch (e) {
+      print('Error fetching teacher count: $e');
+      return "-";
+    }
+  }
+
   static Future<List<Student>> searchStudentsByRollNo(
       String school, String classSection, String rollNo) async {
     List<Student> students = [];
@@ -491,6 +552,7 @@ class Database_Service extends GetxService {
           Class newClass = Class(
             classId: classId,
             className: className,
+            timetable: false,
             subjects: subjects ?? [],
             examTypes: examSystem,
           );
@@ -517,7 +579,7 @@ class Database_Service extends GetxService {
       QuerySnapshot querySnapshot = await classesRef.get();
       for (QueryDocumentSnapshot doc in querySnapshot.docs) {
         classNames.add(doc[
-            'className']); // Assuming each class document has a 'className' field
+            'className']); 
       }
 
       // Sort the class names lexicographically
@@ -527,4 +589,69 @@ class Database_Service extends GetxService {
     }
     return classNames;
   }
+ 
+ 
+  static Future<List<String>> fetchAllClassesbyTimetable(String schoolID) async {
+    List<String> classNames = [];
+    try {
+      CollectionReference classesRef = FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolID)
+          .collection('Classes');
+          
+      QuerySnapshot querySnapshot = await classesRef.where("timetable",isEqualTo: false).get();
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        classNames.add(doc[
+            'className']); 
+      }
+
+      // Sort the class names lexicographically
+      classNames.sort();
+    } catch (e) {
+      print('Error fetching classes: $e');
+    }
+    return classNames;
+  }
+
+
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  static Future<void> addTimetablebyClass(String schoolId,String className,String format,Map<String, Map<String, String>> timetable) async {
+    try {
+      CollectionReference timetableCollection = _firestore.collection('Schools').doc(schoolId).collection('Timetable');
+      CollectionReference classesCollection = _firestore.collection('Schools').doc(schoolId).collection('Classes');
+
+      QuerySnapshot querySnapshot = await classesCollection.where('className', isEqualTo: className).get();
+
+
+      List<Map<String, dynamic>> timetableList = [];
+      timetable.forEach((subject, dayMap) {
+        Map<String, dynamic> subjectTimetable = {
+          'day': subject,
+          'timetable': dayMap,
+        };
+        timetableList.add(subjectTimetable);
+      });
+
+      // Save the timetable data
+      await timetableCollection.doc(className).set({
+        'className': className,
+        'format': format,
+        'timetable': timetableList,
+      });
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentReference classDocRef = querySnapshot.docs.first.reference;
+        await classDocRef.update({
+          'timetable': true,
+        });}
+    
+      print('Timetable added successfully!');
+      Get.snackbar("Added Successfully", "Timetable added successfully for class $className");
+    } catch (e) {
+      print('Error adding timetable: $e');
+      throw e;
+    }
+  }
+
 }

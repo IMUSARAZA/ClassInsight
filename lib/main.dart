@@ -1,10 +1,13 @@
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/routes/mainRoutes.dart';
+import 'package:classinsight/screens/adminSide/AddTimetable.dart';
+import 'package:classinsight/screens/adminSide/ManageTimetable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 void main() async{
@@ -55,17 +58,17 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        fontFamily: GoogleFonts.poppins().fontFamily,
       ),
-      initialRoute:_getInitialLocation(user),
-      getPages: MainRoutes.routes,
-      // home: AddClassSections(),
+      // initialRoute:_getInitialLocation(user),
+      // getPages: MainRoutes.routes,
+      home: AddTimetable(),
     );
   }
 
 
-    String _getInitialLocation(User? user) {
+  String _getInitialLocation(User? user) {
     if (user != null) {
       if (user.email!=null) {
         return '/AdminHome';

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   static const Color appLightBlue = Color(0xFFD2E5FF);
   static const Color appDarkBlue = Color(0xFF83ADFF);
+  static const Color appDarkOrange =     Color.fromARGB(255, 255, 128, 38);
   
   
   static const LinearGradient blueGradient = LinearGradient(
@@ -25,4 +26,5 @@ static const LinearGradient orangeGradient = LinearGradient(
   ],
   stops: [0.06, 1.0]
 );
+
 }

@@ -1,3 +1,6 @@
+import 'package:classinsight/Services/Database_Service.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
+import 'package:classinsight/screens/onBoarding.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,9 +10,34 @@ import 'package:classinsight/utils/AppColors.dart';
 class AddClassSectionsController extends GetxController {
   RxnInt selectedSections = RxnInt();
   RxBool textShow = false.obs;
-  RxList<bool> isValidList = <bool>[false].obs;
+  RxList<bool> isValidList = <bool>[].obs;
   TextEditingController gradeName = TextEditingController();
   RxList<TextEditingController> sectionControllers = <TextEditingController>[].obs;
+  RxBool addClass = true.obs;
+  RxList<String> sections = <String>[].obs;
+  AdminHomeController school = Get.put(AdminHomeController());
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchSections();
+  }
+
+  Future<void> deleteSection(String section) async {
+    try {
+      await Database_Service.deleteClassByName(school.schoolName.value,section);
+      sections.remove(section);
+      fetchSections(); // Refresh the sections list after deletion
+    } catch (e) {
+      print("Error deleting section: $e");
+    }
+  }
+
+  void fetchSections() async {
+    sections.value = await Database_Service.fetchClasses(school.schoolId.value);
+    print(sections.value);
+    update();
+  }
 
   void updateSections(int sections) {
     isValidList.clear();
@@ -51,10 +79,8 @@ class AddClassSectionsController extends GetxController {
   }
 }
 
-
 class AddClassSections extends StatelessWidget {
-  final AddClassSectionsController controller =
-      Get.put(AddClassSectionsController());
+  final AddClassSectionsController controller = Get.put(AddClassSectionsController());
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +105,7 @@ class AddClassSections extends StatelessWidget {
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        Get.back(); // Use Get.back() instead of Navigator.of(context).pop()
+                        Get.back();
                       },
                     ),
                     title: Text(
@@ -91,140 +117,249 @@ class AddClassSections extends StatelessWidget {
                       Container(
                         width: 48.0, // Adjust as needed
                       ),
-                      TextButton(
-                        onPressed: () {
-                          if (controller.validateFields()) {
-                            List<String> formData =
-                                controller.collectFormValues();
-                            print(formData);
-                            Get.toNamed("/AddSubjects", arguments: formData);
-                            // Navigate to AddSubjects with formData
-                          } else {
-                            Get.snackbar("Invalid Input",
-                                "Check whether all the inputs are filled with correct data");
-                          }
-                        },
-                        child: Text(
-                          "Add",
-                          style: Font_Styles.labelHeadingLight(context),
-                        ),
-                      ),
+                      Obx(() {
+                        if (controller.addClass.value) {
+                          return TextButton(
+                            onPressed: () {
+                              if (controller.validateFields()) {
+                                List<String> formData = controller.collectFormValues();
+                                print(formData);
+                                Get.toNamed("/AddSubjects", arguments: formData);
+                              } else {
+                                Get.snackbar("Invalid Input", "Check whether all the inputs are filled with correct data");
+                              }
+                            },
+                            child: Text(
+                              "Next",
+                              style: Font_Styles.labelHeadingLight(context),
+                            ),
+                          );
+                        } else {
+                          return TextButton(
+                            onPressed: () {
+                              if (controller.sections.isNotEmpty) {
+                                String selectedSection = controller.sections.first;
+                                controller.deleteSection(selectedSection);
+                              } else {
+                                Get.snackbar("Invalid Input", "No sections available to delete");
+                              }
+                            },
+                            child: Text(
+                              "Delete",
+                              style: Font_Styles.labelHeadingLight(context),
+                            ),
+                          );
+                        }
+                      }),
                     ],
                   ),
                 ),
-                  Container(
+                Center(
+                  child: Container(
                     height: 0.05 * screenHeight,
-                    width: screenWidth,
                     margin: const EdgeInsets.only(bottom: 10.0),
-                    child: Text(
-                      'Add Class and Section',
-                      textAlign: TextAlign.center,
-                      style: Font_Styles.cardLabel(context),
+                    child: Obx(
+                      () => Container(
+                        width: screenWidth * 0.6,
+                        height: screenHeight * 0.055,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: controller.addClass.value ? "Add Class and Section" : "Delete a Section",
+                              onChanged: (item) {
+                                controller.addClass.value = item == "Add Class and Section";
+                              },
+                              items: [
+                                DropdownMenuItem<String>(
+                                  value: "Add Class and Section",
+                                  child: Text("Add Class and Section"),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value: "Delete a Section",
+                                  child: Text("Delete a Section"),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  Expanded(
-                    child: Container(
-                      width: screenWidth,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          topRight: Radius.circular(20.0),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 4,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
+                ),
+                Expanded(
+                  child: Container(
+                    width: screenWidth,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0),
                       ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 40, 30, 20),
-                              child: CustomTextField(
-                                controller: controller.gradeName,
-                                hintText: 'Enter the Grade/Class Name',
-                                labelText: 'Class Name',
-                                isValid: true,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 4,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Obx(() {
+                            if (controller.addClass.value) {
+                              return Column(
                                 children: [
-                                  Text(
-                                    'Number of Sections',
-                                    style: Font_Styles.labelHeadingLight(context),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(30, 40, 30, 20),
+                                    child: CustomTextField(
+                                      controller: controller.gradeName,
+                                      hintText: 'Enter the Grade/Class Name',
+                                      labelText: 'Class Name',
+                                      isValid: true,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(30, 0, 40, 20),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Number of Sections',
+                                          style: Font_Styles.labelHeadingLight(context),
+                                        ),
+                                        Obx(
+                                          () => Container(
+                                            width: screenWidth * 0.3,
+                                            height: screenHeight * 0.045,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(color: Colors.black),
+                                              borderRadius: BorderRadius.circular(10.0),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: DropdownButtonHideUnderline(
+                                                child: DropdownButton<int>(
+                                                  hint: const Text('Select'),
+                                                  value: controller.selectedSections.value,
+                                                  items: List.generate(5, (index) => index + 1)
+                                                      .map((e) => DropdownMenuItem<int>(
+                                                            value: e,
+                                                            child: Text(e.toString()),
+                                                          ))
+                                                      .toList(),
+                                                  onChanged: (value) {
+                                                    controller.textShow.value = true;
+                                                    if (value != null) {
+                                                      controller.selectedSections.value = value;
+                                                      controller.updateSections(value);
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   Obx(
-                                    () => DropdownButton<int>(
-                                      hint: const Text('Select'),
-                                      value: controller.selectedSections.value,
-                                      items: List.generate(5, (index) => index + 1)
-                                          .map((e) => DropdownMenuItem<int>(
-                                                value: e,
-                                                child: Text(e.toString()),
-                                              ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        controller.textShow.value = true;
-                                        if (value != null) {
-                                          controller.selectedSections.value = value;
-                                          controller.updateSections(value);
-                                        }
-                                      },
+                                    () => controller.textShow.value
+                                        ? const Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                            child: Text("Add name of sections (e.g: alphabets or colors)"),
+                                          )
+                                        : Center(
+                                            child: Text("No Sections added", style: Font_Styles.labelHeadingLight(context)),
+                                          ),
+                                  ),
+                                  Obx(
+                                    () => Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                                      child: Column(
+                                        children: controller.selectedSections.value != null
+                                            ? List.generate(
+                                                controller.selectedSections.value!,
+                                                (index) => Padding(
+                                                  padding: const EdgeInsets.only(bottom: 20.0),
+                                                  child: CustomTextField(
+                                                    controller: controller.sectionControllers[index],
+                                                    hintText: 'Enter Section Name ${index + 1}',
+                                                    labelText: 'Section Name ${index + 1}',
+                                                   
+                                                isValid: true,
+                                              ),
+                                            ),
+                                          )
+                                        : [],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        } else {
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    "Delete a Section",
+                                    style: Font_Styles.labelHeadingLight(context),
+                                  ),
+                                  SizedBox(height: 20),
+                                  Container(
+                                    width: screenWidth * 0.6,
+                                    height: screenHeight * 0.055,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.black),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Obx(()=>
+                                        DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            hint: const Text("Select Section to Delete"),
+                                            value: controller.sections.isNotEmpty ? controller.sections.first : null,
+                                            onChanged: (section) {
+                                              if (section != null) {
+                                                controller.deleteSection(section);
+                                              }
+                                            },
+                                            items: controller.sections
+                                                .map((section) => DropdownMenuItem<String>(
+                                                      value: section,
+                                                      child: Text(section),
+                                                    ))
+                                                .toList(),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            Obx(
-                              () => controller.textShow.value
-                                  ? const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                                      child: Text("Add name of sections (e.g: alphabets or colors)"),
-                                    )
-                                  : Center(
-                                      child: Text("No Sections added", style: Font_Styles.labelHeadingLight(context)),
-                                    ),
-                            ),
-                            Obx(
-                              () => Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                                child: Column(
-                                  children: controller.selectedSections.value != null
-                                      ? List.generate(
-                                          controller.selectedSections.value!,
-                                          (index) => Padding(
-                                            padding: const EdgeInsets.only(bottom: 20.0),
-                                            child: CustomTextField(
-                                              controller: controller.sectionControllers[index],
-                                              hintText: 'Enter Section Name ${index + 1}',
-                                              labelText: 'Section Name ${index + 1}',
-                                              isValid: true,
-                                            ),
-                                          ),
-                                        )
-                                      : [],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                          );
+                        }
+                      }),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  ));
+}
 }

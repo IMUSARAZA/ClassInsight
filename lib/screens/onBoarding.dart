@@ -4,13 +4,12 @@ import 'package:classinsight/utils/fontStyles.dart';
 import 'package:classinsight/Widgets/onBoardDropDown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../Widgets/BaseScreen.dart';
 
+
 class SchoolController extends GetxController {
-
-    List<School> schools = [];
-
+  var schools = <School>[].obs;
+  var school = ''.obs;
 
   @override
   void onInit() {
@@ -18,13 +17,9 @@ class SchoolController extends GetxController {
     getSchools();
   }
 
-  
-
-  var school = ''.obs;
-
   void getSchools() async {
-    schools = await Database_Service.getAllSchools();
-    Get.forceAppUpdate();
+    var fetchedSchools = await Database_Service.getAllSchools();
+    schools.assignAll(fetchedSchools);
   }
 
   void setSchool(String value) {
@@ -36,16 +31,14 @@ class SchoolController extends GetxController {
   }
 }
 
+
+
+
+
 class OnBoarding extends StatelessWidget {
   OnBoarding({Key? key}) : super(key: key);
 
   final SchoolController schoolController = Get.put(SchoolController());
-  List<School> schools = [];
-
-  void getSchools() async {
-    schools = await Database_Service.getAllSchools();
-    Get.forceAppUpdate();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +64,18 @@ class OnBoarding extends StatelessWidget {
               style: Font_Styles.labelHeadingLight(context),
             ),
             SizedBox(height: screenHeight * 0.01),
-            // Display dropdown only if schools are fetched
-              OnBoardDropDown(
-                items: schoolController.schools,
-                onChanged: (item) {
-                  Get.toNamed("/loginAs", arguments: item);
-                },
-              ),
+            Obx(() {
+              if (schoolController.schools.isEmpty) {
+                return CircularProgressIndicator(); // Show a loading indicator while fetching data
+              } else {
+                return OnBoardDropDown(
+                  items: schoolController.schools,
+                  onChanged: (item) {
+                    Get.toNamed("/loginAs", arguments: item);
+                  },
+                );
+              }
+            }),
           ],
         ),
       ),
