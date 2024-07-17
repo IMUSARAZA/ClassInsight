@@ -304,7 +304,7 @@ class AdminHome extends StatelessWidget {
                           ShadowButton(
                             text: "Results",
                             onTap: () {
-                              Get.toNamed("/Results");
+                              Get.toNamed("/SubjectResult");
                             },
                           ),
                         ],

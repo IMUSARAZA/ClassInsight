@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:classinsight/screens/adminSide/AddClassSections.dart';
 import 'package:classinsight/screens/adminSide/AddExamSystem.dart';
 import 'package:classinsight/screens/adminSide/AddStudent.dart';
@@ -11,6 +13,7 @@ import 'package:classinsight/screens/adminSide/LoginScreen.dart';
 import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:classinsight/screens/adminSide/ManageTeachers.dart';
 import 'package:classinsight/screens/adminSide/StudentResult.dart';
+import 'package:classinsight/screens/adminSide/SubjectResult.dart';
 import 'package:classinsight/screens/onBoarding.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
@@ -71,6 +74,10 @@ class MainRoutes{
     GetPage(
       name: "/StudentResult",
       page: () => StudentResult(),
+    ),
+    GetPage(
+      name: "/SubjectResult",
+      page: () => SubjectResult(),
     ),
   ];
 }
