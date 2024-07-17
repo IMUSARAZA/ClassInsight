@@ -7,6 +7,7 @@ import 'package:classinsight/screens/adminSide/AddTeacher.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/screens/adminSide/ClassSections.dart';
 import 'package:classinsight/screens/adminSide/EditStudent.dart';
+import 'package:classinsight/screens/adminSide/EditTeacher.dart';
 import 'package:classinsight/screens/adminSide/LoginScreen.dart';
 import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:classinsight/screens/adminSide/ManageTeachers.dart';
@@ -26,11 +27,11 @@ class MainRoutes{
     ),
     GetPage(
       name: "/AddStudent",
-      page: () => AddStudent(),
+      page: () => const AddStudent(),
     ),
     GetPage(
       name: "/ManageStudents",
-      page: () => ManageStudents(),
+      page: () => const ManageStudents(),
     ),
     GetPage(
       name: "/LoginScreen",
@@ -42,11 +43,11 @@ class MainRoutes{
     ),
     GetPage(
       name: "/EditStudent",
-      page: () => EditStudent(),
+      page: () => const EditStudent(),
     ),
     GetPage(
       name: "/ClassSections",
-      page: () => ClassSections(),
+      page: () => const ClassSections(),
     ),
     GetPage(
       name: "/AddClassSections",
@@ -62,15 +63,19 @@ class MainRoutes{
     ),
     GetPage(
       name: "/ManageTeachers",
-      page: () => ManageTeachers(),
+      page: () => const ManageTeachers(),
     ),
     GetPage(
       name: "/AddTeacher",
       page: () => AddTeacher(),
     ),
     GetPage(
+      name: "/EditTeacher",
+      page: () => EditTeacher(),
+    ),
+    GetPage(
       name: "/StudentResult",
-      page: () => StudentResult(),
+      page: () => const StudentResult(),
     ),
   ];
 }

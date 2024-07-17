@@ -319,13 +319,17 @@ class _ManageTeachersState extends State<ManageTeachers> {
                               ),
                             ),
                             DataColumn(
-                              label: Text(
-                                'Subjects',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
+                              label: Container(
+                                width: MediaQuery.of(context).size.width * 0.5,
+                                child: Text(
+                                  'Subjects',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                            0.01,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
@@ -424,18 +428,24 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                       ),
                                     ),
                                     DataCell(
-                                      Text(
-                                        teacher.subjects.entries
-                                            .map((entry) =>
-                                                '${entry.key}: ${entry.value.join(', ')}')
-                                            .join('\n'),
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.03,
-                                          fontWeight: FontWeight.w600,
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.5,
+                                        child: Text(
+                                          teacher.subjects.entries
+                                              .map((entry) =>
+                                                  '${entry.key}: ${entry.value.join(', ')}')
+                                              .join('\n'),
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.03,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          overflow: TextOverflow.visible,
                                         ),
                                       ),
                                     ),
@@ -444,11 +454,9 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                         onTap: () {
                                           print(
                                               "Edit button pressed for teacher: ${teacher.name}");
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/EditTeacher',
-                                            arguments: teacher,
-                                          ).then((_) =>fetchTeachers());
+
+                                          Get.toNamed("/EditTeacher",
+                                              arguments: teacher);
                                         },
                                         child: const Icon(
                                           FontAwesomeIcons.penToSquare,
