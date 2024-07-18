@@ -1,4 +1,5 @@
 import 'package:classinsight/Services/Database_Service.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:get/get.dart';
 
 class MakeAnnouncementsController extends GetxController {
   TextEditingController announcementController = TextEditingController();
+  AdminHomeController school = Get.put(AdminHomeController());
 
   var announcementValid = true.obs;
   var addStdFontSize = 16.0;
@@ -78,7 +80,7 @@ class MakeAnnouncements extends StatelessWidget {
                             return;
                           }else{
 
-                          Database_Service.createAnnouncement('buwF2J4lkLCdIVrHfgkP', '', controller.announcementController.text, 'Admin', true);
+                          Database_Service.createAnnouncement(controller.school.schoolId.value, '', controller.announcementController.text, 'Admin', true);
 
                           Get.snackbar(
                             'Announcement Sent',

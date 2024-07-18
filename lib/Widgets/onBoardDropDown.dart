@@ -49,7 +49,7 @@ class _OnBoardDropDownState extends State<OnBoardDropDown> {
                       value: item.schoolId, // Use schoolId as the value
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(item.name,style: TextStyle(color: Colors.black),),
+                        child: Text(item.name, style: TextStyle(color: Colors.black)),
                       ),
                     ))
                 .toList(),
@@ -61,7 +61,6 @@ class _OnBoardDropDownState extends State<OnBoardDropDown> {
                 // Find the School object based on selectedItemId
                 School? selectedItem = widget.items.firstWhere(
                   (school) => school.schoolId == selectedItemId,
-                  
                 );
                 widget.onChanged!(selectedItem);
               }

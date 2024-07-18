@@ -4,7 +4,6 @@ import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/utils/AppColors.dart';
-import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 
 class AddSubjectsController extends GetxController {
@@ -158,6 +157,12 @@ class AddSubjects extends StatelessWidget {
                               hintText: 'e.g Physics',
                               labelText: 'Add Subjects',
                               isValid: true,
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.add),
+                                onPressed: () {
+                                  controller.addSubject();
+                                },
+                              ),
                             ),
                           ),
                           Padding(
@@ -175,16 +180,6 @@ class AddSubjects extends StatelessWidget {
                                     );
                                   }).toList(),
                                 )),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(
-                                30, screenHeight * 0.5, 30, 0),
-                            child: CustomBlueButton(
-                              buttonText: 'Add',
-                              onPressed: () {
-                                controller.addSubject();
-                              },
-                            ),
                           ),
                         ],
                       ),

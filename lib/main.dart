@@ -33,7 +33,6 @@ class _MyAppState extends State<MyApp> {
 
   User? user;
 
-
    @override
   void initState() {
     super.initState();
@@ -60,7 +59,7 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute:_getInitialLocation(user),
       getPages: MainRoutes.routes,
-      // home: AddClassSections(),
+      // home: ManageTimetable(),
     );
   }
 

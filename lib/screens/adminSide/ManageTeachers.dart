@@ -21,12 +21,15 @@ class ManageTeachers extends StatefulWidget {
 class _ManageTeachersState extends State<ManageTeachers> {
   Future<List<Teacher>> teachers = Future<List<Teacher>>.value([]);
   TextEditingController searchTeacherController = TextEditingController();
+  AdminHomeController school = Get.put(AdminHomeController());
   bool teachersValid = true;
+  String schoolID = '';
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
+    schoolID = school.schoolId.value;
     fetchTeachers();
   }
 
@@ -38,16 +41,12 @@ class _ManageTeachersState extends State<ManageTeachers> {
   }
 
   Future<void> fetchTeachers() async {
-    String schoolID = 'buwF2J4lkLCdIVrHfgkP';
-
     setState(() {
       teachers = Database_Service.fetchTeachers(schoolID);
     });
   }
 
   void refreshTeachersList() {
-    String schoolID = 'buwF2J4lkLCdIVrHfgkP';
-
     setState(() {
       teachers = Database_Service.fetchTeachers(schoolID);
     });
@@ -81,7 +80,6 @@ class _ManageTeachersState extends State<ManageTeachers> {
   }
 
   void deleteTeacher(BuildContext context, String empID) async {
-    String schoolID = 'buwF2J4lkLCdIVrHfgkP';
 
     bool confirmDelete = await showDialog(
       context: context,

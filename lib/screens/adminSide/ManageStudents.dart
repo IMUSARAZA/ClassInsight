@@ -12,6 +12,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,21 +45,21 @@ class _ManageStudentsState extends State<ManageStudents> {
   Future<List<String>>? classesList;
   String selectedClass = '2A';
   TextEditingController searchController = TextEditingController();
+  AdminHomeController school = Get.put(AdminHomeController());
   bool searchValid = true;
 
   @override
   void initState() {
     super.initState();
-    // Load initial student list
     studentsList = Database_Service.getStudentsOfASpecificClass(
-        'buwF2J4lkLCdIVrHfgkP', selectedClass);
-    classesList = Database_Service.fetchAllClasses('buwF2J4lkLCdIVrHfgkP');
+        school.schoolId.value, selectedClass);
+    classesList = Database_Service.fetchAllClasses(school.schoolId.value);
   }
 
   void refreshStudentList() {
     setState(() {
       studentsList = Database_Service.getStudentsOfASpecificClass(
-          'buwF2J4lkLCdIVrHfgkP', selectedClass);
+          school.schoolId.value, selectedClass);
     });
   }
 
@@ -88,13 +89,11 @@ class _ManageStudentsState extends State<ManageStudents> {
       },
     );
 
-    // Delete student if confirmed
     if (confirmDelete) {
       try {
-        // Show loading indicator while deleting
         showDialog(
           context: context,
-          barrierDismissible: false, // Prevent dismiss on tap outside
+          barrierDismissible: false, 
           builder: (BuildContext context) {
             return Center(
               child: CircularProgressIndicator(
@@ -104,19 +103,15 @@ class _ManageStudentsState extends State<ManageStudents> {
           },
         );
 
-        // Perform deletion
         await Database_Service.deleteStudent(schoolID, studentID);
 
-        // Close loading indicator dialog
         Navigator.of(context).pop();
 
-        // Refresh student list after deletion
         refreshStudentList();
       } catch (e) {
-        // Handle errors
         print('Error deleting student: $e');
         Navigator.of(context)
-            .pop(); // Close the loading indicator dialog on error
+            .pop(); 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to delete student')),
         );
@@ -484,7 +479,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                                             "Delete button pressed for student: ${student.name}");
                                         deleteStudent(
                                             context,
-                                            'buwF2J4lkLCdIVrHfgkP',
+                                            school.schoolId.value,
                                             student.studentID);
                                       },
                                       child: Icon(

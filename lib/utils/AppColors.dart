@@ -11,15 +11,15 @@ class AppColors {
       colors: [Color(0xFFD5E7FF), Color(0xFF2A5099)],
       stops: [0.09, 1.0]);
 
-  static const LinearGradient orangeGradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        Color.fromARGB(255, 255, 194, 150),
-        Color.fromARGB(255, 255, 128, 38),
-      ],
-      stops: [
-        0.06,
-        1.0
-      ]);
+
+static const LinearGradient orangeGradient = LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [
+    Color.fromARGB(255, 255, 194, 150), 
+    Color.fromARGB(255, 255, 128, 38), 
+  ],
+  stops: [0.06, 1.0]
+);
+
 }

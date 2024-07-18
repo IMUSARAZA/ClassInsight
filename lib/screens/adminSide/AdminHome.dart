@@ -1,3 +1,4 @@
+import 'package:classinsight/Services/Database_Service.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:classinsight/models/SchoolModel.dart';
@@ -11,8 +12,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class AdminHomeController extends GetxController {
   var email = 'test@gmail.com'.obs;
   var schoolName = 'School1'.obs;
-  RxString totalStudents = '24'.obs;
-  RxString totalTeachers = '24'.obs;
+  var schoolId = "".obs;
+  RxString totalStudents = '0'.obs;
+  RxString totalTeachers = '0'.obs;
   RxInt height = 120.obs;
   Rx<School?> school = Rx<School?>(null);
   final GetStorage _storage = GetStorage();
@@ -21,11 +23,23 @@ class AdminHomeController extends GetxController {
   void onInit() {
     super.onInit();
     loadCachedSchoolData();
+    totalInformation();
     var schoolFromArguments = Get.arguments as School?;
     if (schoolFromArguments != null) {
       cacheSchoolData(schoolFromArguments);
       updateSchoolData(schoolFromArguments);
     }
+  }
+
+
+  void totalInformation() async {
+    totalTeachers.value = await Database_Service.fetchCounts(schoolName.value, "Teachers");
+    totalStudents.value = await Database_Service.fetchCounts(schoolName.value, "Students");
+    update();
+  }
+
+  void clearCachedSchoolData() {
+    _storage.remove('cachedSchool');
   }
 
   void loadCachedSchoolData() {
@@ -44,8 +58,9 @@ class AdminHomeController extends GetxController {
     school = school;
     email.value = school.adminEmail;
     schoolName.value = school.name;
-    totalStudents.value = '100';
-    totalTeachers.value = '50';
+    schoolId.value = school.schoolId;
+    totalStudents.value = '-';
+    totalTeachers.value = '-';
   }
 }
 
@@ -85,6 +100,7 @@ class AdminHome extends StatelessWidget {
           IconButton(
             onPressed: () {
               Auth_Service.logout(context);
+              _controller.clearCachedSchoolData();
             },
             icon: Icon(Icons.logout_rounded, color: Colors.black),
           )
@@ -292,22 +308,14 @@ class AdminHome extends StatelessWidget {
                               ),
                               Spacer(),
                               ShadowButton(
-                                text: "Promote Students",
+                                text: "Results",
                                 onTap: () {
-                                  Get.toNamed("/PromoteStudents");
+                                  Get.toNamed("/SubjectResult");
                                 },
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          ShadowButton(
-                            text: "Results",
-                            onTap: () {
-                              Get.toNamed("/Results");
-                            },
-                          ),
+                        
                         ],
                       ),
                     ),

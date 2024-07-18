@@ -39,6 +39,7 @@ dependencies:
   get:
   google_fonts: 6.1.0
   get_storage:
+  intl: 
     
 
 

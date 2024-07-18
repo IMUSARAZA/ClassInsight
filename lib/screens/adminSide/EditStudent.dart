@@ -1,11 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:classinsight/models/StudentModel.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:flutter/material.dart';
-import 'package:classinsight/Widgets/CustomTextField.dart';
-import 'package:classinsight/Services/Database_Service.dart';
+import 'package:classinsight/widgets/CustomTextField.dart';
+import 'package:classinsight/services/Database_Service.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class EditStudent extends StatefulWidget {
   const EditStudent({Key? key}) : super(key: key);
@@ -15,13 +18,17 @@ class EditStudent extends StatefulWidget {
 }
 
 class _EditStudentState extends State<EditStudent> {
+  AdminHomeController school = Get.put(AdminHomeController());
   late Student args;
-  String selectedGender = '';
-  String selectedClass = '';
+  String selectedGender = 'Male';
+  String selectedClass = '2-A';
   String studentID = '';
   String changedGender = '';
   String changedClass = '';
+  bool? isEditingName;
+  Future<List<String>>? classesList;
 
+  TextEditingController nameController = TextEditingController();
   TextEditingController bForm_challanIdController = TextEditingController();
   TextEditingController fatherNameController = TextEditingController();
   TextEditingController fatherPhoneNoController = TextEditingController();
@@ -33,16 +40,25 @@ class _EditStudentState extends State<EditStudent> {
   bool fatherCNICValid = true;
 
   @override
+  void initState() {
+    super.initState();
+    // Initialize values when the widget is first created
+    classesList = Database_Service.fetchAllClasses(school.schoolId.value);
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     args = ModalRoute.of(context)!.settings.arguments as Student;
     studentID = args.studentID;
 
-    if (selectedGender.isEmpty && selectedClass.isEmpty) {
+    // Set initial values only if they are empty
+    if (changedGender.isEmpty && changedClass.isEmpty) {
       selectedGender = args.gender;
       selectedClass = args.classSection;
       changedGender = args.gender;
       changedClass = args.classSection;
+      nameController.text = args.name;
       bForm_challanIdController.text = args.bFormChallanId;
       fatherNameController.text = args.fatherName;
       fatherPhoneNoController.text = args.fatherPhoneNo;
@@ -147,7 +163,7 @@ class _EditStudentState extends State<EditStudent> {
                           );
 
                           Map<String, dynamic> updatedData = {
-                            'Name': args.name,
+                            'Name': nameController.text,
                             'Gender': changedGender,
                             'BForm_challanId': bForm_challanIdController.text,
                             'FatherName': fatherNameController.text,
@@ -169,7 +185,8 @@ class _EditStudentState extends State<EditStudent> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ManageStudents()),
+                              builder: (context) => ManageStudents(),
+                            ),
                           );
                         },
                         child: Text(
@@ -223,23 +240,71 @@ class _EditStudentState extends State<EditStudent> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                args.name,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: nameFontSize,
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(30, 10, 30, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      // Toggle editing state for name
+                                      isEditingName = !(isEditingName ?? false);
+                                      // Update text controller with current value when entering edit mode
+                                      if (isEditingName!) {
+                                        nameController.text = args.name;
+                                      }
+                                    });
+                                  },
+                                  child: isEditingName ==
+                                          true // Check explicitly for true, not null or false
+                                      ? SizedBox(
+                                          // Wrap with SizedBox for constraints
+                                          width:
+                                              200, // Adjust width as per your layout needs
+                                          child: TextField(
+                                            controller: nameController,
+                                            decoration: InputDecoration(
+                                              hintText: "Edit name",
+                                              labelText: "Name",
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10),
+                                                ),
+                                                borderSide: BorderSide(
+                                                  color: AppColors.appLightBlue,
+                                                  width: 2.0,
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10),
+                                                ),
+                                                borderSide: BorderSide(
+                                                  color: Colors.black,
+                                                  width: 1.0,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          args.name.split(' ')[
+                                              0], // Get only the first name
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: nameFontSize,
+                                          ),
+                                        ),
                                 ),
-                              ),
-                              Text(
-                                args.studentRollNo,
-                                style: TextStyle(
-                                  fontSize: rollNoFontSize,
+                                Text(
+                                  args.studentRollNo,
+                                  style: TextStyle(
+                                    fontSize: rollNoFontSize,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           SizedBox(height: 20),
                           Padding(
@@ -295,52 +360,74 @@ class _EditStudentState extends State<EditStudent> {
                                 SizedBox(width: 10),
                                 Expanded(
                                   child: Padding(
-                                    padding: EdgeInsets.fromLTRB(0, 0, 13, 0),
-                                    child: DropdownButtonFormField<String>(
-                                      decoration: InputDecoration(
-                                        hintText: "Select your class",
-                                        labelText: "Class",
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(10),
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: AppColors.appLightBlue,
-                                            width: 2.0,
-                                          ),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(10),
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.black,
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                      ),
-                                      value: selectedClass,
-                                      onChanged: (newValue) {
-                                        setState(() {
-                                          selectedClass = newValue!;
-                                          changedClass = newValue;
-                                        });
-                                      },
-                                      items: <String>[
-                                        '2A',
-                                        '1C',
-                                        '3B',
-                                        '3D',
-                                        '4A',
-                                        '4D',
-                                      ].map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
+                                    padding: EdgeInsets.all(16),
+                                    child: FutureBuilder<List<String>>(
+                                      future: classesList,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Center(
+                                              child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              AppColors.appLightBlue,
+                                            ),
+                                          ));
+                                        } else if (snapshot.hasError) {
+                                          return Center(
+                                              child: Text(
+                                                  'Error: ${snapshot.error}'));
+                                        } else if (!snapshot.hasData ||
+                                            snapshot.data!.isEmpty) {
+                                          return Center(
+                                              child: Text('No classes found'));
+                                        } else {
+                                          List<String> classes = snapshot.data!;
+                                          if (!classes
+                                              .contains(selectedClass)) {
+                                            selectedClass = classes[0];
+                                          }
+                                          return DropdownButtonFormField<
+                                              String>(
+                                            value: selectedClass,
+                                            decoration: InputDecoration(
+                                              hintText: "Select your class",
+                                              labelText: "Class",
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10),
+                                                ),
+                                                borderSide: BorderSide(
+                                                  color: AppColors
+                                                      .appLightBlue, // Use your app's light blue color
+                                                  width: 2.0,
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10),
+                                                ),
+                                                borderSide: BorderSide(
+                                                  color: Colors.black,
+                                                  width: 1.0,
+                                                ),
+                                              ),
+                                            ),
+                                            items: classes.map((String value) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              );
+                                            }).toList(),
+                                            onChanged: (String? newValue) {
+                                              setState(() {
+                                                selectedClass = newValue!;
+                                                changedClass = newValue;
+                                              });
+                                            },
                                           );
-                                        },
-                                      ).toList(),
+                                        }
+                                      },
                                     ),
                                   ),
                                 ),

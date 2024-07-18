@@ -68,4 +68,8 @@ class Student {
       // Add other fields as needed
     };
   }
+  @override
+  String toString() {
+    return 'Student{name: $name, gender: $gender, bForm_challanId: $bFormChallanId, fatherName: $fatherName, fatherPhoneNo: $fatherPhoneNo, fatherCNIC: $fatherCNIC, studentRollNo: $studentRollNo, studentID: $studentID, classSection: $classSection}';
+  }
 }
