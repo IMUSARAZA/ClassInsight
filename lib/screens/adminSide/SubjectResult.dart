@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:flutter/material.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
@@ -96,7 +97,7 @@ class _SubjectResultState extends State<SubjectResult> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ManageStudents()),
+                                builder: (context) => AdminHome()),
                           );
                         },
                       ),

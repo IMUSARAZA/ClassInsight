@@ -8,6 +8,7 @@ import 'package:classinsight/screens/adminSide/AddSubjects.dart';
 import 'package:classinsight/screens/adminSide/AddTeacher.dart';
 import 'package:classinsight/screens/adminSide/AddTimetable.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
+import 'package:classinsight/screens/adminSide/DeleteTimetable.dart';
 import 'package:classinsight/screens/adminSide/EditStudent.dart';
 import 'package:classinsight/screens/adminSide/EditTeacher.dart';
 import 'package:classinsight/screens/adminSide/LoginScreen.dart';
@@ -65,6 +66,14 @@ class MainRoutes{
     GetPage(
       name: "/AddTimetable",
       page: () => AddTimetable(),
+    ),
+    GetPage(
+      name: "/ManageTimetable",
+      page: () => ManageTimetable(),
+    ),
+    GetPage(
+      name: "/DeleteTimetable",
+      page: () => DeleteTimetable(),
     ),
     GetPage(
       name: "/ManageTeachers",

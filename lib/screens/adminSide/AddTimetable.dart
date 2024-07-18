@@ -12,11 +12,9 @@ class AddTimetableController extends GetxController {
   RxString selectedFormat = "".obs;
   RxString selectedClass = "".obs;
 
-  // RxMaps to store start and end times for each subject and day
   RxMap<String, RxMap<String, String>> startTimes = RxMap();
   RxMap<String, RxMap<String, String>> endTimes = RxMap();
 
-  // Computed property to determine if save button should be enabled
   RxBool get isSaveEnabled => RxBool(
         startTimes.isNotEmpty &&
         endTimes.isNotEmpty &&
@@ -33,13 +31,13 @@ class AddTimetableController extends GetxController {
   }
 
   void fetchClasses() async {
-    classes.value = await Database_Service.fetchAllClassesbyTimetable(school.schoolId.value);
+    classes.value = await Database_Service.fetchAllClassesbyTimetable(school.schoolId.value,false);
     update();
   }
 
   Future<void> fetchSubjects(String selectedClass) async {
     subjects.value = await Database_Service.fetchSubjects(school.schoolId.value, selectedClass);
-    subjects.add("Break Time"); // Add "Break Time" to subjects list
+    subjects.add("Break Time"); 
   }
 }
 
@@ -49,12 +47,12 @@ class AddTimetable extends StatelessWidget {
   void saveTimetable() async {
     Map<String, Map<String, String>> timetableData = {};
 
-    // Iterate through each subject and day to compile the timetable data
     controller.subjects.forEach((subject) {
       controller.startTimes.forEach((dayLabel, startTimesMap) {
         if (dayLabel == "Monday - Thursday") {
-          // Handle Monday - Thursday as separate days
+
           List<String> days = ["Monday", "Tuesday", "Wednesday", "Thursday"];
+
           for (String day in days) {
             String startTime = startTimesMap[subject] ?? '';
             String endTime = controller.endTimes[dayLabel]?[subject] ?? '';
@@ -87,11 +85,9 @@ class AddTimetable extends StatelessWidget {
       timetableData,
     );
 
-    // Reset startTimes and endTimes after saving
     controller.startTimes.clear();
     controller.endTimes.clear();
 
-    // Other actions after saving
   }
 
   Future<void> _selectTime(BuildContext context, RxMap<String, String> timeMap, String subject, bool isStartTime) async {
@@ -125,6 +121,10 @@ class AddTimetable extends StatelessWidget {
               onPressed: controller.isSaveEnabled.value
                   ? () {
                       saveTimetable();
+                      CircularProgressIndicator(value: 2,);
+                      Future.delayed(Duration(seconds: 2)).then((value) => Get.back());
+                      
+                      
                     }
                   : null,
               child: Text(
@@ -219,7 +219,7 @@ class AddTimetable extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 16),
-                // Display tables based on selected format
+
                 if (controller.selectedFormat.value == "Fixed Schedule")
                   Column(
                     children: [

@@ -670,7 +670,7 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
   }
  
  
-  static Future<List<String>> fetchAllClassesbyTimetable(String schoolID) async {
+  static Future<List<String>> fetchAllClassesbyTimetable(String schoolID, bool timetable) async {
     List<String> classNames = [];
     try {
       CollectionReference classesRef = FirebaseFirestore.instance
@@ -678,7 +678,7 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
           .doc(schoolID)
           .collection('Classes');
           
-      QuerySnapshot querySnapshot = await classesRef.where("timetable",isEqualTo: false).get();
+      QuerySnapshot querySnapshot = await classesRef.where("timetable",isEqualTo: timetable).get();
       for (QueryDocumentSnapshot doc in querySnapshot.docs) {
         classNames.add(doc[
             'className']); 
@@ -703,20 +703,11 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
       QuerySnapshot querySnapshot = await classesCollection.where('className', isEqualTo: className).get();
 
 
-      List<Map<String, dynamic>> timetableList = [];
-      timetable.forEach((subject, dayMap) {
-        Map<String, dynamic> subjectTimetable = {
-          'day': subject,
-          'timetable': dayMap,
-        };
-        timetableList.add(subjectTimetable);
-      });
-
       // Save the timetable data
       await timetableCollection.doc(className).set({
         'className': className,
         'format': format,
-        'timetable': timetableList,
+        'timetable': timetable,
       });
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -734,7 +725,69 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
   }
 
 
+  static Future<void> deleteTimetableByClass(String schoolId,String className) async {
+    try {
+      DocumentReference timetableRef = await _firestore.collection("Schools").doc(schoolId).collection("Timetable").doc(className);
+      CollectionReference classesCollection = _firestore.collection('Schools').doc(schoolId).collection('Classes');
 
+      
+      DocumentSnapshot timetableSnapshot = await timetableRef.get();
+      QuerySnapshot querySnapshot = await classesCollection.where('className', isEqualTo: className).get();
+
+
+
+      if (!timetableSnapshot.exists) {
+        print("No timetable found for class: $className");
+        return;
+      }
+      await timetableSnapshot.reference.delete();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentReference classDocRef = querySnapshot.docs.first.reference;
+        await classDocRef.update({
+          'timetable': false,
+        });}
+
+      Get.snackbar("Deleted Succesfully", "Timetable for ${className} has been deleted");
+    } catch (e) {
+      
+    }
+  }
+
+
+  static Future<Map<String, dynamic>> fetchTimetable(String schoolId, String className, String day) async {
+    try {
+      print("Fetching timetable for schoolId: $schoolId, className: $className");
+      
+      DocumentReference timetableDocRef = _firestore.collection("Schools").doc(schoolId).collection('Timetable').doc(className);
+      DocumentSnapshot timetableSnapshot = await timetableDocRef.get();
+
+      if (!timetableSnapshot.exists) {
+        print("No timetable found for class: $className");
+        return {};
+      }
+
+      Map<String, dynamic>? timetableData = timetableSnapshot.data() as Map<String, dynamic>?;
+
+      if (timetableData == null) {
+        print("No data retrieved from the timetable document");
+        return {};
+      }
+
+      if (!timetableData.containsKey('timetable')) {
+        print("No 'timetable' field in the document");
+        return {};
+      }
+
+      Map<String, dynamic> timetable = timetableData['timetable'] as Map<String, dynamic>;
+      Map<String,dynamic> timetablebyDay = timetable[day];
+      print(timetablebyDay);
+      return timetablebyDay;
+    } catch (e) {
+      print("Error fetching timetable: $e");
+      return {};
+    }
+  }
 
   static Future<void> createAnnouncement(
     String schoolID,

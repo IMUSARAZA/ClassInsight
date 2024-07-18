@@ -308,22 +308,14 @@ class AdminHome extends StatelessWidget {
                               ),
                               Spacer(),
                               ShadowButton(
-                                text: "Promote Students",
+                                text: "Results",
                                 onTap: () {
-                                  Get.toNamed("/PromoteStudents");
+                                  Get.toNamed("/SubjectResult");
                                 },
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          ShadowButton(
-                            text: "Results",
-                            onTap: () {
-                              Get.toNamed("/SubjectResult");
-                            },
-                          ),
+                        
                         ],
                       ),
                     ),

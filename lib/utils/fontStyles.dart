@@ -9,35 +9,35 @@ class Font_Styles {
   }
 
   static TextStyle largeHeadingBold(BuildContext context) {
-    return TextStyle(
+    return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 40),
       fontWeight: FontWeight.bold,
     );
   }
 
   static TextStyle mediumHeadingBold(BuildContext context) {
-    return TextStyle(
+    return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 35),
       fontWeight: FontWeight.bold,
     );
   }
 
   static TextStyle labelHeadingLight(BuildContext context) {
-    return TextStyle(
+    return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 15),
       fontWeight: FontWeight.w400,
     );
   }
 
   static TextStyle labelHeadingRegular(BuildContext context) {
-    return TextStyle(
+    return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 15),
       fontWeight: FontWeight.normal, 
     );
   }
 
   static TextStyle cardLabel(BuildContext context) {
-    return TextStyle(
+    return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 25),
       fontWeight: FontWeight.w600, 
     );
