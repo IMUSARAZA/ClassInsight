@@ -1,4 +1,6 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
+import 'dart:async';
+
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
@@ -20,12 +22,23 @@ class _ManageTeachersState extends State<ManageTeachers> {
   Future<List<Teacher>> teachers = Future<List<Teacher>>.value([]);
   TextEditingController searchTeacherController = TextEditingController();
   bool teachersValid = true;
+  Timer? _debounce;
+
 
   @override
   void initState() {
     super.initState();
     fetchTeachers();
   }
+
+  @override
+  void dispose() {
+  _debounce?.cancel();
+  searchTeacherController.dispose();
+  super.dispose();
+}
+
+
 
   Future<void> fetchTeachers() async {
     String schoolID = 'buwF2J4lkLCdIVrHfgkP';
@@ -43,35 +56,34 @@ class _ManageTeachersState extends State<ManageTeachers> {
     });
   }
 
-  void searchTeacher(String value, BuildContext context) async {
+  String capitalize(String input) {
+  return input.split(' ').map((word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
+  }).join(' ');
+}
+
+
+  void searchTeacher(String value, BuildContext context) {
+  const duration = Duration(milliseconds: 700);
+
+  if (_debounce?.isActive ?? false) _debounce?.cancel();
+  
+  _debounce = Timer(duration, () async {
     String schoolID = 'buwF2J4lkLCdIVrHfgkP';
+    String searchText = capitalize(value);
 
     try {
-      // showDialog(
-      //       context: context,
-      //       barrierDismissible: false,
-      //       builder: (BuildContext context) {
-      //         return Center(
-      //           child: CircularProgressIndicator(
-      //             valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-      //           ),
-      //         );
-      //       },
-      //     );
-
-      // Perform deletion
-      await Database_Service.searchTeachers(schoolID, value);
-
-      // Close loading indicator dialog
-      // Navigator.of(context).pop();
-
-      refreshTeachersList();
+      setState(() {
+        teachers = Database_Service.searchTeachers(schoolID, searchText);
+      });
     } catch (e) {
-      print('Error deleting teacher: $e');
-      Navigator.of(context).pop();
-      Get.snackbar('Error', 'Failed to delete teacher');
+      print('Error searching for teacher: $e');
+      Get.snackbar('Error', 'Failed to search for teacher');
     }
-  }
+  });
+}
+
 
   void deleteTeacher(BuildContext context, String empID) async {
     String schoolID = 'buwF2J4lkLCdIVrHfgkP';
@@ -212,7 +224,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                   padding: const EdgeInsets.fromLTRB(30, 10, 30, 20),
                   child: CustomTextField(
                     controller: searchTeacherController,
-                    hintText: 'Search by name or employee ID.',
+                    hintText: 'Search by name.',
                     labelText: 'Search Teacher',
                     isValid: teachersValid,
                     onChanged: (value) {
@@ -327,7 +339,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                     color: Colors.black,
                                     fontSize:
                                         MediaQuery.of(context).size.width *
-                                            0.01,
+                                            0.03,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -442,7 +454,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                             fontSize: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                0.03,
+                                                0.02,
                                             fontWeight: FontWeight.w600,
                                           ),
                                           overflow: TextOverflow.visible,
@@ -472,9 +484,9 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                           deleteTeacher(context, teacher.empID);
                                         },
                                         child: const Icon(
-                                          FontAwesomeIcons.trashAlt,
-                                          color: Colors.black,
-                                        ),
+                                        Icons.delete,
+                                        color: Colors.red,
+                                      ),
                                       ),
                                     ),
                                   ],

@@ -1,11 +1,13 @@
 class Class{
   final String className,classId;
   final List<String> subjects, examTypes;
+  final bool timetable;
 
 
   Class({
     required this.className,
     required this.classId,
+    required this.timetable,
     required this.subjects,
     required this.examTypes,
   });
@@ -14,6 +16,7 @@ class Class{
   factory Class.fromJson(Map<String, dynamic> json) {
     return Class(
       classId: json['classId'],
+      timetable: json['timetable'],
       className: json['className'] ?? '',
       subjects: json['subjects'] ?? '',
       examTypes: json['examtypes'] ?? '',
@@ -25,6 +28,7 @@ class Class{
       'classId': classId,
       'className': className,
       'subjects': subjects,
+      'timetable':timetable,
       'examTypes': examTypes,
     };
   }
