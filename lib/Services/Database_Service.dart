@@ -520,8 +520,8 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
   }
 
 
-  static Future<List<Student>> searchStudentsByRollNo(
-      String school, String classSection, String rollNo) async {
+  static Future<List<Student>> searchStudents(
+      String school, String classSection, String query) async {
     List<Student> students = [];
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -529,18 +529,29 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
           .doc(school)
           .collection('Students')
           .where('ClassSection', isEqualTo: classSection)
-          .where('RollNo', isEqualTo: rollNo)
+          .where('RollNo', isEqualTo: query)  // Search by RollNo
           .get();
+      
+      if (querySnapshot.docs.isEmpty) {
+        // If no results by RollNo, search by Name
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('Schools')
+            .doc(school)
+            .collection('Students')
+            .where('ClassSection', isEqualTo: classSection)
+            .where('Name', isEqualTo: query)  // Search by Name
+            .get();
+      }
 
       for (var doc in querySnapshot.docs) {
         students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
       }
     } catch (e) {
-      print(
-          'Error searching students by roll number $rollNo in class $classSection: $e');
+      print('Error searching students by query $query in class $classSection: $e');
     }
     return students;
   }
+
 
   static Future<Student?> getStudentByID(
       String school, String studentID) async {

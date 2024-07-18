@@ -23,7 +23,7 @@ void main() async {
     runApp(MaterialApp(
       routes: {
         '/AddStudent': (context) => AddStudent(),
-        '/EditStudent': (context) => EditStudent(),
+        '/EditStudent': (context) => EditStudent()
       },
       home: ManageStudents(),
       debugShowCheckedModeBanner: false,
