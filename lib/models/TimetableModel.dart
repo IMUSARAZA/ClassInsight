@@ -23,7 +23,16 @@ class Timetable {
     return Timetable(
       className: map['className'],
       format: map['format'],
-      timetable: (map['timetable'] as Map<String, dynamic>).map((key, value) => MapEntry(key, Map<String, String>.from(value))),
+      timetable: Map<String, Map<String, String>>.from(map['timetable'] ?? {}),
     );
+  }
+
+  // Optionally, you can add a method to convert to JSON if needed
+  Map<String, dynamic> toJson() {
+    return {
+      'className': className,
+      'format': format,
+      'timetable': timetable,
+    };
   }
 }

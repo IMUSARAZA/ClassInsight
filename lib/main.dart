@@ -36,7 +36,6 @@ class _MyAppState extends State<MyApp> {
 
   User? user;
 
-
    @override
   void initState() {
     super.initState();
@@ -61,9 +60,9 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
         fontFamily: GoogleFonts.poppins().fontFamily,
       ),
-      // initialRoute:_getInitialLocation(user),
-      // getPages: MainRoutes.routes,
-      home: AddTimetable(),
+      initialRoute:_getInitialLocation(user),
+      getPages: MainRoutes.routes,
+      // home: ManageTimetable(),
     );
   }
 

@@ -315,35 +315,46 @@ class AddClassSections extends StatelessWidget {
                                     style: Font_Styles.labelHeadingLight(context),
                                   ),
                                   SizedBox(height: 20),
-                                  Container(
-                                    width: screenWidth * 0.6,
-                                    height: screenHeight * 0.055,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Obx(()=>
-                                        DropdownButtonHideUnderline(
-                                          child: DropdownButton<String>(
-                                            hint: const Text("Select Section to Delete"),
-                                            value: controller.sections.isNotEmpty ? controller.sections.first : null,
-                                            onChanged: (section) {
-                                              if (section != null) {
-                                                controller.deleteSection(section);
-                                              }
-                                            },
-                                            items: controller.sections
-                                                .map((section) => DropdownMenuItem<String>(
-                                                      value: section,
-                                                      child: Text(section),
-                                                    ))
-                                                .toList(),
+                                  Column(
+                                    children: [
+                                      Container(
+                                        width: screenWidth * 0.6,
+                                        height: screenHeight * 0.055,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(color: Colors.black),
+                                          borderRadius: BorderRadius.circular(10.0),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Obx(()=>
+                                            DropdownButtonHideUnderline(
+                                              child: DropdownButton<String>(
+                                                hint: const Text("Select Section to Delete"),
+                                                value: controller.sections.isNotEmpty ? controller.sections.first : null,
+                                                onChanged: (section) {
+                                                  if (section != null) {
+                                                    controller.deleteSection(section);
+                                                  }
+                                                },
+                                                items: controller.sections
+                                                    .map((section) => DropdownMenuItem<String>(
+                                                          value: section,
+                                                          child: Text(section),
+                                                        ))
+                                                    .toList(),
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                      SizedBox(height: 20,),
+
+                                      Text(
+                                        "Make sure you have no teachers and students \nassigned for this class section",
+                                        softWrap: true,
+                                        style: TextStyle(color: Colors.red),
+                                        ),
+                                    ],
                                   ),
                                 ],
                               ),
