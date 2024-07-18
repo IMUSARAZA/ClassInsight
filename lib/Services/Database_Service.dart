@@ -46,6 +46,7 @@ class Database_Service extends GetxService {
     }
   }
 
+
   Future<Map<String, Map<String, String>>> fetchStudentResultMap(
       String schoolID, String studentID) async {
     try {
