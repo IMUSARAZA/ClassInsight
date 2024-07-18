@@ -118,7 +118,7 @@ class MakeAnnouncements extends StatelessWidget {
                     child: TextField(
                       controller: controller.announcementController,
                       decoration: const InputDecoration(
-                        hintText: 'Type your custom notification here......', 
+                        hintText: 'Type your announcement here......', 
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                       ),
