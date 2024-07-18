@@ -523,15 +523,41 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
 
 
   static Future<List<Student>> searchStudentsByRollNo(
-      String school, String classSection, String rollNo) async {
+    String school, String classSection, String rollNo) async {
+  List<Student> students = [];
+  try {
+    
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Schools')
+        .doc(school)
+        .collection('Students')
+        .where('ClassSection', isEqualTo: classSection)
+        .where('StudentRollNo', isEqualTo: rollNo)
+        .get();
+
+
+    for (var doc in querySnapshot.docs) {
+      students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
+    }
+  } catch (e) {
+
+  }
+  return students;
+}
+
+
+  static Future<List<Student>> searchStudentsByName(
+      String school, String classSection, String studentName) async {
     List<Student> students = [];
     try {
+
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('Schools')
           .doc(school)
           .collection('Students')
           .where('ClassSection', isEqualTo: classSection)
-          .where('RollNo', isEqualTo: rollNo)
+          .where('Name', isGreaterThanOrEqualTo: studentName)
+          .where('Name', isLessThanOrEqualTo: studentName + '\uf8ff')
           .get();
 
       for (var doc in querySnapshot.docs) {
@@ -539,10 +565,12 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
       }
     } catch (e) {
       print(
-          'Error searching students by roll number $rollNo in class $classSection: $e');
+          'Error searching students by name $studentName in class $classSection: $e');
     }
     return students;
   }
+
+
 
   static Future<Student?> getStudentByID(
       String school, String studentID) async {
