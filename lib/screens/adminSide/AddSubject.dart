@@ -1,22 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    runApp(AddSubject());
-  } catch (e) {
-    print('Error initializing Firebase: $e');
-  }
-}
 
 class AddSubject extends StatefulWidget {
   const AddSubject({super.key});
@@ -52,9 +39,7 @@ class _AddSubjectState extends State<AddSubject> {
       headingFontSize = 17;
     }
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return Scaffold(
         backgroundColor: AppColors.appLightBlue,
         body: SingleChildScrollView(
           child: Container(
@@ -145,7 +130,6 @@ class _AddSubjectState extends State<AddSubject> {
             ),
           ),
         ),
-      ),
     );
   }
 }

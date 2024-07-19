@@ -4,7 +4,6 @@ import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:flutter/material.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
-import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:classinsight/utils/AppColors.dart';
 
 class SubjectResult extends StatefulWidget {
@@ -354,7 +353,7 @@ class _SubjectResultState extends State<SubjectResult> {
                                                       'buwF2J4lkLCdIVrHfgkP',
                                                       student.studentID)
                                                   .then((result) {
-                                                return result![
+                                                return result[
                                                         selectedSubject] ??
                                                     {};
                                               }),
@@ -405,5 +404,5 @@ Future<Map<String, String>> fetchStudentResults(
     Database_Service databaseService, String studentID, String subject) async {
   Map<String, Map<String, String>>? studentResult = await databaseService
       .fetchStudentResultMap('buwF2J4lkLCdIVrHfgkP', studentID);
-  return studentResult?[subject] ?? {};
+  return studentResult[subject] ?? {};
 }

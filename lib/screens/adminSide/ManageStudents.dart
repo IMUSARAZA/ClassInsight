@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:async';
+
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/screens/adminSide/AddStudent.dart';
@@ -47,6 +49,7 @@ class _ManageStudentsState extends State<ManageStudents> {
   TextEditingController searchController = TextEditingController();
   AdminHomeController school = Get.put(AdminHomeController());
   bool searchValid = true;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -56,12 +59,59 @@ class _ManageStudentsState extends State<ManageStudents> {
     classesList = Database_Service.fetchAllClasses(school.schoolId.value);
   }
 
+    @override
+  void dispose() {
+    _debounce?.cancel();
+    searchController.dispose();
+    super.dispose();
+  }
+
   void refreshStudentList() {
     setState(() {
       studentsList = Database_Service.getStudentsOfASpecificClass(
           school.schoolId.value, selectedClass);
     });
   }
+
+
+ void searchStudent(String value, BuildContext context) {
+  const duration = Duration(milliseconds: 700);
+
+  if (_debounce?.isActive ?? false) _debounce?.cancel();
+
+  _debounce = Timer(duration, () async {
+    String schoolID = 'buwF2J4lkLCdIVrHfgkP';
+
+    try {
+
+      if (_containsDigits(value)) {
+        studentsList =  Database_Service.searchStudentsByRollNo(schoolID, selectedClass, value);
+      } else {
+        String searchText = capitalize(value); 
+        studentsList =  Database_Service.searchStudentsByName(schoolID, selectedClass, searchText);
+      }
+
+      setState(() {
+
+      });
+    } catch (e) {
+      print('Error searching for Student: $e');
+      Get.snackbar('Error', 'Failed to search for Student');
+    }
+  });
+}
+
+bool _containsDigits(String value) {
+  return value.contains(RegExp(r'\d'));
+}
+
+String capitalize(String input) {
+  return input.split(' ').map((word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
+  }).join(' ');
+}
+
 
   void deleteStudent(
       BuildContext context, String schoolID, String studentID) async {
@@ -91,6 +141,7 @@ class _ManageStudentsState extends State<ManageStudents> {
 
     if (confirmDelete) {
       try {
+        // ignore: use_build_context_synchronously
         showDialog(
           context: context,
           barrierDismissible: false, 
@@ -145,7 +196,7 @@ class _ManageStudentsState extends State<ManageStudents> {
                 'Add Student',
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 16, // Adjust as needed
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -238,6 +289,10 @@ class _ManageStudentsState extends State<ManageStudents> {
                 hintText: 'Search by name or roll no.',
                 labelText: 'Search Student',
                 isValid: searchValid,
+                onChanged: (String value) {
+                  print( 'Search value: $value');
+                  searchStudent(value, context);
+                },
               ),
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.03),

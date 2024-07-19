@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
@@ -30,6 +32,7 @@ class DeleteTimeController extends GetxController{
   
 }
 
+// ignore: use_key_in_widget_constructors
 class DeleteTimetable extends StatelessWidget {
   DeleteTimeController controller = Get.put(DeleteTimeController());
 

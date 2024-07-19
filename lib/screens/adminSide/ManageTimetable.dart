@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
@@ -184,7 +186,7 @@ class ManageTimetable extends StatelessWidget {
             ),
             Obx(() {
 
-              var timetableForClass = controller.timetable.value ?? {};
+              var timetableForClass = controller.timetable.value;
   
               var sortedEntries = timetableForClass.entries.toList()
                   ..sort((a, b) {

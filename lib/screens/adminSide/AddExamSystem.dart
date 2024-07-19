@@ -1,5 +1,4 @@
 import 'package:classinsight/Services/Database_Service.dart';
-import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
@@ -180,6 +179,13 @@ class AddExamSystem extends StatelessWidget {
                                 hintText: 'e.g CA/Mid/Final/Mock',
                                 labelText: 'Add name of the type of exam',
                                 isValid: true,
+                                suffixIcon: IconButton(
+                                icon: Icon(Icons.add),
+                                onPressed: () {
+                                controller.addExamStructure();
+
+                                },
+                              ),
                               ),
                             ),
                             Padding(
@@ -198,16 +204,7 @@ class AddExamSystem extends StatelessWidget {
                                     }).toList(),
                                   )),
                             ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                  30, screenHeight * 0.5, 30, 0),
-                              child: CustomBlueButton(
-                                buttonText: 'Add',
-                                onPressed: () {
-                                  controller.addExamStructure();
-                                },
-                              ),
-                            ),
+                            
                           ],
                         ),
                       ),

@@ -1,6 +1,7 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
-import 'package:classinsight/screens/onBoarding.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

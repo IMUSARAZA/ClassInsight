@@ -10,6 +10,7 @@ class CustomTextField extends StatefulWidget {
   final bool isValid;
   final ValueChanged<String>? onChanged;
   final String? helperText;
+  final Widget? suffixIcon; // New optional parameter for suffix icon
 
   const CustomTextField({
     Key? key,
@@ -19,6 +20,7 @@ class CustomTextField extends StatefulWidget {
     required this.isValid,
     this.helperText,
     this.onChanged,
+    this.suffixIcon, // Initialize suffixIcon parameter
   }) : super(key: key);
 
   @override
@@ -38,6 +40,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         labelText: widget.labelText,
         labelStyle: TextStyle(color: Colors.black),
         floatingLabelStyle: TextStyle(color: Colors.black),
+        suffixIcon: widget.suffixIcon, 
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
           borderSide: BorderSide(

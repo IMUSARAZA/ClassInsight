@@ -26,7 +26,6 @@ class _ManageTeachersState extends State<ManageTeachers> {
   String schoolID = '';
   Timer? _debounce;
 
-
   @override
   void initState() {
     super.initState();
@@ -36,12 +35,10 @@ class _ManageTeachersState extends State<ManageTeachers> {
 
   @override
   void dispose() {
-  _debounce?.cancel();
-  searchTeacherController.dispose();
-  super.dispose();
-}
-
-
+    _debounce?.cancel();
+    searchTeacherController.dispose();
+    super.dispose();
+  }
 
   Future<void> fetchTeachers() async {
     setState(() {
@@ -56,32 +53,31 @@ class _ManageTeachersState extends State<ManageTeachers> {
   }
 
   String capitalize(String input) {
-  return input.split(' ').map((word) {
-    if (word.isEmpty) return word;
-    return word[0].toUpperCase() + word.substring(1).toLowerCase();
-  }).join(' ');
-}
-
+    return input.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
+  }
 
   void searchTeacher(String value, BuildContext context) {
-  const duration = Duration(milliseconds: 700);
+    const duration = Duration(milliseconds: 700);
 
-  if (_debounce?.isActive ?? false) _debounce?.cancel();
-  
-  _debounce = Timer(duration, () async {
-    String searchText = capitalize(value);
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
 
-    try {
-      setState(() {
-        teachers = Database_Service.searchTeachers(schoolID, searchText);
-      });
-    } catch (e) {
-      print('Error searching for teacher: $e');
-      Get.snackbar('Error', 'Failed to search for teacher');
-    }
-  });
-}
+    _debounce = Timer(duration, () async {
+      String schoolID = 'buwF2J4lkLCdIVrHfgkP';
+      String searchText = capitalize(value);
 
+      try {
+        setState(() {
+          teachers = Database_Service.searchTeachers(schoolID, searchText);
+        });
+      } catch (e) {
+        print('Error searching for teacher: $e');
+        Get.snackbar('Error', 'Failed to search for teacher');
+      }
+    });
+  }
 
   void deleteTeacher(BuildContext context, String empID) async {
 
@@ -441,20 +437,34 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.5,
-                                        child: Text(
-                                          teacher.subjects.entries
-                                              .map((entry) =>
-                                                  '${entry.key}: ${entry.value.join(', ')}')
-                                              .join('\n'),
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.02,
-                                            fontWeight: FontWeight.w600,
+                                        child: SingleChildScrollView(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: teacher.subjects.entries
+                                                  .map((entry) {
+                                                return Tooltip(
+                                                  message: entry.value.join(', '),
+                                                  child: Text(
+                                                    '${entry.key}: ${entry.value.join(', ')}',
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.03,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                );
+                                              }).toList(),
+                                            ),
                                           ),
-                                          overflow: TextOverflow.visible,
                                         ),
                                       ),
                                     ),
@@ -481,9 +491,9 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                           deleteTeacher(context, teacher.empID);
                                         },
                                         child: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                      ),
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
                                       ),
                                     ),
                                   ],

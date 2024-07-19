@@ -472,6 +472,7 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
    static Future<void> updateTeacher(
     String schoolID,
     String empID,
+    String name,
     String gender,
     String phoneNo,
     String cnic,
@@ -504,6 +505,7 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
       DocumentReference teacherDocRef = teacherSnapshot.docs.first.reference;
 
       await teacherDocRef.update({
+        'Name': name,
         'Gender': gender,
         'PhoneNo': phoneNo,
         'CNIC': cnic,
@@ -520,37 +522,54 @@ static Future<void> deleteClassByName(String schoolName,String className) async 
   }
 
 
-  static Future<List<Student>> searchStudents(
-      String school, String classSection, String query) async {
+  static Future<List<Student>> searchStudentsByRollNo(
+    String school, String classSection, String rollNo) async {
+  List<Student> students = [];
+  try {
+    
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Schools')
+        .doc(school)
+        .collection('Students')
+        .where('ClassSection', isEqualTo: classSection)
+        .where('StudentRollNo', isEqualTo: rollNo)
+        .get();
+
+
+    for (var doc in querySnapshot.docs) {
+      students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
+    }
+  } catch (e) {
+
+  }
+  return students;
+}
+
+
+  static Future<List<Student>> searchStudentsByName(
+      String school, String classSection, String studentName) async {
     List<Student> students = [];
     try {
+
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('Schools')
           .doc(school)
           .collection('Students')
           .where('ClassSection', isEqualTo: classSection)
-          .where('RollNo', isEqualTo: query)  // Search by RollNo
+          .where('Name', isGreaterThanOrEqualTo: studentName)
+          .where('Name', isLessThanOrEqualTo: studentName + '\uf8ff')
           .get();
-      
-      if (querySnapshot.docs.isEmpty) {
-        // If no results by RollNo, search by Name
-        querySnapshot = await FirebaseFirestore.instance
-            .collection('Schools')
-            .doc(school)
-            .collection('Students')
-            .where('ClassSection', isEqualTo: classSection)
-            .where('Name', isEqualTo: query)  // Search by Name
-            .get();
-      }
 
       for (var doc in querySnapshot.docs) {
         students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
       }
     } catch (e) {
-      print('Error searching students by query $query in class $classSection: $e');
+      print(
+          'Error searching students by name $studentName in class $classSection: $e');
     }
     return students;
   }
+
 
 
   static Future<Student?> getStudentByID(
