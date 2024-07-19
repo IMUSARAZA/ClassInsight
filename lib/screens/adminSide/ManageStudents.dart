@@ -10,6 +10,7 @@ import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/screens/adminSide/EditStudent.dart';
 import 'package:classinsight/utils/AppColors.dart';
+import 'package:classinsight/utils/fontStyles.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -175,6 +176,7 @@ String capitalize(String input) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        title: Text("Manage Students", style: Font_Styles.labelHeadingRegular(context),),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -190,18 +192,12 @@ String capitalize(String input) {
             onPressed: () {
               Navigator.pushNamed(context, '/AddStudent');
             },
-            child: Padding(
-              padding: EdgeInsets.all(4.0),
-              child: Text(
+            child:  Text(
                 'Add Student',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Font_Styles.labelHeadingRegular(context)
               ),
             ),
-          )
+          
         ],
       ),
       body: SingleChildScrollView(
@@ -209,12 +205,12 @@ String capitalize(String input) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
+              padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
               child: Text(
                 'Students',
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 25, // Adjust as needed
+                  fontSize: 30, // Adjust as needed
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -525,7 +521,7 @@ String capitalize(String input) {
                                             ),
                                           ).then((_) => refreshStudentList());
                                         },
-                                        child: Icon(FontAwesomeIcons.edit)),
+                                        child: Icon(FontAwesomeIcons.penToSquare)),
                                   ),
                                   DataCell(
                                     GestureDetector(

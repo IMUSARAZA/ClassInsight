@@ -123,7 +123,7 @@ class AddExamSystem extends StatelessWidget {
                           );
 
                           await Future.delayed(const Duration(seconds: 3));
-                          Navigator.of(context).pop();
+                          Get.offNamedUntil('/AdminHome', (route) => false);
                           Get.snackbar("Success", "Classes added successfully");
                         },
                         child: Text(

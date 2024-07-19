@@ -35,6 +35,7 @@ class TimetableController extends GetxController {
       }
     } catch (e) {
       print("Error fetching classes: $e");
+      Get.snackbar("Error", "Failed to fetch classes. Please try again later.");
     }
   }
 
@@ -45,25 +46,24 @@ class TimetableController extends GetxController {
       timetable.value = fetchedTimetable;
     } catch (e) {
       print("Error fetching timetable: $e");
+      Get.snackbar("Error", "Failed to fetch timetable. Please try again later.");
     }
   }
-
 
   void refreshData() {
     fetchClasses();
   }
 }
 
+
+
 class ManageTimetable extends StatelessWidget {
   final TimetableController controller = Get.put(TimetableController());
-
-
 
   @override
   Widget build(BuildContext context) {
     controller.refreshData();
-    
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Manage Timetable", style: Font_Styles.labelHeadingLight(context)),
@@ -90,15 +90,13 @@ class ManageTimetable extends StatelessWidget {
           )
         ],
       ),
-
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.appOrange,
-        onPressed: (){
+        backgroundColor: Colors.white,
+        onPressed: () {
           Get.toNamed("/DeleteTimetable");
         },
-        child: Icon(CupertinoIcons.pen),
-        ),
-
+        child: Icon(Icons.delete_rounded, color: AppColors.appOrange),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,10 +106,9 @@ class ManageTimetable extends StatelessWidget {
               child: Obx(() {
                 if (controller.classesList.isEmpty) {
                   return Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.appOrange,
-                      ),
+                    child: Text(
+                      'No classes found',
+                      style: Font_Styles.labelHeadingRegular(context),
                     ),
                   );
                 }
@@ -185,6 +182,17 @@ class ManageTimetable extends StatelessWidget {
               }),
             ),
             Obx(() {
+              if (controller.timetable.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                  child: Center(
+                    child: Text(
+                      'No timetable found for the selected class and day',
+                      style: Font_Styles.labelHeadingRegular(context),
+                    ),
+                  ),
+                );
+              }
 
               var timetableForClass = controller.timetable.value;
   
@@ -194,7 +202,6 @@ class ManageTimetable extends StatelessWidget {
                     var startTimeB = _extractStartTime(b.value);
                     return startTimeA.compareTo(startTimeB);
                   });
-
 
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -223,17 +230,17 @@ class ManageTimetable extends StatelessWidget {
                     ),
                   ],
                   rows: sortedEntries.map((entry) {
-                  var subjectDetails = entry.value.split('-');
+                    var subjectDetails = entry.value.split('-');
 
-                  return DataRow(
-                    color: MaterialStateColor.resolveWith((states) => AppColors.appOrange),
-                    cells: [
-                      DataCell(Text(entry.key)),
-                      DataCell(Text(_formatTime(_extractStartTime(subjectDetails[0])))), // Display sorted start time
-                      DataCell(Text(subjectDetails[1])),
-                    ],
-                  );
-                }).toList(),
+                    return DataRow(
+                      color: MaterialStateColor.resolveWith((states) => AppColors.appOrange),
+                      cells: [
+                        DataCell(Text(entry.key)),
+                        DataCell(Text(_formatTime(_extractStartTime(subjectDetails[0])))), // Display sorted start time
+                        DataCell(Text(subjectDetails[1])),
+                      ],
+                    );
+                  }).toList(),
                 ),
               );
             }),
@@ -243,19 +250,18 @@ class ManageTimetable extends StatelessWidget {
     );
   }
 
-DateTime _extractStartTime(String subjectDetail) {
-  var startTime = subjectDetail.split(' - ')[0].trim(); 
-  return _convertTimeToDateTime(startTime); 
-}
+  DateTime _extractStartTime(String subjectDetail) {
+    var startTime = subjectDetail.split(' - ')[0].trim(); 
+    return _convertTimeToDateTime(startTime); 
+  }
 
-String _formatTime(DateTime dateTime) {
-  final format = DateFormat('h:mm a');
-  return format.format(dateTime); 
-}
+  String _formatTime(DateTime dateTime) {
+    final format = DateFormat('h:mm a');
+    return format.format(dateTime); 
+  }
 
-DateTime _convertTimeToDateTime(String timeString) {
-  final format = DateFormat('h:mm a'); 
-  return format.parse(timeString); 
-}
-
+  DateTime _convertTimeToDateTime(String timeString) {
+    final format = DateFormat('h:mm a'); 
+    return format.parse(timeString); 
+  }
 }

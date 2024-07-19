@@ -203,7 +203,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                   ),
                 ),
                 const Padding(
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
+                  padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
                   child: Text(
                     'Teachers',
                     style: TextStyle(
