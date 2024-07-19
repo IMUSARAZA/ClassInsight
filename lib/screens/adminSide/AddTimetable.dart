@@ -113,7 +113,7 @@ class AddTimetable extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "Add timetable",
-          style: Font_Styles.labelHeadingLight(context),
+          style: Font_Styles.labelHeadingRegular(context),
         ),
         actions: [
           Obx(
@@ -129,7 +129,7 @@ class AddTimetable extends StatelessWidget {
                   : null,
               child: Text(
                 "Save",
-                style: Font_Styles.labelHeadingLight(context),
+                style: Font_Styles.labelHeadingRegular(context),
               ),
             ),
           ),
@@ -142,10 +142,8 @@ class AddTimetable extends StatelessWidget {
             () => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
                     Container(
-                      width: screenWidth * 0.3,
+                      width: screenWidth * 0.7,
                       padding: EdgeInsets.only(right: screenWidth * 0.1),
                       child: Obx(
                         () => DropdownButtonFormField<String>(
@@ -156,7 +154,7 @@ class AddTimetable extends StatelessWidget {
                               borderRadius: BorderRadius.all(Radius.circular(10)),
                               borderSide: BorderSide(
                                 color: AppColors.appOrange,
-                                width: 2.0,
+                                width: 1.0,
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
@@ -181,8 +179,9 @@ class AddTimetable extends StatelessWidget {
                         ),
                       ),
                     ),
+                    SizedBox(height: 20,),
                     Container(
-                      width: screenWidth * 0.5,
+                      width: screenWidth * 0.7,
                       child: Obx(
                         () => DropdownButtonFormField<String>(
                           decoration: const InputDecoration(
@@ -216,8 +215,7 @@ class AddTimetable extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  
                 SizedBox(height: 16),
 
                 if (controller.selectedFormat.value == "Fixed Schedule")

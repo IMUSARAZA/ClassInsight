@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
+import 'package:get/get.dart';
 
 class SubjectResult extends StatefulWidget {
-  const SubjectResult({Key? key}) : super(key: key);
+ SubjectResult({Key? key}) : super(key: key);
+  AdminHomeController school = Get.put(AdminHomeController());
 
   @override
   State<SubjectResult> createState() => _SubjectResultState();
@@ -33,22 +35,22 @@ class _SubjectResultState extends State<SubjectResult> {
 
   // Function to fetch initial data
   void fetchData() {
-    classesList = Database_Service.fetchAllClasses('buwF2J4lkLCdIVrHfgkP');
+    classesList = Database_Service.fetchAllClasses(widget.school.schoolId.value);
     subjectsList =
-        Database_Service.fetchSubjects('buwF2J4lkLCdIVrHfgkP', selectedClass);
+        Database_Service.fetchSubjects(widget.school.schoolId.value, selectedClass);
     studentsList = Database_Service.getStudentsOfASpecificClass(
-        'buwF2J4lkLCdIVrHfgkP', selectedClass);
+        widget.school.schoolId.value, selectedClass);
     examsList = databaseService.fetchExamStructure(
-        'buwF2J4lkLCdIVrHfgkP', selectedClass);
+        widget.school.schoolId.value, selectedClass);
   }
 
   void updateData() {
     subjectsList =
-        Database_Service.fetchSubjects('buwF2J4lkLCdIVrHfgkP', selectedClass);
+        Database_Service.fetchSubjects(widget.school.schoolId.value, selectedClass);
     studentsList = Database_Service.getStudentsOfASpecificClass(
-        'buwF2J4lkLCdIVrHfgkP', selectedClass);
+        widget.school.schoolId.value, selectedClass);
     examsList = databaseService.fetchExamStructure(
-        'buwF2J4lkLCdIVrHfgkP', selectedClass);
+        widget.school.schoolId.value, selectedClass);
   }
 
   @override
@@ -123,26 +125,14 @@ class _SubjectResultState extends State<SubjectResult> {
                     margin: EdgeInsets.only(bottom: 10.0),
                     padding: EdgeInsets.only(left: 30),
                     child: Text(
-                      'Subject wise Marks',
+                      'Subject Result',
                       style: TextStyle(
                         fontSize: headingFontSize,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Class',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 15, // Adjust as needed
-                        ),
-                      ),
-                    ),
-                  ),
+                
                   Padding(
                     padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
                     child: FutureBuilder<List<String>>(
@@ -165,6 +155,7 @@ class _SubjectResultState extends State<SubjectResult> {
                           return DropdownButtonFormField<String>(
                             value: selectedClass,
                             decoration: InputDecoration(
+                              labelText: "Class",
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 5),
                               border: OutlineInputBorder(
@@ -194,19 +185,7 @@ class _SubjectResultState extends State<SubjectResult> {
                       },
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Subject',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 15, // Adjust as needed
-                        ),
-                      ),
-                    ),
-                  ),
+                
                   Padding(
                     padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
                     child: FutureBuilder<List<String>>(
@@ -228,7 +207,9 @@ class _SubjectResultState extends State<SubjectResult> {
                           }
                           return DropdownButtonFormField<String>(
                             value: selectedSubject,
+                            
                             decoration: InputDecoration(
+                              labelText: "Subject",
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 5),
                               border: OutlineInputBorder(
@@ -258,7 +239,9 @@ class _SubjectResultState extends State<SubjectResult> {
                     ),
                   ),
                   Expanded(
+                    
                     child: SingleChildScrollView(
+                      
                       scrollDirection: Axis.horizontal,
                       child: FutureBuilder<List<String>>(
                         future: examsList,
@@ -276,7 +259,11 @@ class _SubjectResultState extends State<SubjectResult> {
                             return Text('Error: ${examSnapshot.error}');
                           } else if (!examSnapshot.hasData ||
                               examSnapshot.data!.isEmpty) {
-                            return Text('No exams found');
+                            return Center(
+                              child: 
+                                Text('No exams found for this school/class'),
+                              
+                            );
                           } else {
                             List<String> exams = examSnapshot.data!;
                             return FutureBuilder<List<Student>>(
@@ -350,7 +337,7 @@ class _SubjectResultState extends State<SubjectResult> {
                                                 Map<String, String>>(
                                               future: databaseService
                                                   .fetchStudentResultMap(
-                                                      'buwF2J4lkLCdIVrHfgkP',
+                                                      widget.school.schoolId.value,
                                                       student.studentID)
                                                   .then((result) {
                                                 return result[
@@ -398,11 +385,13 @@ class _SubjectResultState extends State<SubjectResult> {
       ),
     );
   }
+
+
 }
 
 Future<Map<String, String>> fetchStudentResults(
-    Database_Service databaseService, String studentID, String subject) async {
+    Database_Service databaseService, String studentID, String subject, String schoolId) async {
   Map<String, Map<String, String>>? studentResult = await databaseService
-      .fetchStudentResultMap('buwF2J4lkLCdIVrHfgkP', studentID);
+      .fetchStudentResultMap(schoolId, studentID);
   return studentResult[subject] ?? {};
 }

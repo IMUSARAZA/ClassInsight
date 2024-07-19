@@ -18,6 +18,14 @@ static Future<void> login(String email, String password, School school) async {
       
       if (school.adminEmail == email) {
         print(school.adminEmail);
+
+        Get.snackbar('Logging In', '',
+          backgroundColor: Colors.white, 
+          showProgressIndicator: true,
+          progressIndicatorBackgroundColor: AppColors.appDarkBlue
+          );
+
+
         UserCredential userCredential = await auth.signInWithEmailAndPassword(
           email: email,
           password: password,

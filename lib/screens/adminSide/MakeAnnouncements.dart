@@ -86,6 +86,8 @@ class MakeAnnouncements extends StatelessWidget {
                             'Announcement Sent',
                             'The announement has been successfully sent to all the school.',
                           );
+
+                          Get.back();
                         }
                         },
                         child: Text(

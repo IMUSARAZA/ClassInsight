@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 void main() async{
@@ -56,7 +57,10 @@ class _MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
-      ),
+        textTheme: GoogleFonts.poppinsTextTheme(
+                  Theme.of(context).textTheme,
+                ),  
+           ),
       initialRoute:_getInitialLocation(user),
       getPages: MainRoutes.routes,
       // home: ManageTimetable(),

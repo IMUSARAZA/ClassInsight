@@ -23,23 +23,25 @@ class AdminHomeController extends GetxController {
   void onInit() {
     super.onInit();
     loadCachedSchoolData();
-    totalInformation();
     var schoolFromArguments = Get.arguments as School?;
     if (schoolFromArguments != null) {
       cacheSchoolData(schoolFromArguments);
       updateSchoolData(schoolFromArguments);
     }
+    totalInformation();
   }
-
 
   void totalInformation() async {
     totalTeachers.value = await Database_Service.fetchCounts(schoolName.value, "Teachers");
     totalStudents.value = await Database_Service.fetchCounts(schoolName.value, "Students");
+    cacheTotalCounts();
     update();
   }
 
   void clearCachedSchoolData() {
     _storage.remove('cachedSchool');
+    _storage.remove('totalTeachers');
+    _storage.remove('totalStudents');
   }
 
   void loadCachedSchoolData() {
@@ -48,19 +50,36 @@ class AdminHomeController extends GetxController {
       school.value = School.fromJson(cachedSchool);
       updateSchoolData(school.value!);
     }
+    var cachedTotalTeachers = _storage.read('totalTeachers');
+    if (cachedTotalTeachers != null) {
+      totalTeachers.value = cachedTotalTeachers;
+    }
+    var cachedTotalStudents = _storage.read('totalStudents');
+    if (cachedTotalStudents != null) {
+      totalStudents.value = cachedTotalStudents;
+    }
   }
 
   void cacheSchoolData(School school) {
     _storage.write('cachedSchool', school.toJson());
   }
 
+  void cacheTotalCounts() {
+    _storage.write('totalTeachers', totalTeachers.value);
+    _storage.write('totalStudents', totalStudents.value);
+  }
+
   void updateSchoolData(School school) {
-    school = school;
+    totalStudents.value = '-';
+    totalTeachers.value = '-';
+    this.school.value = school;
     email.value = school.adminEmail;
     schoolName.value = school.name;
     schoolId.value = school.schoolId;
-    totalStudents.value = '-';
-    totalTeachers.value = '-';
+    // Reload counts if cached data is outdated or missing
+    if (totalTeachers.value == '-' || totalStudents.value == '-') {
+      totalInformation();
+    }
   }
 }
 
@@ -114,7 +133,7 @@ class AdminHome extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical:10
+                  vertical:8
                 ),
                 child: Text(
                   "Hi, Admin",
@@ -125,7 +144,7 @@ class AdminHome extends StatelessWidget {
                 () => Padding(
                   padding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical:10
+                  vertical:8
                 ),
                   child: Text(
                     _controller.email.value,
