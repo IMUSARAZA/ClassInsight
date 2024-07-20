@@ -94,7 +94,7 @@ class MainRoutes {
     ),
     GetPage(
       name: "/StudentResult",
-      page: () => const StudentResult(),
+      page: () => StudentResult(),
     ),
     GetPage(
       name: "/MakeAnnouncements",

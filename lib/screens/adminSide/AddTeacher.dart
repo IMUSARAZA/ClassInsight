@@ -486,7 +486,7 @@ class AddTeacher extends StatelessWidget {
                                       print('Error saving teacher: $e');
                                     }
                                   }
-                                },
+                                }, text: 'Add',
                               ),
                             ),
                           ],
