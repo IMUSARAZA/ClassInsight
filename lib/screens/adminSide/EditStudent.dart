@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 class EditStudent extends StatefulWidget {
-  const EditStudent({Key? key}) : super(key: key);
+  const EditStudent({Key? key, required Student student}) : super(key: key);
 
   @override
   State<EditStudent> createState() => _EditStudentState();
@@ -111,7 +111,7 @@ class _EditStudentState extends State<EditStudent> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                height: screenHeight * 0.10,
+                height: screenHeight * 0.05,
                 width: screenWidth,
                 decoration: BoxDecoration(
                   color: AppColors.appLightBlue,
@@ -120,7 +120,7 @@ class _EditStudentState extends State<EditStudent> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 30),
+                      padding: EdgeInsets.only(top: 10),
                       child: IconButton(
                         icon: const Icon(Icons.arrow_back),
                         onPressed: () {
@@ -129,7 +129,7 @@ class _EditStudentState extends State<EditStudent> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 30),
+                      padding: EdgeInsets.only(top: 10),
                       child: Text(
                         'Edit Student',
                         style: TextStyle(
@@ -140,7 +140,7 @@ class _EditStudentState extends State<EditStudent> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 30),
+                      padding: EdgeInsets.only(top: 10),
                       child: TextButton(
                         onPressed: () async {
                           showDialog(

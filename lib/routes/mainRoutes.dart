@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/screens/adminSide/AddClassSections.dart';
 import 'package:classinsight/screens/adminSide/AddExamSystem.dart';
 import 'package:classinsight/screens/adminSide/AddStudent.dart';
@@ -19,10 +20,12 @@ import 'package:classinsight/screens/adminSide/ManageTimetable.dart';
 import 'package:classinsight/screens/adminSide/StudentResult.dart';
 import 'package:classinsight/screens/adminSide/SubjectResult.dart';
 import 'package:classinsight/screens/onBoarding.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
-class MainRoutes{
-   static List<GetPage> routes = [
+class MainRoutes {
+  static List<GetPage> routes = [
     GetPage(
       name: "/onBoarding",
       page: () => OnBoarding(),
@@ -37,7 +40,7 @@ class MainRoutes{
     ),
     GetPage(
       name: "/ManageStudents",
-      page: () => const ManageStudents(),
+      page: () => ManageStudents(),
     ),
     GetPage(
       name: "/LoginScreen",
@@ -49,7 +52,9 @@ class MainRoutes{
     ),
     GetPage(
       name: "/EditStudent",
-      page: () => const EditStudent(),
+      page: () => EditStudent(
+        student: Get.arguments as Student,
+      ),
     ),
     GetPage(
       name: "/AddClassSections",
