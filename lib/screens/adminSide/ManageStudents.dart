@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:async';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
@@ -24,7 +26,7 @@ class StudentController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchClasses(); // Fetch classes first
+    fetchClasses();
   }
 
   void fetchStudents() async {
@@ -308,6 +310,16 @@ class ManageStudents extends StatelessWidget {
                       ),
                       DataColumn(
                         label: Text(
+                          'Fee Status',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: MediaQuery.of(context).size.width * 0.03,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
                           'Result',
                           style: TextStyle(
                             color: Colors.black,
@@ -404,6 +416,17 @@ class ManageStudents extends StatelessWidget {
                                 ),
                               ),
                               DataCell(
+                                TextButton(
+                                    child: Text(student.feeStatus),
+                                    onPressed: () {
+                                      _showFeeStatusPopup(context, student);
+
+                                      final studentController =
+                                          Get.find<StudentController>();
+                                      studentController.refreshStudentList();
+                                    }),
+                              ),
+                              DataCell(
                                 IconButton(
                                   icon: Icon(
                                     Icons.text_snippet_outlined,
@@ -416,16 +439,19 @@ class ManageStudents extends StatelessWidget {
                                       context,
                                       '/StudentResult',
                                       arguments: Student(
-                                        studentID: student.studentID,
-                                        name: student.name,
-                                        gender: student.gender,
-                                        bFormChallanId: student.bFormChallanId,
-                                        fatherName: student.fatherName,
-                                        fatherPhoneNo: student.fatherPhoneNo,
-                                        fatherCNIC: student.fatherCNIC,
-                                        studentRollNo: student.studentRollNo,
-                                        classSection: student.classSection,
-                                      ),
+                                          studentID: student.studentID,
+                                          name: student.name,
+                                          gender: student.gender,
+                                          bFormChallanId:
+                                              student.bFormChallanId,
+                                          fatherName: student.fatherName,
+                                          fatherPhoneNo: student.fatherPhoneNo,
+                                          fatherCNIC: student.fatherCNIC,
+                                          studentRollNo: student.studentRollNo,
+                                          classSection: student.classSection,
+                                          feeStatus: student.feeStatus,
+                                          feeStartDate: student.feeStartDate,
+                                          feeEndDate: student.feeEndDate),
                                     );
                                   },
                                 ),
@@ -439,16 +465,19 @@ class ManageStudents extends StatelessWidget {
                                       context,
                                       '/EditStudent',
                                       arguments: Student(
-                                        studentID: student.studentID,
-                                        name: student.name,
-                                        gender: student.gender,
-                                        bFormChallanId: student.bFormChallanId,
-                                        fatherName: student.fatherName,
-                                        fatherPhoneNo: student.fatherPhoneNo,
-                                        fatherCNIC: student.fatherCNIC,
-                                        studentRollNo: student.studentRollNo,
-                                        classSection: student.classSection,
-                                      ),
+                                          studentID: student.studentID,
+                                          name: student.name,
+                                          gender: student.gender,
+                                          bFormChallanId:
+                                              student.bFormChallanId,
+                                          fatherName: student.fatherName,
+                                          fatherPhoneNo: student.fatherPhoneNo,
+                                          fatherCNIC: student.fatherCNIC,
+                                          studentRollNo: student.studentRollNo,
+                                          classSection: student.classSection,
+                                          feeStatus: student.feeStatus,
+                                          feeStartDate: student.feeStartDate,
+                                          feeEndDate: student.feeEndDate),
                                     );
                                   },
                                 ),
@@ -478,4 +507,130 @@ class ManageStudents extends StatelessWidget {
       ),
     );
   }
+}
+void _showFeeStatusPopup(BuildContext context, Student student) {
+  TextEditingController startDateController = TextEditingController();
+  TextEditingController endDateController = TextEditingController();
+  
+  // Initialize with existing values
+  String feeStatus = student.feeStatus;
+  String originalStartDate = student.feeStartDate ?? '';
+  String originalEndDate = student.feeEndDate ?? '';
+
+  // Set controllers with existing values
+  startDateController.text = originalStartDate;
+  endDateController.text = originalEndDate;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Update Fee Status'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: 20),
+              child: TextField(
+                controller: startDateController,
+                decoration: InputDecoration(labelText: 'Start Date'),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (pickedDate != null) {
+                    startDateController.text =
+                        pickedDate.toLocal().toString().split(' ')[0];
+                  }
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 30),
+              child: TextField(
+                controller: endDateController,
+                decoration: InputDecoration(labelText: 'End Date'),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (pickedDate != null) {
+                    endDateController.text =
+                        pickedDate.toLocal().toString().split(' ')[0];
+                  }
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 20),
+              child: DropdownButtonFormField<String>(
+                value: ['paid', 'unpaid'].contains(student.feeStatus)
+                    ? student.feeStatus
+                    : null,
+                items: ['paid', 'unpaid'].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  feeStatus = newValue!;
+                },
+                decoration: InputDecoration(
+                  labelText: 'Fee Status',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            )
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Update'),
+            onPressed: () async {
+              // Only update the start date and end date if they are not empty
+              String updatedStartDate = startDateController.text.isNotEmpty
+                  ? startDateController.text
+                  : originalStartDate;
+              String updatedEndDate = endDateController.text.isNotEmpty
+                  ? endDateController.text
+                  : originalEndDate;
+
+              student.feeStatus = feeStatus;
+              student.feeStartDate = updatedStartDate;
+              student.feeEndDate = updatedEndDate;
+
+              try {
+                await Database_Service.updateFeeStatus(
+                    "buwF2J4lkLCdIVrHfgkP",
+                    student.studentID,
+                    feeStatus,
+                    updatedStartDate,
+                    updatedEndDate);
+
+                Navigator.of(context).pop();
+              } catch (e) {
+                print('Error updating fee status: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed to update fee status')),
+                );
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

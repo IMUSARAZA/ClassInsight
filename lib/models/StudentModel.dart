@@ -8,6 +8,9 @@ class Student {
   late String studentRollNo;
   late String studentID;
   late String classSection;
+  late String feeStatus;
+  late String feeStartDate;
+  late String feeEndDate;
   late Map<String, Map<String, String>> resultMap;
 
   Student({
@@ -20,6 +23,9 @@ class Student {
     required this.studentRollNo,
     required this.studentID,
     required this.classSection,
+    required this.feeStatus,
+    required this.feeStartDate,
+    required this.feeEndDate,
     Map<String, Map<String, String>>? resultMap,
   }) : resultMap = resultMap ?? {};
 
@@ -34,6 +40,9 @@ class Student {
       studentRollNo: json['StudentRollNo'] ?? '',
       studentID: json['StudentID'] ?? '',
       classSection: json['ClassSection'] ?? '',
+      feeStatus: json['FeeStatus'] ?? '',
+      feeStartDate: json['FeeStartDate'] ?? '',
+      feeEndDate: json['FeeEndDate'] ?? '',
       resultMap: Map<String, Map<String, String>>.from(json['ResultMap'] ?? {}),
     );
   }
@@ -49,6 +58,9 @@ class Student {
       'StudentRollNo': studentRollNo,
       'StudentID': studentID,
       'ClassSection': classSection,
+      'FeeStatus': feeStatus,
+      'FeeStartDate': feeStartDate,
+      'FeeEndDate': feeEndDate,
       'ResultMap': resultMap,
     };
   }
@@ -64,12 +76,15 @@ class Student {
       'StudentRollNo': studentRollNo,
       'StudentID': studentID,
       'ClassSection': classSection,
+      'FeeStatus': feeStatus,
+      'FeeStartDate': feeStartDate,
+      'FeeEndDate': feeEndDate,
       'ResultMap': resultMap,
-      // Add other fields as needed
     };
   }
+
   @override
   String toString() {
-    return 'Student{name: $name, gender: $gender, bForm_challanId: $bFormChallanId, fatherName: $fatherName, fatherPhoneNo: $fatherPhoneNo, fatherCNIC: $fatherCNIC, studentRollNo: $studentRollNo, studentID: $studentID, classSection: $classSection}';
+    return 'Student{name: $name, gender: $gender, bForm_challanId: $bFormChallanId, fatherName: $fatherName, fatherPhoneNo: $fatherPhoneNo, fatherCNIC: $fatherCNIC, studentRollNo: $studentRollNo, studentID: $studentID, classSection: $classSection}, feeStatus: $feeStatus, feeStartDate: $feeStartDate, feeEndDate: $feeEndDate';
   }
 }

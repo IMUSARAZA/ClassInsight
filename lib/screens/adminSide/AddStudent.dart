@@ -1,4 +1,6 @@
 // lib/controllers/add_student_controller.dart
+// ignore_for_file: prefer_const_constructors
+
 import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
@@ -79,6 +81,9 @@ class AddStudentController extends GetxController {
         studentRollNo: studentRollNoController.text,
         studentID: '', // This will be assigned by Firestore
         classSection: selectedClass.value,
+        feeStatus: '-',
+        feeStartDate: '-',
+        feeEndDate: '-',
         resultMap: {}, // Initialize resultMap here as an empty map
       );
 
