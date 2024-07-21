@@ -41,7 +41,7 @@ class SubjectResultController extends GetxController {
     Map<String, Map<String, String>>? studentResult =
         await databaseService.fetchStudentResultMap(
             Get.find<AdminHomeController>().schoolId.value, studentID);
-    return studentResult?[selectedSubject.value] ?? {};
+    return studentResult[selectedSubject.value] ?? {};
   }
 
   void updateData() async {

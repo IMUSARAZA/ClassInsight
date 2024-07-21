@@ -3,14 +3,10 @@
 import 'dart:async';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
-import 'package:classinsight/screens/adminSide/AddStudent.dart';
-import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
-import 'package:classinsight/screens/adminSide/EditStudent.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
