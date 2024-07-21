@@ -1,79 +1,73 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable
+// ignore_for_file: prefer_const_constructors
 
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
+import 'package:flutter/material.dart';
 import 'package:classinsight/utils/AppColors.dart';
-import 'package:get/get.dart';
 
-class SubjectResult extends StatefulWidget {
- SubjectResult({Key? key}) : super(key: key);
-  AdminHomeController school = Get.put(AdminHomeController());
+class SubjectResultController extends GetxController {
+  var classesList = <String>[].obs;
+  var subjectsList = <String>[].obs;
+  var studentsList = <Student>[].obs;
+  var examsList = <String>[].obs;
 
-  @override
-  State<SubjectResult> createState() => _SubjectResultState();
-}
+  var selectedClass = '2-A'.obs;
+  var selectedSubject = ''.obs;
 
-class _SubjectResultState extends State<SubjectResult> {
-  Future<List<String>>? classesList;
-  Future<List<String>>? subjectsList;
-  Future<List<Student>>? studentsList;
-  Future<List<String>>? examsList;
   Database_Service databaseService = Database_Service();
 
-  double resultFontSize = 16;
-  double headingFontSize = 31;
-  String selectedClass = '2-A';
-  String selectedSubject = '';
-
   @override
-  void initState() {
-    super.initState();
-    fetchData();
+  void onInit() {
+    super.onInit();
+    fetchInitialData();
+    ever(selectedSubject, (_) => updateStudentResults());
   }
 
-  // Function to fetch initial data
-  void fetchData() {
-    classesList = Database_Service.fetchAllClasses(widget.school.schoolId.value);
-    subjectsList =
-        Database_Service.fetchSubjects(widget.school.schoolId.value, selectedClass);
-    studentsList = Database_Service.getStudentsOfASpecificClass(
-        widget.school.schoolId.value, selectedClass);
-    examsList = databaseService.fetchExamStructure(
-        widget.school.schoolId.value, selectedClass);
+  void fetchInitialData() async {
+    var schoolId = Get.find<AdminHomeController>().schoolId.value;
+
+    classesList.value = await Database_Service.fetchAllClasses(schoolId);
+    subjectsList.value =
+        await Database_Service.fetchSubjects(schoolId, selectedClass.value);
+    studentsList.value = await Database_Service.getStudentsOfASpecificClass(
+        schoolId, selectedClass.value);
+    examsList.value =
+        await databaseService.fetchExamStructure(schoolId, selectedClass.value);
   }
 
-  void updateData() {
-    subjectsList =
-        Database_Service.fetchSubjects(widget.school.schoolId.value, selectedClass);
-    studentsList = Database_Service.getStudentsOfASpecificClass(
-        widget.school.schoolId.value, selectedClass);
-    examsList = databaseService.fetchExamStructure(
-        widget.school.schoolId.value, selectedClass);
+  Future<Map<String, String>> fetchStudentResults(String studentID) async {
+    Map<String, Map<String, String>>? studentResult =
+        await databaseService.fetchStudentResultMap(
+            Get.find<AdminHomeController>().schoolId.value, studentID);
+    return studentResult[selectedSubject.value] ?? {};
   }
+
+  void updateData() async {
+    var schoolId = Get.find<AdminHomeController>().schoolId.value;
+
+    subjectsList.value =
+        await Database_Service.fetchSubjects(schoolId, selectedClass.value);
+    studentsList.value = await Database_Service.getStudentsOfASpecificClass(
+        schoolId, selectedClass.value);
+    examsList.value =
+        await databaseService.fetchExamStructure(schoolId, selectedClass.value);
+  }
+
+  void updateStudentResults() async {
+    // Trigger UI update for students results
+    studentsList.refresh();
+  }
+}
+
+class SubjectResult extends StatelessWidget {
+  final SubjectResultController controller = Get.put(SubjectResultController());
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-
-    if (screenWidth < 350) {
-      resultFontSize = 14;
-      headingFontSize = 25;
-    }
-    if (screenWidth < 300) {
-      resultFontSize = 14;
-      headingFontSize = 23;
-    }
-    if (screenWidth < 250) {
-      resultFontSize = 11;
-      headingFontSize = 20;
-    }
-    if (screenWidth < 230) {
-      resultFontSize = 8;
-      headingFontSize = 17;
-    }
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -107,7 +101,7 @@ class _SubjectResultState extends State<SubjectResult> {
                           'Marks',
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: resultFontSize,
+                            fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -127,222 +121,194 @@ class _SubjectResultState extends State<SubjectResult> {
                     child: Text(
                       'Subject Result',
                       style: TextStyle(
-                        fontSize: headingFontSize,
+                        fontSize: 31,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                
                   Padding(
                     padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
-                    child: FutureBuilder<List<String>>(
-                      future: classesList,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(
-                              child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return Center(child: Text('No classes found'));
-                        } else {
-                          List<String> classes = snapshot.data!;
-                          if (!classes.contains(selectedClass)) {
-                            selectedClass = classes[0];
-                          }
-                          return DropdownButtonFormField<String>(
-                            value: selectedClass,
-                            decoration: InputDecoration(
-                              labelText: "Class",
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: Colors.black),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(
-                                    color: AppColors.appOrange, width: 2.0),
-                              ),
-                            ),
-                            items: classes.map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedClass = newValue!;
-                                updateData();
-                              });
-                            },
-                          );
+                    child: Obx(() {
+                      var classesList = controller.classesList;
+                      if (classesList.isEmpty) {
+                        return Center(child: CircularProgressIndicator());
+                      } else {
+                        if (!classesList
+                            .contains(controller.selectedClass.value)) {
+                          controller.selectedClass.value =
+                              classesList.isNotEmpty ? classesList[0] : '';
                         }
-                      },
-                    ),
+
+                        return DropdownButtonFormField<String>(
+                          value: controller.selectedClass.value.isEmpty
+                              ? null
+                              : controller.selectedClass.value,
+                          decoration: InputDecoration(
+                            labelText: "Class",
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                  color: AppColors.appOrange, width: 2.0),
+                            ),
+                          ),
+                          items: classesList.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              controller.selectedClass.value = newValue;
+                              controller.updateData();
+                            }
+                          },
+                        );
+                      }
+                    }),
                   ),
-                
                   Padding(
                     padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
-                    child: FutureBuilder<List<String>>(
-                      future: subjectsList,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(
-                              child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return Center(child: Text('No subjects found'));
-                        } else {
-                          List<String> subjects = snapshot.data!;
-                          if (!subjects.contains(selectedSubject)) {
-                            selectedSubject = subjects[0];
-                          }
-                          return DropdownButtonFormField<String>(
-                            value: selectedSubject,
-                            
-                            decoration: InputDecoration(
-                              labelText: "Subject",
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: Colors.black),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(
-                                    color: AppColors.appOrange, width: 2.0),
-                              ),
-                            ),
-                            items: subjects.map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedSubject = newValue!;
-                              });
-                            },
-                          );
+                    child: Obx(() {
+                      var subjectsList = controller.subjectsList;
+                      if (subjectsList.isEmpty) {
+                        return Center(child: CircularProgressIndicator());
+                      } else {
+                        if (!subjectsList
+                            .contains(controller.selectedSubject.value)) {
+                          controller.selectedSubject.value =
+                              subjectsList.isNotEmpty ? subjectsList[0] : '';
                         }
-                      },
-                    ),
+
+                        return DropdownButtonFormField<String>(
+                          value: controller.selectedSubject.value.isEmpty
+                              ? null
+                              : controller.selectedSubject.value,
+                          decoration: InputDecoration(
+                            labelText: "Subject",
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                  color: AppColors.appOrange, width: 2.0),
+                            ),
+                          ),
+                          items: subjectsList.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              controller.selectedSubject.value = newValue;
+                            }
+                          },
+                        );
+                      }
+                    }),
                   ),
                   Expanded(
-                    
                     child: SingleChildScrollView(
-                      
                       scrollDirection: Axis.horizontal,
-                      child: FutureBuilder<List<String>>(
-                        future: examsList,
-                        builder: (context, examSnapshot) {
-                          if (examSnapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return SizedBox(
-                              width: screenWidth,
-                              height: 20,
-                              child: Padding(
-                                  padding: EdgeInsets.only(left: 30),
-                                  child: Text('Loading...')),
-                            );
-                          } else if (examSnapshot.hasError) {
-                            return Text('Error: ${examSnapshot.error}');
-                          } else if (!examSnapshot.hasData ||
-                              examSnapshot.data!.isEmpty) {
-                            return Center(
-                              child: 
-                                Text('No exams found for this school/class'),
-                              
-                            );
-                          } else {
-                            List<String> exams = examSnapshot.data!;
-                            return FutureBuilder<List<Student>>(
-                              future: studentsList,
-                              builder: (context, studentSnapshot) {
-                                if (examSnapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return SizedBox(
-                                    width: screenWidth,
-                                    height: 20,
-                                    child: Padding(
-                                        padding: EdgeInsets.only(left: 30),
-                                        child: Text('Loading...')),
-                                  );
-                                } else if (studentSnapshot.hasError) {
-                                  return Text(
-                                      'Error: ${studentSnapshot.error}');
-                                } else if (!studentSnapshot.hasData ||
-                                    studentSnapshot.data!.isEmpty) {
-                                  return Padding(
-                                      padding: EdgeInsets.only(left: 30),
-                                      child: Text('No students found'));
-                                } else {
-                                  List<Student> students =
-                                      studentSnapshot.data!;
-                                  return DataTable(
-                                    columns: [
+                      child: Column(
+                        children: [
+                          Obx(() {
+                            var subjectsList = controller.subjectsList;
+                            if (subjectsList.isEmpty) {
+                              return Padding(
+                                padding: EdgeInsets.fromLTRB(30, 20, 0, 0),
+                                child: Text(
+                                  'No subjects found...',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Container(); // Placeholder to maintain layout structure
+                            }
+                          }),
+                          Obx(() {
+                            var examsList = controller.examsList;
+                            if (examsList.isEmpty) {
+                              return Container(
+                                width: screenWidth,
+                                height: 20,
+                                padding: EdgeInsets.only(left: 30),
+                                child: Center(
+                                  child: Text(
+                                    'No exams found for this Class',
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Obx(() {
+                                var students = controller.studentsList;
+                                return DataTable(
+                                  columns: [
+                                    DataColumn(
+                                      label: Text(
+                                        'Roll No.',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Student Name',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    for (var exam in examsList)
                                       DataColumn(
                                         label: Text(
-                                          'Roll No.',
+                                          exam,
                                           style: TextStyle(
-                                            fontSize: resultFontSize,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
-                                      DataColumn(
-                                        label: Text(
-                                          'Student Name',
-                                          style: TextStyle(
-                                            fontSize: resultFontSize,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                  ],
+                                  rows: students.map((student) {
+                                    return DataRow(
+                                      color: MaterialStateProperty.resolveWith<
+                                          Color?>(
+                                        (Set<MaterialState> states) {
+                                          return AppColors
+                                              .appOrange; // Set the desired color here
+                                        },
                                       ),
-                                      for (var exam in exams)
-                                        DataColumn(
-                                          label: Text(
-                                            exam,
-                                            style: TextStyle(
-                                              fontSize: resultFontSize,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                    rows: students.map((student) {
-                                      return DataRow(
-                                        color: MaterialStateProperty
-                                            .resolveWith<Color?>(
-                                          (Set<MaterialState> states) {
-                                            return AppColors
-                                                .appOrange; // Set the desired color here
-                                          },
-                                        ),
-                                        cells: [
-                                          DataCell(Text(student.studentRollNo)),
-                                          DataCell(Text(student.name)),
-                                          for (var exam in exams)
-                                            DataCell(FutureBuilder<
-                                                Map<String, String>>(
-                                              future: databaseService
-                                                  .fetchStudentResultMap(
-                                                      widget.school.schoolId.value,
+                                      cells: [
+                                        DataCell(Text(student.studentRollNo)),
+                                        DataCell(Text(student.name)),
+                                        for (var exam in examsList)
+                                          DataCell(Obx(() {
+                                            return FutureBuilder<String>(
+                                              future: controller
+                                                  .fetchStudentResults(
                                                       student.studentID)
-                                                  .then((result) {
-                                                return result[
-                                                        selectedSubject] ??
-                                                    {};
+                                                  .then((resultMap) {
+                                                return resultMap[exam] ?? '-';
                                               }),
                                               builder:
                                                   (context, resultSnapshot) {
@@ -350,33 +316,32 @@ class _SubjectResultState extends State<SubjectResult> {
                                                         .connectionState ==
                                                     ConnectionState.waiting) {
                                                   return Padding(
-                                                      padding: EdgeInsets.only(
-                                                          left: 30),
-                                                      child:
-                                                          Text('Loading...'));
+                                                    padding: EdgeInsets.only(
+                                                        left: 30),
+                                                    child: Text('Loading...'),
+                                                  );
                                                 } else if (resultSnapshot
                                                     .hasError) {
                                                   return Text('Error');
                                                 } else {
-                                                  String result = resultSnapshot
-                                                          .data![exam] ??
-                                                      '-';
-                                                  return Text(result);
+                                                  return Text(
+                                                      resultSnapshot.data ??
+                                                          '-');
                                                 }
                                               },
-                                            )),
-                                        ],
-                                      );
-                                    }).toList(),
-                                  );
-                                }
-                              },
-                            );
-                          }
-                        },
+                                            );
+                                          })),
+                                      ],
+                                    );
+                                  }).toList(),
+                                );
+                              });
+                            }
+                          }),
+                        ],
                       ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -385,13 +350,4 @@ class _SubjectResultState extends State<SubjectResult> {
       ),
     );
   }
-
-
-}
-
-Future<Map<String, String>> fetchStudentResults(
-    Database_Service databaseService, String studentID, String subject, String schoolId) async {
-  Map<String, Map<String, String>>? studentResult = await databaseService
-      .fetchStudentResultMap(schoolId, studentID);
-  return studentResult[subject] ?? {};
 }

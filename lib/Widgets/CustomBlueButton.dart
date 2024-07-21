@@ -8,7 +8,7 @@ class CustomBlueButton extends StatelessWidget {
   const CustomBlueButton({
     Key? key,
     required this.buttonText,
-    required this.onPressed,
+    required this.onPressed, required String text,
   }) : super(key: key);
 
   @override
