@@ -464,8 +464,7 @@ class AddTeacher extends StatelessWidget {
                                       },
                                     );
 
-                                    try {
-                                      await Database_Service.saveTeacher(
+                                    Database_Service.saveTeacher(
                                         controller.schoolId,
                                         controller.empIDController.text,
                                         controller.nameController.text,
@@ -478,12 +477,7 @@ class AddTeacher extends StatelessWidget {
                                         controller.selectedClassTeacher.value,
                                       );
 
-                                      // Navigator.of(context).pop();
-                                      //  Get.snackbar('Success', 'Teacher added successfully');
-                                    } catch (e) {
-                                      Navigator.of(context).pop();
-                                      print('Error saving teacher: $e');
-                                    }
+
                                        Navigator.of(context).pop();
                                        Get.snackbar('Success', 'Teacher added successfully');
 
