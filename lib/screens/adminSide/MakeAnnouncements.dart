@@ -79,15 +79,18 @@ class MakeAnnouncements extends StatelessWidget {
                             );
                             return;
                           }else{
-
-                          Database_Service.createAnnouncement(controller.school.schoolId.value, '', controller.announcementController.text, 'Admin', true);
-
+                          
                           Get.snackbar(
                             'Announcement Sent',
                             'The announement has been successfully sent to all the school.',
                           );
 
-                          Get.back();
+                          Database_Service.createAnnouncement(controller.school.schoolId.value, '', controller.announcementController.text, 'Admin', true);
+
+                          controller.announcementController.clear();
+
+                          Navigator.of(context).pop();
+
                         }
                         },
                         child: Text(

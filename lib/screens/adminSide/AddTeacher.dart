@@ -439,8 +439,6 @@ class AddTeacher extends StatelessWidget {
                                 onPressed: () async {
                                   if (controller.selectedClasses.isEmpty ||
                                       controller.selectedSubjects.isEmpty ||
-                                      controller
-                                          .selectedClassTeacher.value.isEmpty ||
                                       controller.empIDController.text.isEmpty ||
                                       controller.nameController.text.isEmpty ||
                                       controller.selectedGender.value.isEmpty ||
@@ -481,6 +479,8 @@ class AddTeacher extends StatelessWidget {
                                       );
 
                                       Navigator.of(context).pop();
+                                      Navigator.of(context).pop();
+                                       Get.snackbar('Success', 'Teacher added successfully');
                                     } catch (e) {
                                       Navigator.of(context).pop();
                                       print('Error saving teacher: $e');

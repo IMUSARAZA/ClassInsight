@@ -509,8 +509,8 @@ void _showFeeStatusPopup(BuildContext context, Student student) {
   
   // Initialize with existing values
   String feeStatus = student.feeStatus;
-  String originalStartDate = student.feeStartDate ?? '';
-  String originalEndDate = student.feeEndDate ?? '';
+  String originalStartDate = student.feeStartDate;
+  String originalEndDate = student.feeEndDate;
 
   // Set controllers with existing values
   startDateController.text = originalStartDate;
