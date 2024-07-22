@@ -478,9 +478,8 @@ class AddTeacher extends StatelessWidget {
                                         controller.selectedClassTeacher.value,
                                       );
 
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop();
-                                       Get.snackbar('Success', 'Teacher added successfully');
+                                      // Navigator.of(context).pop();
+                                      //  Get.snackbar('Success', 'Teacher added successfully');
                                     } catch (e) {
                                       Navigator.of(context).pop();
                                       print('Error saving teacher: $e');

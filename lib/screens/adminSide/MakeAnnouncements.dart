@@ -79,7 +79,20 @@ class MakeAnnouncements extends StatelessWidget {
                             );
                             return;
                           }else{
-                          
+                          showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext context) {
+                                        return const Center(
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    AppColors.appLightBlue),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                    
                           Get.snackbar(
                             'Announcement Sent',
                             'The announement has been successfully sent to all the school.',
