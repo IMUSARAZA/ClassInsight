@@ -1,4 +1,5 @@
 import 'package:classinsight/firebase_options.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
@@ -79,11 +80,11 @@ class MyApp extends StatelessWidget {
 }
 
 class StudentResult extends StatelessWidget {
+  final AdminHomeController school = Get.find();
   @override
   Widget build(BuildContext context) {
-    // Get the Student object passed through arguments
     final Student student = ModalRoute.of(context)!.settings.arguments as Student;
-    final String schoolId = 'buwF2J4lkLCdIVrHfgkP'; // Replace with your actual school ID
+    final String schoolId = school.schoolId.value; 
 
     // Initialize the controller with the school ID
     final StudentResultController controller = Get.put(StudentResultController(schoolId));

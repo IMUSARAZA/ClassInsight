@@ -174,7 +174,7 @@ class AddTeacher extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 40, 30, 0),
+                              padding: const EdgeInsets.fromLTRB(30, 40, 30, 20),
                               child: CustomTextField(
                                 controller: controller.empIDController,
                                 hintText: 'Employee ID',
@@ -184,7 +184,7 @@ class AddTeacher extends StatelessWidget {
                             ),
                             Padding(
                               padding:
-                                  const EdgeInsets.fromLTRB(30, 40, 30, 20),
+                                  const EdgeInsets.fromLTRB(30, 0, 30, 20),
                               child: CustomTextField(
                                 controller: controller.nameController,
                                 hintText: 'Name',

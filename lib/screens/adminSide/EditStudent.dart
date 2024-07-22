@@ -16,10 +16,12 @@ class EditStudent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AdminHomeController school = Get.find(); // Accessing AdminHomeController
+    final AdminHomeController school =
+        Get.find(); // Accessing AdminHomeController
 
     return GetBuilder<EditStudentController>(
-      init: EditStudentController(student), // Initialize the controller with student data
+      init: EditStudentController(
+          student), // Initialize the controller with student data
       builder: (controller) {
         return Scaffold(
           backgroundColor: AppColors.appLightBlue,
@@ -31,7 +33,7 @@ class EditStudent extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Container(
-                    height: MediaQuery.of(context).size.height * 0.05,
+                    height: MediaQuery.of(context).size.height * 0.10,
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       color: AppColors.appLightBlue,
@@ -40,7 +42,7 @@ class EditStudent extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                          padding: EdgeInsets.only(top: 20),
                           child: IconButton(
                             icon: const Icon(Icons.arrow_back),
                             onPressed: () {
@@ -49,18 +51,19 @@ class EditStudent extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                          padding: EdgeInsets.only(top: 20),
                           child: Text(
                             'Edit Student',
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 16, // editStdFontSize is removed for simplification
+                              fontSize:
+                                  16, // editStdFontSize is removed for simplification
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                          padding: EdgeInsets.only(top: 20),
                           child: TextButton(
                             onPressed: () async {
                               showDialog(
@@ -88,10 +91,12 @@ class EditStudent extends StatelessWidget {
                                 'Gender': controller.changedGender,
                                 'BForm_challanId':
                                     controller.bForm_challanIdController.text,
-                                'FatherName': controller.fatherNameController.text,
+                                'FatherName':
+                                    controller.fatherNameController.text,
                                 'FatherPhoneNo':
                                     controller.fatherPhoneNoController.text,
-                                'FatherCNIC': controller.fatherCNICController.text,
+                                'FatherCNIC':
+                                    controller.fatherCNICController.text,
                                 'StudentRollNo': student.studentRollNo,
                                 'ClassSection': controller.changedClass,
                               };
@@ -105,7 +110,8 @@ class EditStudent extends StatelessWidget {
                               );
 
                               Navigator.of(context).pop(); // Close the dialog
-                              Get.offAll(() => ManageStudents()); // Navigate back to ManageStudents
+                              Get.offAll(() =>
+                                  ManageStudents()); // Navigate back to ManageStudents
                             },
                             child: Text(
                               'Save',
@@ -128,7 +134,8 @@ class EditStudent extends StatelessWidget {
                       'Edit Student',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 33, // headingFontSize is removed for simplification
+                        fontSize:
+                            33, // headingFontSize is removed for simplification
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -159,9 +166,11 @@ class EditStudent extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+                                padding:
+                                    const EdgeInsets.fromLTRB(30, 10, 30, 0),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     GestureDetector(
                                       onTap: () {
@@ -171,21 +180,27 @@ class EditStudent extends StatelessWidget {
                                           ? SizedBox(
                                               width: 200,
                                               child: TextField(
-                                                controller: controller.nameController,
+                                                controller:
+                                                    controller.nameController,
                                                 decoration: InputDecoration(
                                                   hintText: "Edit name",
                                                   labelText: "Name",
-                                                  focusedBorder: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.all(
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
                                                       Radius.circular(10),
                                                     ),
                                                     borderSide: BorderSide(
-                                                      color: AppColors.appLightBlue,
+                                                      color: AppColors
+                                                          .appLightBlue,
                                                       width: 2.0,
                                                     ),
                                                   ),
-                                                  enabledBorder: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.all(
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
                                                       Radius.circular(10),
                                                     ),
                                                     borderSide: BorderSide(
@@ -200,14 +215,16 @@ class EditStudent extends StatelessWidget {
                                               student.name.split(' ')[0],
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 25, // nameFontSize is removed for simplification
+                                                fontSize:
+                                                    25, // nameFontSize is removed for simplification
                                               ),
                                             ),
                                     ),
                                     Text(
                                       student.studentRollNo,
                                       style: TextStyle(
-                                        fontSize: 22, // rollNoFontSize is removed for simplification
+                                        fontSize:
+                                            22, // rollNoFontSize is removed for simplification
                                       ),
                                     ),
                                   ],
@@ -220,7 +237,8 @@ class EditStudent extends StatelessWidget {
                                   children: [
                                     Expanded(
                                       child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(13, 0, 0, 0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            13, 0, 0, 0),
                                         child: DropdownButtonFormField<String>(
                                           decoration: InputDecoration(
                                             hintText: "Select your gender",
@@ -246,7 +264,8 @@ class EditStudent extends StatelessWidget {
                                           ),
                                           value: controller.selectedGender,
                                           onChanged: (newValue) {
-                                            controller.updateSelectedGender(newValue!);
+                                            controller.updateSelectedGender(
+                                                newValue!);
                                           },
                                           items: ['Male', 'Female', 'Other']
                                               .map<DropdownMenuItem<String>>(
@@ -270,9 +289,11 @@ class EditStudent extends StatelessWidget {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
                                               return Center(
-                                                  child: CircularProgressIndicator(
+                                                  child:
+                                                      CircularProgressIndicator(
                                                 valueColor:
-                                                    AlwaysStoppedAnimation<Color>(
+                                                    AlwaysStoppedAnimation<
+                                                        Color>(
                                                   AppColors.appLightBlue,
                                                 ),
                                               ));
@@ -283,28 +304,38 @@ class EditStudent extends StatelessWidget {
                                             } else if (!snapshot.hasData ||
                                                 snapshot.data!.isEmpty) {
                                               return Center(
-                                                  child: Text('No classes found'));
+                                                  child:
+                                                      Text('No classes found'));
                                             } else {
-                                              List<String> classes = snapshot.data!;
-                                              if (!classes.contains(controller.selectedClass)) {
-                                                controller.updateSelectedClass(classes[0]);
+                                              List<String> classes =
+                                                  snapshot.data!;
+                                              if (!classes.contains(
+                                                  controller.selectedClass)) {
+                                                controller.updateSelectedClass(
+                                                    classes[0]);
                                               }
-                                              return DropdownButtonFormField<String>(
+                                              return DropdownButtonFormField<
+                                                  String>(
                                                 value: controller.selectedClass,
                                                 decoration: InputDecoration(
                                                   hintText: "Select your class",
                                                   labelText: "Class",
-                                                  focusedBorder: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.all(
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
                                                       Radius.circular(10),
                                                     ),
                                                     borderSide: BorderSide(
-                                                      color: AppColors.appLightBlue,
+                                                      color: AppColors
+                                                          .appLightBlue,
                                                       width: 2.0,
                                                     ),
                                                   ),
-                                                  enabledBorder: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.all(
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
                                                       Radius.circular(10),
                                                     ),
                                                     borderSide: BorderSide(
@@ -313,14 +344,18 @@ class EditStudent extends StatelessWidget {
                                                     ),
                                                   ),
                                                 ),
-                                                items: classes.map((String value) {
-                                                  return DropdownMenuItem<String>(
+                                                items:
+                                                    classes.map((String value) {
+                                                  return DropdownMenuItem<
+                                                      String>(
                                                     value: value,
                                                     child: Text(value),
                                                   );
                                                 }).toList(),
                                                 onChanged: (String? newValue) {
-                                                  controller.updateSelectedClass(newValue!);
+                                                  controller
+                                                      .updateSelectedClass(
+                                                          newValue!);
                                                 },
                                               );
                                             }
@@ -332,16 +367,19 @@ class EditStudent extends StatelessWidget {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                                padding:
+                                    const EdgeInsets.fromLTRB(30, 0, 30, 20),
                                 child: CustomTextField(
-                                  controller: controller.bForm_challanIdController,
+                                  controller:
+                                      controller.bForm_challanIdController,
                                   hintText: student.bFormChallanId,
                                   labelText: 'B-Form/Challan ID',
                                   isValid: controller.bForm_challanIdValid,
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                                padding:
+                                    const EdgeInsets.fromLTRB(30, 0, 30, 20),
                                 child: CustomTextField(
                                   controller: controller.fatherNameController,
                                   hintText: student.fatherName,
@@ -350,16 +388,19 @@ class EditStudent extends StatelessWidget {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                                padding:
+                                    const EdgeInsets.fromLTRB(30, 0, 30, 20),
                                 child: CustomTextField(
-                                  controller: controller.fatherPhoneNoController,
+                                  controller:
+                                      controller.fatherPhoneNoController,
                                   hintText: student.fatherPhoneNo,
                                   labelText: "Father's phone no.",
                                   isValid: controller.fatherPhoneNoValid,
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                                padding:
+                                    const EdgeInsets.fromLTRB(30, 0, 30, 20),
                                 child: CustomTextField(
                                   controller: controller.fatherCNICController,
                                   hintText: student.fatherCNIC,
@@ -382,6 +423,7 @@ class EditStudent extends StatelessWidget {
     );
   }
 }
+
 class EditStudentController extends GetxController {
   late TextEditingController nameController;
   late TextEditingController bForm_challanIdController;
@@ -402,13 +444,16 @@ class EditStudentController extends GetxController {
 
   late Future<List<String>> classesList;
 
-  final AdminHomeController school = Get.find(); // Accessing AdminHomeController
+  final AdminHomeController school =
+      Get.find(); // Accessing AdminHomeController
 
   EditStudentController(Student student) {
     nameController = TextEditingController(text: student.name);
-    bForm_challanIdController = TextEditingController(text: student.bFormChallanId);
+    bForm_challanIdController =
+        TextEditingController(text: student.bFormChallanId);
     fatherNameController = TextEditingController(text: student.fatherName);
-    fatherPhoneNoController = TextEditingController(text: student.fatherPhoneNo);
+    fatherPhoneNoController =
+        TextEditingController(text: student.fatherPhoneNo);
     fatherCNICController = TextEditingController(text: student.fatherCNIC);
 
     isEditingName = false;
