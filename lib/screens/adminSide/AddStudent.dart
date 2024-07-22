@@ -312,7 +312,7 @@ class AddStudent extends StatelessWidget {
                               padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
                               child: CustomTextField(
                                 controller: controller.fatherPhoneNoController,
-                                hintText: "Father's phone number",
+                                hintText: "03xxxxxxxxx",
                                 labelText: "Father's phone number",
                                 isValid: controller.fatherPhoneNoValid.value,
                               ),
@@ -321,7 +321,7 @@ class AddStudent extends StatelessWidget {
                               padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
                               child: CustomTextField(
                                 controller: controller.fatherCNICController,
-                                hintText: "Father's CNIC",
+                                hintText: "35202xxxxxxxx",
                                 labelText: "Father's CNIC",
                                 isValid: controller.fatherCNICValid.value,
                               ),
