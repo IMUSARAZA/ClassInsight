@@ -1,6 +1,7 @@
 // lib/controllers/add_student_controller.dart
 // ignore_for_file: prefer_const_constructors
 
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
@@ -19,6 +20,8 @@ class AddStudentController extends GetxController {
   final fatherCNICController = TextEditingController();
   final studentRollNoController = TextEditingController();
 
+  final AdminHomeController school = Get.find();
+
   // Observables for validation
   var nameValid = true.obs;
   var genderValid = true.obs;
@@ -35,7 +38,7 @@ class AddStudentController extends GetxController {
 
   // Fetch classes from the database
   Future<List<String>> fetchClasses() async {
-    return await Database_Service.fetchAllClasses('buwF2J4lkLCdIVrHfgkP');
+    return await Database_Service.fetchAllClasses(school.schoolId.value);
   }
 
   bool validateInputs() {
@@ -49,13 +52,13 @@ class AddStudentController extends GetxController {
     selectedClassValid.value = selectedClass.value.isNotEmpty;
 
     return nameValid.value &&
-           genderValid.value &&
-           bFormChallanIdValid.value &&
-           fatherNameValid.value &&
-           fatherPhoneNoValid.value &&
-           fatherCNICValid.value &&
-           studentRollNoValid.value &&
-           selectedClassValid.value;
+        genderValid.value &&
+        bFormChallanIdValid.value &&
+        fatherNameValid.value &&
+        fatherPhoneNoValid.value &&
+        fatherCNICValid.value &&
+        studentRollNoValid.value &&
+        selectedClassValid.value;
   }
 
   Future<void> addStudent() async {
@@ -63,8 +66,32 @@ class AddStudentController extends GetxController {
       // Show loading dialog
       Get.dialog(
         Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.appLightBlue),
+          child: Container(
+            color: Colors.white,
+            width: double.infinity,
+            height: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: CircularProgressIndicator(
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.appLightBlue),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Adding student...',
+                  style: TextStyle(
+                    color: AppColors.appLightBlue,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         barrierDismissible: false,
@@ -90,7 +117,7 @@ class AddStudentController extends GetxController {
       // Call the database service to save the student
       Database_Service databaseService = Database_Service();
       await databaseService.saveStudent(
-        'buwF2J4lkLCdIVrHfgkP', // Replace with your actual school ID
+        school.schoolId.value, // Replace with your actual school ID
         selectedClass.value, // Pass selected class section
         student, // Pass the student object
       );
@@ -306,12 +333,17 @@ class AddStudent extends StatelessWidget {
                               child: FutureBuilder<List<String>>(
                                 future: controller.fetchClasses(),
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return Center(child: CircularProgressIndicator());
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                        child: CircularProgressIndicator());
                                   } else if (snapshot.hasError) {
-                                    return Center(child: Text('Error fetching classes'));
-                                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                    return Center(child: Text('No classes available'));
+                                    return Center(
+                                        child: Text('Error fetching classes'));
+                                  } else if (!snapshot.hasData ||
+                                      snapshot.data!.isEmpty) {
+                                    return Center(
+                                        child: Text('No classes available'));
                                   } else {
                                     return Theme(
                                       data: Theme.of(context).copyWith(
@@ -322,27 +354,31 @@ class AddStudent extends StatelessWidget {
                                           hintText: "Select class",
                                           labelText: "Class",
                                           focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.all(Radius.circular(10)),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10)),
                                             borderSide: BorderSide(
                                                 color: AppColors.appLightBlue,
                                                 width: 2.0),
                                           ),
                                           enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.all(Radius.circular(10)),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10)),
                                             borderSide: BorderSide(
-                                                color: Colors.black, width: 1.0),
+                                                color: Colors.black,
+                                                width: 1.0),
                                           ),
                                         ),
-                                        value: controller.selectedClass.value.isEmpty
+                                        value: controller
+                                                .selectedClass.value.isEmpty
                                             ? null
                                             : controller.selectedClass.value,
                                         onChanged: (newValue) {
-                                          controller.selectedClass.value = newValue!;
+                                          controller.selectedClass.value =
+                                              newValue!;
                                         },
-                                        items: snapshot.data!.map<DropdownMenuItem<String>>(
-                                            (String value) {
+                                        items: snapshot.data!
+                                            .map<DropdownMenuItem<String>>(
+                                                (String value) {
                                           return DropdownMenuItem<String>(
                                             value: value,
                                             child: Text(value),
@@ -355,10 +391,12 @@ class AddStudent extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 20),
                               child: CustomBlueButton(
                                 onPressed: controller.addStudent,
-                                text: 'Add Student', buttonText: 'Add',
+                                text: 'Add Student',
+                                buttonText: 'Add',
                               ),
                             ),
                           ],

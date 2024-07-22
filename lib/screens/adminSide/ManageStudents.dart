@@ -505,6 +505,7 @@ class ManageStudents extends StatelessWidget {
 void _showFeeStatusPopup(BuildContext context, Student student) {
   TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
+  final AdminHomeController school = Get.find();
   
   // Initialize with existing values
   String feeStatus = student.feeStatus;
@@ -608,7 +609,7 @@ void _showFeeStatusPopup(BuildContext context, Student student) {
 
               try {
                 await Database_Service.updateFeeStatus(
-                    "buwF2J4lkLCdIVrHfgkP",
+                    school.schoolId.value,
                     student.studentID,
                     feeStatus,
                     updatedStartDate,

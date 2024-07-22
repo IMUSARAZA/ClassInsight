@@ -3,6 +3,7 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/models/StudentModel.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class DisplayMarksController extends GetxController {
   var subjectsList = <String>[].obs;
   var studentsList = <Student>[].obs;
   var examsList = <String>[].obs;
+  final AdminHomeController school = Get.find();
 
   var selectedSubject = ''.obs;
   final String className = "2-A"; // Initialize with "2-A"
@@ -41,7 +43,7 @@ class DisplayMarksController extends GetxController {
   }
 
   void fetchInitialData() async {
-    schoolId = "buwF2J4lkLCdIVrHfgkP";
+    schoolId = school.schoolId.value;
 
     subjectsList.value =
         await Database_Service.fetchSubjects(schoolId, className);
@@ -58,7 +60,7 @@ class DisplayMarksController extends GetxController {
   }
 
   void updateData() async {
-    schoolId = "buwF2J4lkLCdIVrHfgkP";
+    schoolId = school.schoolId.value;
 
     subjectsList.value =
         await Database_Service.fetchSubjects(schoolId, className);
