@@ -181,13 +181,14 @@ class EditTeacher extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          if (controller.nameController.text.isEmpty &&
-                              controller.selectedGender.value.isEmpty &&
-                              controller.selectedClassTeacher.value.isEmpty &&
-                              controller.phoneNoController.text.isEmpty &&
-                              controller.cnicController.text.isEmpty &&
-                              controller.fatherNameController.text.isEmpty &&
-                              controller.selectedClasses.isEmpty &&
+                          if (
+                            controller.nameController.text.isEmpty ||
+                              controller.selectedGender.value.isEmpty ||
+                              controller.selectedClassTeacher.value.isEmpty ||
+                              controller.phoneNoController.text.isEmpty ||
+                              controller.cnicController.text.isEmpty ||
+                              controller.fatherNameController.text.isEmpty ||
+                              controller.selectedClasses.isEmpty ||
                               controller.selectedSubjects.isEmpty) {
                             Get.snackbar('No Changes Made',
                                 'Please make some changes to update the teacher');
