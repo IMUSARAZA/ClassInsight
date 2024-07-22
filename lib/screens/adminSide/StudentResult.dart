@@ -121,11 +121,12 @@ class StudentResult extends StatelessWidget {
                         leading: IconButton(
                           icon: const Icon(Icons.arrow_back),
                           onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ManageStudents()),
-                            );
+                            Get.back();
+                            // Navigator.pushReplacement(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => ManageStudents()),
+                            // );
                           },
                         ),
                         title: Center(

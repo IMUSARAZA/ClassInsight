@@ -84,7 +84,7 @@ class StudentController extends GetxController {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false);
+                Get.back();
               },
               child: Text('Cancel'),
             ),
@@ -137,27 +137,33 @@ class ManageStudents extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text(
-          "Manage Students",
-          style: Font_Styles.labelHeadingRegular(context),
-        ),
-        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => AdminHome()),
-            );
+            Get.back();
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => AdminHome()),
+            // );
           },
         ),
-        actions: [
+        title: Text(
+          'Students',
+          style: Font_Styles.labelHeadingLight(context),
+        ),
+        centerTitle: true,
+        actions: <Widget>[
+          Container(
+            width: 48.0,
+          ),
           TextButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/AddStudent');
+              Get.toNamed("/AddStudent");
             },
-            child: Text('Add Student',
-                style: Font_Styles.labelHeadingRegular(context)),
+            child: Text(
+              "Add Student",
+              style: Font_Styles.labelHeadingLight(context),
+            ),
           ),
         ],
       ),
@@ -416,10 +422,6 @@ class ManageStudents extends StatelessWidget {
                                     child: Text(student.feeStatus),
                                     onPressed: () {
                                       _showFeeStatusPopup(context, student);
-
-                                      final studentController =
-                                          Get.find<StudentController>();
-                                      studentController.refreshStudentList();
                                     }),
                               ),
                               DataCell(
@@ -504,11 +506,12 @@ class ManageStudents extends StatelessWidget {
     );
   }
 }
+
 void _showFeeStatusPopup(BuildContext context, Student student) {
   TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
   final AdminHomeController school = Get.find();
-  
+
   // Initialize with existing values
   String feeStatus = student.feeStatus;
   String originalStartDate = student.feeStartDate ?? '';
@@ -616,6 +619,9 @@ void _showFeeStatusPopup(BuildContext context, Student student) {
                     feeStatus,
                     updatedStartDate,
                     updatedEndDate);
+
+                final studentController = Get.find<StudentController>();
+                studentController.refreshStudentList();
 
                 Navigator.of(context).pop();
               } catch (e) {

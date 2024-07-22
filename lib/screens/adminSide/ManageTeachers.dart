@@ -175,10 +175,11 @@ class _ManageTeachersState extends State<ManageTeachers> {
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => AdminHome()),
-                        );
+                        Get.back();
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(builder: (context) => AdminHome()),
+                        // );
                       },
                     ),
                     title: Text(
@@ -195,7 +196,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                           Get.toNamed("/AddTeacher");
                         },
                         child: Text(
-                          "Add",
+                          "Add Teacher",
                           style: Font_Styles.labelHeadingLight(context),
                         ),
                       ),

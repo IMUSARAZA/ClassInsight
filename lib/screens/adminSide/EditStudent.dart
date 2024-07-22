@@ -16,8 +16,7 @@ class EditStudent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AdminHomeController school =
-        Get.find(); // Accessing AdminHomeController
+    final AdminHomeController school = Get.put(AdminHomeController());
 
     return GetBuilder<EditStudentController>(
       init: EditStudentController(
@@ -46,7 +45,8 @@ class EditStudent extends StatelessWidget {
                           child: IconButton(
                             icon: const Icon(Icons.arrow_back),
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              Get.back();
+                              // Navigator.of(context).pop();
                             },
                           ),
                         ),
@@ -445,7 +445,7 @@ class EditStudentController extends GetxController {
   late Future<List<String>> classesList;
 
   final AdminHomeController school =
-      Get.find(); // Accessing AdminHomeController
+      Get.put(AdminHomeController()); // Accessing AdminHomeController
 
   EditStudentController(Student student) {
     nameController = TextEditingController(text: student.name);

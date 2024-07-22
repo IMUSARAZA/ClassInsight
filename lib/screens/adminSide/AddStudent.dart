@@ -42,15 +42,22 @@ class AddStudentController extends GetxController {
   }
 
   bool validateInputs() {
+    // Regular expressions for validation
+    RegExp numeric13Digits = RegExp(r'^\d{13}$');
+    RegExp numeric11Digits = RegExp(r'^\d{11}$');
+
+    // Validate each field
     nameValid.value = nameController.text.isNotEmpty;
-    genderValid.value = selectedGender.value.isNotEmpty;
+    genderValid.value = selectedGender.isNotEmpty;
     bFormChallanIdValid.value = bFormChallanIdController.text.isNotEmpty;
     fatherNameValid.value = fatherNameController.text.isNotEmpty;
-    fatherPhoneNoValid.value = fatherPhoneNoController.text.isNotEmpty;
-    fatherCNICValid.value = fatherCNICController.text.isNotEmpty;
+    fatherPhoneNoValid.value =
+        numeric11Digits.hasMatch(fatherPhoneNoController.text);
+    fatherCNICValid.value = numeric13Digits.hasMatch(fatherCNICController.text);
     studentRollNoValid.value = studentRollNoController.text.isNotEmpty;
-    selectedClassValid.value = selectedClass.value.isNotEmpty;
+    selectedClassValid.value = selectedClass.isNotEmpty;
 
+    // Return overall validation status
     return nameValid.value &&
         genderValid.value &&
         bFormChallanIdValid.value &&

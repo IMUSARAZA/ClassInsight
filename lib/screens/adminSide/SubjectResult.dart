@@ -89,11 +89,12 @@ class SubjectResult extends StatelessWidget {
                       leading: IconButton(
                         icon: const Icon(Icons.arrow_back),
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AdminHome()),
-                          );
+                          Get.back();
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) => AdminHome()),
+                          // );
                         },
                       ),
                       title: Center(

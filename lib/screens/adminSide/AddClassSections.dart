@@ -232,9 +232,12 @@ class AddClassSections extends StatelessWidget {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          'Number of Sections',
-                                          style: Font_Styles.labelHeadingLight(context),
+                                        Padding(
+                                          padding: EdgeInsets.only(bottom: 10),
+                                          child: Text(
+                                            'Number of Sections',
+                                            style: Font_Styles.labelHeadingLight(context),
+                                          ),
                                         ),
                                         Obx(
                                           () => Container(
