@@ -437,16 +437,14 @@ class AddTeacher extends StatelessWidget {
                               child: CustomBlueButton(
                                 buttonText: 'Add',
                                 onPressed: () async {
-                                  if (controller.selectedClasses.isEmpty &&
-                                      controller.selectedSubjects.isEmpty &&
+                                  if (controller.selectedClasses.isEmpty ||
+                                      controller.selectedSubjects.isEmpty ||
+                                      controller.empIDController.text.isEmpty ||
+                                      controller.nameController.text.isEmpty ||
+                                      controller.selectedGender.value.isEmpty ||
                                       controller
-                                          .selectedClassTeacher.value.isEmpty &&
-                                      controller.empIDController.text.isEmpty &&
-                                      controller.nameController.text.isEmpty &&
-                                      controller.selectedGender.value.isEmpty &&
-                                      controller
-                                          .phoneNoController.text.isEmpty &&
-                                      controller.cnicController.text.isEmpty &&
+                                          .phoneNoController.text.isEmpty ||
+                                      controller.cnicController.text.isEmpty ||
                                       controller
                                           .fatherNameController.text.isEmpty) {
                                     Get.snackbar(
@@ -466,8 +464,7 @@ class AddTeacher extends StatelessWidget {
                                       },
                                     );
 
-                                    try {
-                                      await Database_Service.saveTeacher(
+                                    Database_Service.saveTeacher(
                                         controller.schoolId,
                                         controller.empIDController.text,
                                         controller.nameController.text,
@@ -480,11 +477,10 @@ class AddTeacher extends StatelessWidget {
                                         controller.selectedClassTeacher.value,
                                       );
 
-                                      Navigator.of(context).pop();
-                                    } catch (e) {
-                                      Navigator.of(context).pop();
-                                      print('Error saving teacher: $e');
-                                    }
+
+                                       Navigator.of(context).pop();
+                                       Get.snackbar('Success', 'Teacher added successfully');
+
                                   }
                                 }, text: 'Add',
                               ),

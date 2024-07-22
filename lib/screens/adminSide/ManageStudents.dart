@@ -1,6 +1,4 @@
 // ignore_for_file: prefer_const_constructors
-
-import 'dart:async';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/models/StudentModel.dart';
@@ -514,8 +512,8 @@ void _showFeeStatusPopup(BuildContext context, Student student) {
 
   // Initialize with existing values
   String feeStatus = student.feeStatus;
-  String originalStartDate = student.feeStartDate ?? '';
-  String originalEndDate = student.feeEndDate ?? '';
+  String originalStartDate = student.feeStartDate;
+  String originalEndDate = student.feeEndDate;
 
   // Set controllers with existing values
   startDateController.text = originalStartDate;

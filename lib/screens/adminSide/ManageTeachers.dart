@@ -434,36 +434,39 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                       ),
                                     ),
                                     DataCell(
-                                      Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.5,
-                                        child: SingleChildScrollView(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: teacher.subjects.entries
-                                                  .map((entry) {
-                                                return Tooltip(
-                                                  message: entry.value.join(', '),
-                                                  child: Text(
-                                                    '${entry.key}: ${entry.value.join(', ')}',
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width *
-                                                              0.03,
-                                                      fontWeight: FontWeight.w600,
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                                        child: Container(
+                                          width:
+                                              MediaQuery.of(context).size.width *
+                                                  0.5,
+                                          child: SingleChildScrollView(
+                                            child: Padding(
+                                              padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: teacher.subjects.entries
+                                                    .map((entry) {
+                                                  return Tooltip(
+                                                    message: entry.value.join(', '),
+                                                    child: Text(
+                                                      '${entry.key}: ${entry.value.join(', ')}',
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize:
+                                                            MediaQuery.of(context)
+                                                                    .size
+                                                                    .width *
+                                                                0.03,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                );
-                                              }).toList(),
+                                                  );
+                                                }).toList(),
+                                              ),
                                             ),
                                           ),
                                         ),
