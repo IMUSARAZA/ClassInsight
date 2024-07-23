@@ -1,6 +1,4 @@
 // ignore_for_file: must_be_immutable
-
-import 'package:classinsight/screens/adminSide/ManageTeachers.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';

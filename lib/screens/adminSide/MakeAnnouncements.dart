@@ -92,7 +92,7 @@ class MakeAnnouncements extends StatelessWidget {
                                         );
                                       },
                                     );
-                                    
+
                           Get.snackbar(
                             'Announcement Sent',
                             'The announement has been successfully sent to all the school.',
@@ -116,7 +116,7 @@ class MakeAnnouncements extends StatelessWidget {
                 ),
 
                 Padding(
-                  padding: EdgeInsets.fromLTRB(20, screenHeight * 0.18, 20, 0),
+                  padding: EdgeInsets.fromLTRB(0, screenHeight * 0.18, 0, 0),
                   child: Center(
                     child: Text(
                       "Make Announcement",
@@ -138,7 +138,7 @@ class MakeAnnouncements extends StatelessWidget {
                     child: TextField(
                       controller: controller.announcementController,
                       decoration: const InputDecoration(
-                        hintText: 'Type your announcement here...', 
+                        hintText: 'Type your announcement here......', 
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                       ),
