@@ -1,5 +1,3 @@
-// main.dart
-
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/routes/mainRoutes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,7 +15,6 @@ void main() async {
     );
     await GetStorage.init();
   } catch (e) {
-    print(e.toString());
   }
   runApp(const MyApp());
 }

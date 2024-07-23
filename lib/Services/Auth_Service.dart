@@ -15,9 +15,9 @@ static FirebaseAuth auth = FirebaseAuth.instance;
 static Future<void> login(String email, String password, School school) async {
 
   try {
-      
+      print("HEREEE" + school.schoolId);
       if (school.adminEmail == email) {
-        print(school.adminEmail);
+        print("HWEFBHEBH"+school.schoolId);
 
         Get.snackbar('Logging In', '',
           backgroundColor: Colors.white, 
@@ -31,8 +31,8 @@ static Future<void> login(String email, String password, School school) async {
           password: password,
         );
 
+        Get.offAllNamed('/AdminHome', arguments: school);
         Get.snackbar('Logged in Successfully', "Welcome, Admin - ${school.name}");
-        Get.offNamed('/AdminHome', arguments: school);
 
         print("Logged IN");
       } else {

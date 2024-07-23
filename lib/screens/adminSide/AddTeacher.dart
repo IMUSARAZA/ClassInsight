@@ -93,9 +93,7 @@ class AddTeacher extends StatelessWidget {
       headingFontSize = 17;
     }
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return Scaffold(
         backgroundColor: AppColors.appLightBlue,
         body: SingleChildScrollView(
           child: Container(
@@ -111,16 +109,6 @@ class AddTeacher extends StatelessWidget {
                     child: AppBar(
                       backgroundColor: AppColors.appLightBlue,
                       elevation: 0,
-                      leading: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ManageTeachers()),
-                          );
-                        },
-                      ),
                       title: Center(
                         child: Text(
                           'Add Teacher',
@@ -442,29 +430,15 @@ class AddTeacher extends StatelessWidget {
                                       controller.empIDController.text.isEmpty ||
                                       controller.nameController.text.isEmpty ||
                                       controller.selectedGender.value.isEmpty ||
-                                      controller
-                                          .phoneNoController.text.isEmpty ||
+                                      controller.phoneNoController.text.isEmpty ||
                                       controller.cnicController.text.isEmpty ||
-                                      controller
-                                          .fatherNameController.text.isEmpty) {
-                                    Get.snackbar(
-                                        'Error', 'Please fill all the fields');
+                                      controller.fatherNameController.text.isEmpty) {
+                                    Get.snackbar('Error', 'Please fill all the fields');
                                   } else {
-                                    showDialog(
-                                      context: context,
-                                      barrierDismissible: false,
-                                      builder: (BuildContext context) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    AppColors.appLightBlue),
-                                          ),
-                                        );
-                                      },
-                                    );
-
-                                    Database_Service.saveTeacher(
+                                    try {
+                                      Get.snackbar('Saving', 'Adding a new teacher...');
+                                      
+                                      await Database_Service.saveTeacher(
                                         controller.schoolId,
                                         controller.empIDController.text,
                                         controller.nameController.text,
@@ -475,12 +449,13 @@ class AddTeacher extends StatelessWidget {
                                         controller.selectedClasses.toList(),
                                         controller.selectedSubjects.toJson(),
                                         controller.selectedClassTeacher.value,
-                                      );
+                                      ).then((value) => Get.back(result: 'updated'));
 
-
-                                       Navigator.of(context).pop();
-                                       Get.snackbar('Success', 'Teacher added successfully');
-
+                                      Get.back(result: 'updated');
+                                      Get.snackbar('Saved', 'New teacher added successfully');
+                                    } catch (e) {
+                                      Get.snackbar('Error', 'Failed to add new teacher: $e');
+                                    }
                                   }
                                 }, text: 'Add',
                               ),
@@ -495,7 +470,6 @@ class AddTeacher extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:classinsight/Services/Database_Service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:classinsight/models/SchoolModel.dart';
@@ -12,31 +15,97 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class AdminHomeController extends GetxController {
   var email = 'test@gmail.com'.obs;
   var schoolName = 'School1'.obs;
-  var schoolId = "".obs;
+  var schoolId = "j".obs;
   RxString totalStudents = '0'.obs;
   RxString totalTeachers = '0'.obs;
   RxInt height = 120.obs;
   Rx<School?> school = Rx<School?>(null);
   final GetStorage _storage = GetStorage();
+  StreamSubscription? studentsSubscription;
+  StreamSubscription? teachersSubscription;
 
   @override
   void onInit() {
     super.onInit();
     loadCachedSchoolData();
-    var schoolFromArguments = Get.arguments as School?;
+    var schoolFromArguments = Get.arguments;
     if (schoolFromArguments != null) {
       cacheSchoolData(schoolFromArguments);
       updateSchoolData(schoolFromArguments);
     }
     totalInformation();
+    startListeners();
+  }
+
+  @override
+  void onClose() {
+    studentsSubscription?.cancel();
+    teachersSubscription?.cancel();
+    super.onClose();
   }
 
   void totalInformation() async {
+    print(schoolName.value);
+    print(schoolId.value);
     totalTeachers.value = await Database_Service.fetchCounts(schoolName.value, "Teachers");
     totalStudents.value = await Database_Service.fetchCounts(schoolName.value, "Students");
     cacheTotalCounts();
     update();
   }
+
+  void startListeners() async {
+  try {
+    // Ensure schoolId is not empty
+    if (schoolId.value.isEmpty) {
+      print('Error: schoolId is empty');
+      totalStudents.value = '0';
+      totalTeachers.value = '0';
+      return;
+    }
+
+    final schoolRef = FirebaseFirestore.instance.collection('Schools').doc(schoolId.value);
+
+    // Check if the document exists
+    final schoolDocSnapshot = await schoolRef.get();
+    if (!schoolDocSnapshot.exists) {
+      print('Error: School document does not exist');
+      totalStudents.value = '0';
+      totalTeachers.value = '0';
+      return;
+    }
+
+    // Check if the Students collection exists
+    final studentsCollectionRef = schoolRef.collection('Students');
+    final studentsSnapshot = await studentsCollectionRef.limit(1).get();
+    if (studentsSnapshot.docs.isEmpty) {
+      totalStudents.value = '0';
+    } else {
+      // Start listening if the collection exists
+      studentsSubscription = studentsCollectionRef.snapshots().listen((snapshot) {
+        totalStudents.value = snapshot.size.toString();
+        cacheTotalCounts();
+      });
+    }
+
+    // Check if the Teachers collection exists
+    final teachersCollectionRef = schoolRef.collection('Teachers');
+    final teachersSnapshot = await teachersCollectionRef.limit(1).get();
+    if (teachersSnapshot.docs.isEmpty) {
+      totalTeachers.value = '0';
+    } else {
+      // Start listening if the collection exists
+      teachersSubscription = teachersCollectionRef.snapshots().listen((snapshot) {
+        totalTeachers.value = snapshot.size.toString();
+        cacheTotalCounts();
+      });
+    }
+  } catch (e) {
+    print('Error starting listeners: $e');
+    totalStudents.value = '0';
+    totalTeachers.value = '0';
+  }
+}
+
 
   void clearCachedSchoolData() {
     _storage.remove('cachedSchool');
@@ -73,16 +142,20 @@ class AdminHomeController extends GetxController {
     totalStudents.value = '-';
     totalTeachers.value = '-';
     this.school.value = school;
+    schoolId.value = school.schoolId;
     email.value = school.adminEmail;
     schoolName.value = school.name;
-    schoolId.value = school.schoolId;
-    // Reload counts if cached data is outdated or missing
+
+     print("Updated schoolId: ${this.schoolId.value}");
+  print("Updated schoolName: ${schoolName.value}");
+  print("Updated email: ${email.value}");
+
     if (totalTeachers.value == '-' || totalStudents.value == '-') {
       totalInformation();
     }
+    startListeners();
   }
 }
-
 
 
 
@@ -105,6 +178,8 @@ class AdminHome extends StatelessWidget {
     } else if (screenWidth > 768) {
       _controller.height.value = 270;
     }
+
+
 
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
@@ -282,7 +357,7 @@ class AdminHome extends StatelessWidget {
                               ShadowButton(
                                 text: "Manage Students",
                                 onTap: () {
-                                  Get.toNamed("/ManageStudents",arguments: _controller.school);
+                                  Get.toNamed("/ManageStudents");
                                 },
                               ),
                               Spacer(),

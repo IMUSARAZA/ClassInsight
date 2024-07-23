@@ -1,5 +1,6 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:get/get.dart';
 
 class AddExamSystemController extends GetxController{
 
+  AdminHomeController school = Get.put(AdminHomeController());
   RxList<String> examStructure = <String>[].obs;
   TextEditingController examStructureController = TextEditingController();
   RxBool examValid = true.obs;
@@ -107,7 +109,7 @@ class AddExamSystem extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () async {
-                          Database_Service.addClass(controller.classes, controller.subjects, controller.examStructure);
+                          Database_Service.addClass(controller.classes, controller.subjects, controller.examStructure, controller.school.schoolId.value);
 
                             showDialog(
                             context: context,

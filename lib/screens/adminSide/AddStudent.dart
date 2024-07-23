@@ -8,8 +8,10 @@ import 'package:classinsight/models/StudentModel.dart';
 import 'package:flutter/material.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
-import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:classinsight/utils/AppColors.dart';
+
+
+
 
 class AddStudentController extends GetxController {
   // TextEditingController instances
@@ -41,6 +43,7 @@ class AddStudentController extends GetxController {
     return await Database_Service.fetchAllClasses(school.schoolId.value);
   }
 
+
   bool validateInputs() {
     // Regular expressions for validation
     RegExp numeric13Digits = RegExp(r'^\d{13}$');
@@ -48,14 +51,13 @@ class AddStudentController extends GetxController {
 
     // Validate each field
     nameValid.value = nameController.text.isNotEmpty;
-    genderValid.value = selectedGender.isNotEmpty;
+    genderValid.value = selectedGender.value.isNotEmpty;
     bFormChallanIdValid.value = bFormChallanIdController.text.isNotEmpty;
     fatherNameValid.value = fatherNameController.text.isNotEmpty;
-    fatherPhoneNoValid.value =
-        numeric11Digits.hasMatch(fatherPhoneNoController.text);
+    fatherPhoneNoValid.value = numeric11Digits.hasMatch(fatherPhoneNoController.text);
     fatherCNICValid.value = numeric13Digits.hasMatch(fatherCNICController.text);
     studentRollNoValid.value = studentRollNoController.text.isNotEmpty;
-    selectedClassValid.value = selectedClass.isNotEmpty;
+    selectedClassValid.value = selectedClass.value.isNotEmpty;
 
     // Return overall validation status
     return nameValid.value &&
@@ -84,8 +86,7 @@ class AddStudentController extends GetxController {
                   width: 30,
                   height: 30,
                   child: CircularProgressIndicator(
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(AppColors.appLightBlue),
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.appLightBlue),
                   ),
                 ),
                 SizedBox(height: 20),
@@ -124,16 +125,18 @@ class AddStudentController extends GetxController {
       // Call the database service to save the student
       Database_Service databaseService = Database_Service();
       await databaseService.saveStudent(
-        school.schoolId.value, // Replace with your actual school ID
-        selectedClass.value, // Pass selected class section
-        student, // Pass the student object
+        school.schoolId.value,
+        selectedClass.value,
+        student,
       );
-
-      Get.back(); // Hide the progress indicator
-      Get.off(() => ManageStudents());
+      
+      
+      Get.back(); 
+      Get.back(result: selectedClass.value); // Navigate back with the result
     }
   }
 }
+
 
 class AddStudent extends StatelessWidget {
   const AddStudent({Key? key}) : super(key: key);
@@ -185,7 +188,7 @@ class AddStudent extends StatelessWidget {
                       leading: IconButton(
                         icon: const Icon(Icons.arrow_back),
                         onPressed: () {
-                          Get.off(() => ManageStudents());
+                          Get.back();
                         },
                       ),
                       title: Center(

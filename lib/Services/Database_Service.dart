@@ -286,6 +286,8 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
         'ClassTeacher': classTeacher,
       });
 
+      Get.back(result: 'updated');
+
       print('Teacher saved successfully');
     } catch (e) {
       print('Error saving teacher: $e');
@@ -457,32 +459,45 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
       print("Error deleting class: $e");
     }
   }
+  
+static Future<String> fetchCounts(
+    String schoolName, String collectionName) async {
+  try {
+    // Access the Schools collection
+    CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
 
-  static Future<String> fetchCounts(
-      String schoolName, String collectionName) async {
-    try {
-      CollectionReference schoolsRef =
-          FirebaseFirestore.instance.collection('Schools');
+    // Query to find the school document
+    QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolName', isEqualTo: schoolName).get();
 
-      QuerySnapshot schoolSnapshot =
-          await schoolsRef.where('SchoolName', isEqualTo: schoolName).get();
-
-      if (schoolSnapshot.docs.isEmpty) {
-        print('School with ID $schoolName not found');
-        return "-";
-      }
-      DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
-
-      CollectionReference teachersRef = schoolDocRef.collection(collectionName);
-
-      QuerySnapshot teachersSnapshot = await teachersRef.get();
-
-      return teachersSnapshot.size.toString();
-    } catch (e) {
-      print('Error fetching teacher count: $e');
-      return "-";
+    // Check if the school document exists
+    if (schoolSnapshot.docs.isEmpty) {
+      print('School with name $schoolName not found');
+      return "0";
     }
+
+    // Get a reference to the school document
+    DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+
+    // Access the specified collection within the school document
+    CollectionReference teachersRef = schoolDocRef.collection(collectionName);
+
+    // Check if the collection exists by querying its size
+    QuerySnapshot teachersSnapshot = await teachersRef.limit(1).get();
+
+    // Return the count of documents in the collection if it exists
+    if (teachersSnapshot.docs.isEmpty) {
+      return "0";
+    } else {
+      // Get the total count of documents in the collection
+      QuerySnapshot fullSnapshot = await teachersRef.get();
+      return fullSnapshot.size.toString();
+    }
+  } catch (e) {
+    // Print the error and return a fallback value
+    print('Error fetching count from collection $collectionName: $e');
+    return "0";
   }
+}
 
   static Future<void> updateTeacher(
     String schoolID,
@@ -651,8 +666,7 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
   }
 
   static Future<void> addClass(List<String>? classes, List<String>? subjects,
-      List<String> examSystem) async {
-    String schoolID = 'buwF2J4lkLCdIVrHfgkP';
+      List<String> examSystem, String schoolID) async {
 
     try {
       QuerySnapshot schoolSnapshot = await FirebaseFirestore.instance
@@ -665,17 +679,17 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
         CollectionReference classesCollection = schoolDoc.collection('Classes');
 
         for (String className in classes ?? []) {
-          String classId = classesCollection.doc().id;
+        DocumentReference classDoc = classesCollection.doc(className);
 
           Class newClass = Class(
-            classId: classId,
+            classId: className,
             className: className,
             timetable: false,
             subjects: subjects ?? [],
             examTypes: examSystem,
           );
 
-          await classesCollection.doc(classId).set(newClass.toJson());
+          await classDoc.set(newClass.toJson());
         }
 
         print('Classes added successfully');
@@ -761,8 +775,6 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
       }
 
       print('Timetable added successfully!');
-      Get.snackbar("Added Successfully",
-          "Timetable added successfully for class $className");
     } catch (e) {
       print('Error adding timetable: $e');
       throw e;
@@ -798,8 +810,6 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
         });
       }
 
-      Get.snackbar(
-          "Deleted Succesfully", "Timetable for ${className} has been deleted");
     } catch (e) {}
   }
 

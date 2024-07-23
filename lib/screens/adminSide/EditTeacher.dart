@@ -1,10 +1,12 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/models/TeacherModel.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 
@@ -37,6 +39,8 @@ class EditTeacherController extends GetxController {
   var nameValid = true.obs;
   var fatherNameValid = true.obs;
   var phoneNoValid = true.obs;
+  AdminHomeController school = Get.put(AdminHomeController());
+  RxString schoolId = ''.obs;
   var selectedGender = ''.obs;
   var selectedClassTeacher = ''.obs;
   var existingClassTeacher = ''.obs;
@@ -49,20 +53,20 @@ class EditTeacherController extends GetxController {
   void onInit() {
     super.onInit();
     teacher = Get.arguments;
+    schoolId.value = school.schoolId.value;
     initializeData(teacher!);
     fetchClassesAndSubjects();
   }
 
-  String schoolId = 'buwF2J4lkLCdIVrHfgkP';
 
   void fetchClassesAndSubjects() async {
     isLoading.value = true;
-    List<String> classesFetched = await Database_Service.fetchClasses(schoolId);
+    List<String> classesFetched = await Database_Service.fetchClasses(schoolId.value);
     List<ClassSubject> fetchedClassesSubjects = [];
 
     for (String className in classesFetched) {
       List<String> subjects =
-          await Database_Service.fetchSubjects(schoolId, className);
+          await Database_Service.fetchSubjects(schoolId.value, className);
       fetchedClassesSubjects
           .add(ClassSubject(className: className, subjects: subjects));
     }
@@ -198,7 +202,7 @@ class EditTeacher extends StatelessWidget {
                         print(controller.selectedClassTeacher.value);
 
                             Database_Service.updateTeacher(
-                                'buwF2J4lkLCdIVrHfgkP',
+                                controller.schoolId.value,
                                 controller.teacher!.empID,
                                 controller.name.value,
                                 controller.selectedGender.value,

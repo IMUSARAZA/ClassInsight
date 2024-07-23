@@ -18,7 +18,7 @@ class LoginController extends GetxController {
 
 class LoginScreen extends StatelessWidget {
   final LoginController _controller = Get.put(LoginController());
-  static School schools = Get.arguments;
+  School schools = Get.arguments;
 
 
   @override
