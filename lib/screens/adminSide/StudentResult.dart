@@ -3,7 +3,6 @@ import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
-import 'package:classinsight/screens/adminSide/ManageStudents.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -208,7 +207,7 @@ class StudentResult extends StatelessWidget {
                           ],
                           rows: subjects.map(
                             (subject) => DataRow(
-                              color: MaterialStateColor.resolveWith(
+                              color: WidgetStateColor.resolveWith(
                                   (states) => AppColors.appOrange),
                               cells: [
                                 DataCell(Text(

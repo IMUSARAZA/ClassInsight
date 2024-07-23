@@ -450,6 +450,7 @@ class AddTeacher extends StatelessWidget {
                                       ).then((value) => Get.back(result: 'updated'));
 
                                       Get.back(result: 'updated');
+                                      Navigator.pop(context);
                                       Get.snackbar('Saved', 'New teacher added successfully');
                                     } catch (e) {
                                       Get.snackbar('Error', 'Failed to add new teacher: $e');

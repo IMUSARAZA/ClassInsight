@@ -4,7 +4,6 @@ import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -240,7 +239,7 @@ class ManageTimetable extends StatelessWidget {
                       var subjectDetails = entry.value.split('-');
       
                       return DataRow(
-                        color: MaterialStateColor.resolveWith((states) => AppColors.appOrange),
+                        color: WidgetStateColor.resolveWith((states) => AppColors.appOrange),
                         cells: [
                           DataCell(Text(entry.key)),
                           DataCell(Text(_formatTime(_extractStartTime(subjectDetails[0])))), // Display sorted start time

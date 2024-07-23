@@ -369,7 +369,7 @@ class ManageStudents extends StatelessWidget {
                           rows: studentController.studentsList
                               .map(
                                 (student) => DataRow(
-                                  color: MaterialStateColor.resolveWith(
+                                  color: WidgetStateColor.resolveWith(
                                       (states) => AppColors.appDarkBlue),
                                   cells: [
                                     DataCell(

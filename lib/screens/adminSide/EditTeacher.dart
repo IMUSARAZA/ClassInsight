@@ -6,7 +6,6 @@ import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 
@@ -186,14 +185,13 @@ class EditTeacher extends StatelessWidget {
                       TextButton(
                         onPressed: () {
                           if (
-                            controller.nameController.text.isEmpty ||
-                              controller.selectedGender.value.isEmpty ||
-                              controller.selectedClassTeacher.value.isEmpty ||
-                              controller.phoneNoController.text.isEmpty ||
-                              controller.cnicController.text.isEmpty ||
-                              controller.fatherNameController.text.isEmpty ||
-                              controller.selectedClasses.isEmpty ||
-                              controller.selectedSubjects.isEmpty) {
+                            controller.selectedGender.value.isEmpty ||
+                            controller.phoneNoController.text.isEmpty ||
+                            controller.cnicController.text.isEmpty ||
+                            controller.fatherNameController.text.isEmpty ||
+                            controller.selectedClasses.isEmpty ||
+                            controller.selectedSubjects.isEmpty
+                              ) {
                             Get.snackbar('No Changes Made',
                                 'Please make some changes to update the teacher');
                           } 
