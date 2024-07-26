@@ -2,6 +2,7 @@ class Teacher {
   late String empID;
   late String name;
   late String gender;
+  late String email;
   late String cnic;
   late String phoneNo;
   late String fatherName;
@@ -13,6 +14,7 @@ class Teacher {
     required this.empID,
     required this.name,
     required this.gender,
+    required this.email,
     required this.cnic,
     required this.phoneNo,
     required this.fatherName,
@@ -26,6 +28,7 @@ class Teacher {
       empID: json['EmployeeID'] ?? '',
       name: json['Name'] ?? '',
       gender: json['Gender'] ?? '',
+      email: json['Email'] ?? '',
       cnic: json['CNIC'] ?? '',
       phoneNo: json['PhoneNo'] ?? '',
       fatherName: json['FatherName'] ?? '',
@@ -42,6 +45,7 @@ class Teacher {
       'EmployeeID': empID,
       'Name': name,
       'Gender': gender,
+      'Email': email,
       'CNIC': cnic,
       'PhoneNo': phoneNo,
       'FatherName': fatherName,

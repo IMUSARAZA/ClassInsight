@@ -251,6 +251,7 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
     String empID,
     String name,
     String gender,
+    String email,
     String phoneNo,
     String cnic,
     String fatherName,
@@ -278,6 +279,7 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
         'EmployeeID': empID,
         'Name': name,
         'Gender': gender,
+        'Email': email,
         'PhoneNo': phoneNo,
         'CNIC': cnic,
         'FatherName': fatherName,
@@ -315,10 +317,12 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
 
       List<Teacher> teachers = teachersSnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
         return Teacher(
           empID: data['EmployeeID'],
           name: data['Name'],
           gender: data['Gender'],
+          email: data['Email'],
           cnic: data['CNIC'],
           phoneNo: data['PhoneNo'],
           fatherName: data['FatherName'],
@@ -373,7 +377,7 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
     }
   }
 
-  static Future<List<Teacher>> searchTeachers(
+    static Future<List<Teacher>> searchTeachers(
       String schoolID, String searchText) async {
     try {
       CollectionReference schoolsRef =
@@ -407,6 +411,7 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
           empID: data['EmployeeID'],
           name: data['Name'],
           gender: data['Gender'],
+          email: data['Email'],
           cnic: data['CNIC'],
           phoneNo: data['PhoneNo'],
           fatherName: data['FatherName'],

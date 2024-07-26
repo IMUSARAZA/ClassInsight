@@ -89,6 +89,17 @@ class EditTeacherController extends GetxController {
     selectedSubjects.assignAll(teacher.subjects);
   }
 
+  String capitalizeName(String name) {
+    List<String> parts = name.split(' ');
+    return parts.map((part) => _capitalize(part)).join(' ');
+  }
+
+  String _capitalize(String word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
+  }
+
+
   void showEditNameDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -199,14 +210,17 @@ class EditTeacher extends StatelessWidget {
                           else {
                         print(controller.selectedClassTeacher.value);
 
+                          String capitalizedName = controller.capitalizeName(controller.name.value);
+                          String capitalizedFatherName = controller.capitalizeName(controller.fatherNameController.text);
+
                             Database_Service.updateTeacher(
                                 controller.schoolId.value,
                                 controller.teacher!.empID,
-                                controller.name.value,
+                                capitalizedName,
                                 controller.selectedGender.value,
                                 controller.phoneNoController.text,
                                 controller.cnicController.text,
-                                controller.fatherNameController.text,
+                                capitalizedFatherName,
                                 controller.selectedClasses,
                                 controller.selectedSubjects,
                                 controller.selectedClassTeacher.value);

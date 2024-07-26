@@ -3,19 +3,23 @@ import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class AddTeacherController extends GetxController {
   TextEditingController empIDController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController cnicController = TextEditingController();
   TextEditingController phoneNoController = TextEditingController();
   TextEditingController fatherNameController = TextEditingController();
 
   var empIDValid = true.obs;
   var nameValid = true.obs;
+  var emailValid = true.obs;
   var genderValid = true.obs;
   var cnicValid = true.obs;
   var fatherNameValid = true.obs;
@@ -52,6 +56,16 @@ class AddTeacherController extends GetxController {
     }
 
     classesSubjects.assignAll(fetchedClassesSubjects);
+  }
+
+  String capitalizeName(String name) {
+    List<String> parts = name.split(' ');
+    return parts.map((part) => _capitalize(part)).join(' ');
+  }
+
+  String _capitalize(String word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
   }
 }
 
@@ -92,293 +106,101 @@ class AddTeacher extends StatelessWidget {
     }
 
     return Scaffold(
-        backgroundColor: AppColors.appLightBlue,
-        body: SingleChildScrollView(
-          child: Container(
-            height: screenHeight,
-            width: screenWidth,
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: screenHeight * 0.10,
-                    width: screenWidth,
-                    child: AppBar(
-                      backgroundColor: AppColors.appLightBlue,
-                      elevation: 0,
-                      title: Center(
-                        child: Text(
-                          'Add Teacher',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: addStdFontSize,
-                            fontWeight: FontWeight.w600,
-                          ),
+      backgroundColor: AppColors.appLightBlue,
+      body: SingleChildScrollView(
+        child: Container(
+          height: screenHeight,
+          width: screenWidth,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  height: screenHeight * 0.10,
+                  width: screenWidth,
+                  child: AppBar(
+                    backgroundColor: AppColors.appLightBlue,
+                    elevation: 0,
+                    title: Center(
+                      child: Text(
+                        'Add Teacher',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: addStdFontSize,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      actions: <Widget>[
-                        Container(
-                          width: 48.0,
+                    ),
+                    actions: <Widget>[
+                      Container(
+                        width: 48.0,
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 0.05 * screenHeight,
+                  width: screenWidth,
+                  margin: const EdgeInsets.only(bottom: 10.0),
+                  child: Text(
+                    'Add New Teacher',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: headingFontSize,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    width: screenWidth,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 4,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
-                  ),
-                  Container(
-                    height: 0.05 * screenHeight,
-                    width: screenWidth,
-                    margin: const EdgeInsets.only(bottom: 10.0),
-                    child: Text(
-                      'Add New Teacher',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: headingFontSize,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      width: screenWidth,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          topRight: Radius.circular(20.0),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 4,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 40, 30, 20),
+                            child: CustomTextField(
+                              controller: controller.empIDController,
+                              hintText: 'Employee ID',
+                              labelText: 'Employee ID',
+                              isValid: controller.empIDValid.value,
+                            ),
                           ),
-                        ],
-                      ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 40, 30, 20),
-                              child: CustomTextField(
-                                controller: controller.empIDController,
-                                hintText: 'Employee ID',
-                                labelText: 'Employee ID',
-                                isValid: controller.empIDValid.value,
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: CustomTextField(
+                              controller: controller.nameController,
+                              hintText: 'Name',
+                              labelText: 'Name',
+                              isValid: controller.nameValid.value,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                canvasColor: Colors.white,
                               ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(30, 0, 30, 20),
-                              child: CustomTextField(
-                                controller: controller.nameController,
-                                hintText: 'Name',
-                                labelText: 'Name',
-                                isValid: controller.nameValid.value,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  canvasColor: Colors.white,
-                                ),
-                                child:
-                                    Obx(() => DropdownButtonFormField<String>(
-                                          decoration: const InputDecoration(
-                                            hintText: "Select your gender",
-                                            labelText: "Gender",
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              borderSide: BorderSide(
-                                                  color: AppColors.appLightBlue,
-                                                  width: 2.0),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              borderSide: BorderSide(
-                                                  color: Colors.black,
-                                                  width: 1.0),
-                                            ),
-                                          ),
-                                          value: controller
-                                                  .selectedGender.value.isEmpty
-                                              ? null
-                                              : controller.selectedGender.value,
-                                          onChanged: (newValue) {
-                                            controller.selectedGender.value =
-                                                newValue!;
-                                          },
-                                          items: <String>[
-                                            'Male',
-                                            'Female',
-                                            'Other'
-                                          ].map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          }).toList(),
-                                        )),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
-                              child: CustomTextField(
-                                controller: controller.cnicController,
-                                hintText: '352020xxxxxxxx91',
-                                labelText: 'CNIC No',
-                                isValid: controller.cnicValid.value,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
-                              child: CustomTextField(
-                                controller: controller.phoneNoController,
-                                hintText: '0321xxxxxx12',
-                                labelText: 'Phone Number',
-                                isValid: controller.phoneNoValid.value,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
-                              child: CustomTextField(
-                                controller: controller.fatherNameController,
-                                hintText: "Father's name",
-                                labelText: "Father's name",
-                                isValid: controller.fatherNameValid.value,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
-                              child: Obx(() => MultiSelectDialogField(
-                                    backgroundColor: AppColors.appLightBlue,
-                                    items: controller.classesSubjects
-                                        .map((classSubject) => MultiSelectItem(
-                                            classSubject.className,
-                                            classSubject.className))
-                                        .toList(),
-                                    title: const Text("Available Classes"),
-                                    selectedColor: Colors.black,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(10),
-                                      ),
-                                      border: Border.all(
-                                        color: Colors.black,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    buttonIcon: const Icon(
-                                      Icons.class_,
-                                      color: Colors.black,
-                                    ),
-                                    buttonText: const Text(
-                                      "Class to Assign",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    checkColor: Colors.white,
-                                    cancelText: const Text(
-                                      "CANCEL",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    confirmText: const Text(
-                                      "OK",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    onConfirm: (results) {
-                                      controller.selectedClasses
-                                          .assignAll(results);
-                                    },
-                                  )),
-                            ),
-                            Obx(() => Column(
-                                  children: [
-                                    for (var className
-                                        in controller.selectedClasses)
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            30, 0, 30, 20),
-                                        child: MultiSelectDialogField(
-                                          backgroundColor:
-                                              AppColors.appLightBlue,
-                                          items: controller.classesSubjects
-                                              .firstWhere((classSubject) =>
-                                                  classSubject.className ==
-                                                  className)
-                                              .subjects
-                                              .map((subject) => MultiSelectItem(
-                                                  subject, subject))
-                                              .toList(),
-                                          title:
-                                              Text("Subjects for $className"),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              Radius.circular(10),
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.black,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          buttonIcon: const Icon(
-                                            Icons.subject,
-                                            color: Colors.black,
-                                          ),
-                                          buttonText: Text(
-                                            "Select Subjects for $className",
-                                            style: const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          selectedColor: Colors.black,
-                                          cancelText: const Text(
-                                            "CANCEL",
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          confirmText: const Text(
-                                            "OK",
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          checkColor: Colors.white,
-                                          onConfirm: (results) {
-                                            controller.selectedSubjects[
-                                                className] = results;
-                                          },
-                                        ),
-                                      ),
-                                  ],
-                                )),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
                               child: Obx(() => DropdownButtonFormField<String>(
                                     decoration: const InputDecoration(
-                                      hintText: "Class Teacher",
-                                      labelText:
-                                          "Select Section For Class Teacher",
+                                      hintText: "Select your gender",
+                                      labelText: "Gender",
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10)),
@@ -393,82 +215,290 @@ class AddTeacher extends StatelessWidget {
                                             color: Colors.black, width: 1.0),
                                       ),
                                     ),
-                                    value: controller
-                                            .selectedClassTeacher.value.isEmpty
-                                        ? null
-                                        : controller.selectedClassTeacher.value,
+                                    value:
+                                        controller.selectedGender.value.isEmpty
+                                            ? null
+                                            : controller.selectedGender.value,
                                     onChanged: (newValue) {
-                                      controller.selectedClassTeacher.value =
+                                      controller.selectedGender.value =
                                           newValue!;
                                     },
-                                    items: [
-                                      DropdownMenuItem<String>(
-                                        value: '',
-                                        child: Text('None'),
-                                      ),
-                                      ...controller.selectedClasses
-                                          .map<DropdownMenuItem<String>>(
-                                              (String className) {
-                                        return DropdownMenuItem<String>(
-                                          value: className,
-                                          child: Text(className),
-                                        );
-                                      }).toList(),
-                                    ],
+                                    items: <String>['Male', 'Female', 'Other']
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList(),
                                   )),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(30, 20, 30, 20),
-                              child: CustomBlueButton(
-                                buttonText: 'Add',
-                                onPressed: () async {
-                                  if (controller.selectedClasses.isEmpty ||
-                                      controller.selectedSubjects.isEmpty ||
-                                      controller.empIDController.text.isEmpty ||
-                                      controller.nameController.text.isEmpty ||
-                                      controller.selectedGender.value.isEmpty ||
-                                      controller.phoneNoController.text.isEmpty ||
-                                      controller.cnicController.text.isEmpty ||
-                                      controller.fatherNameController.text.isEmpty) {
-                                    Get.snackbar('Error', 'Please fill all the fields');
-                                  } else {
-                                    try {
-                                      Get.snackbar('Saving', 'Adding a new teacher...');
-                                      
-                                      await Database_Service.saveTeacher(
-                                        controller.schoolId,
-                                        controller.empIDController.text,
-                                        controller.nameController.text,
-                                        controller.selectedGender.value,
-                                        controller.phoneNoController.text,
-                                        controller.cnicController.text,
-                                        controller.fatherNameController.text,
-                                        controller.selectedClasses.toList(),
-                                        controller.selectedSubjects.toJson(),
-                                        controller.selectedClassTeacher.value,
-                                      ).then((value) => Get.back(result: 'updated'));
-
-                                      Get.back(result: 'updated');
-                                      Navigator.pop(context);
-                                      Get.snackbar('Saved', 'New teacher added successfully');
-                                    } catch (e) {
-                                      Get.snackbar('Error', 'Failed to add new teacher: $e');
-                                    }
-                                  }
-                                }, text: 'Add',
-                              ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: CustomTextField(
+                              controller: controller.emailController,
+                              hintText: 'jhondoe@....com',
+                              labelText: 'Email',
+                              isValid: controller.emailValid.value,
                             ),
-                          ],
-                        ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: CustomTextField(
+                              controller: controller.cnicController,
+                              hintText: '352020xxxxxxxx91',
+                              labelText: 'CNIC No',
+                              isValid: controller.cnicValid.value,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: CustomTextField(
+                              controller: controller.phoneNoController,
+                              hintText: '0321xxxxxx12',
+                              labelText: 'Phone Number',
+                              isValid: controller.phoneNoValid.value,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: CustomTextField(
+                              controller: controller.fatherNameController,
+                              hintText: "Father's name",
+                              labelText: "Father's name",
+                              isValid: controller.fatherNameValid.value,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: Obx(() => MultiSelectDialogField(
+                                  backgroundColor: AppColors.appLightBlue,
+                                  items: controller.classesSubjects
+                                      .map((classSubject) => MultiSelectItem(
+                                          classSubject.className,
+                                          classSubject.className))
+                                      .toList(),
+                                  title: const Text("Available Classes"),
+                                  selectedColor: Colors.black,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  buttonIcon: const Icon(
+                                    Icons.class_,
+                                    color: Colors.black,
+                                  ),
+                                  buttonText: const Text(
+                                    "Class to Assign",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  checkColor: Colors.white,
+                                  cancelText: const Text(
+                                    "CANCEL",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  confirmText: const Text(
+                                    "OK",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  onConfirm: (results) {
+                                    controller.selectedClasses
+                                        .assignAll(results);
+                                  },
+                                )),
+                          ),
+                          Obx(() => Column(
+                                children: [
+                                  for (var className
+                                      in controller.selectedClasses)
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          30, 0, 30, 20),
+                                      child: MultiSelectDialogField(
+                                        backgroundColor: AppColors.appLightBlue,
+                                        items: controller.classesSubjects
+                                            .firstWhere((classSubject) =>
+                                                classSubject.className ==
+                                                className)
+                                            .subjects
+                                            .map((subject) => MultiSelectItem(
+                                                subject, subject))
+                                            .toList(),
+                                        title: Text("Subjects for $className"),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: const BorderRadius.all(
+                                            Radius.circular(10),
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.black,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        buttonIcon: const Icon(
+                                          Icons.subject,
+                                          color: Colors.black,
+                                        ),
+                                        buttonText: Text(
+                                          "Select Subjects for $className",
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        selectedColor: Colors.black,
+                                        cancelText: const Text(
+                                          "CANCEL",
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        confirmText: const Text(
+                                          "OK",
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        checkColor: Colors.white,
+                                        onConfirm: (results) {
+                                          controller
+                                                  .selectedSubjects[className] =
+                                              results;
+                                        },
+                                      ),
+                                    ),
+                                ],
+                              )),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: Obx(() => DropdownButtonFormField<String>(
+                                  decoration: const InputDecoration(
+                                    hintText: "Class Teacher",
+                                    labelText:
+                                        "Select Section For Class Teacher",
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
+                                      borderSide: BorderSide(
+                                          color: AppColors.appLightBlue,
+                                          width: 2.0),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
+                                      borderSide: BorderSide(
+                                          color: Colors.black, width: 1.0),
+                                    ),
+                                  ),
+                                  value: controller
+                                          .selectedClassTeacher.value.isEmpty
+                                      ? null
+                                      : controller.selectedClassTeacher.value,
+                                  onChanged: (newValue) {
+                                    controller.selectedClassTeacher.value =
+                                        newValue!;
+                                  },
+                                  items: [
+                                    DropdownMenuItem<String>(
+                                      value: '',
+                                      child: Text('None'),
+                                    ),
+                                    ...controller.selectedClasses
+                                        .map<DropdownMenuItem<String>>(
+                                            (String className) {
+                                      return DropdownMenuItem<String>(
+                                        value: className,
+                                        child: Text(className),
+                                      );
+                                    }).toList(),
+                                  ],
+                                )),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
+                            child: CustomBlueButton(
+                              buttonText: 'Add',
+                              onPressed: () async {
+                                if (controller.selectedClasses.isEmpty ||
+                                    controller.selectedSubjects.isEmpty ||
+                                    controller.empIDController.text.isEmpty ||
+                                    controller.nameController.text.isEmpty ||
+                                    controller.selectedGender.value.isEmpty ||
+                                    controller.emailController.text.isEmpty ||
+                                    controller.phoneNoController.text.isEmpty ||
+                                    controller.cnicController.text.isEmpty ||
+                                    controller
+                                        .fatherNameController.text.isEmpty) {
+                                  Get.snackbar(
+                                      'Error', 'Please fill all the fields');
+                                } else {
+                                  try {
+                                    Get.snackbar(
+                                        'Saving', 'Adding a new teacher...');
+
+                                    String capitalizedName =
+                                        controller.capitalizeName(
+                                            controller.nameController.text);
+                                    String capitalizedFatherName =
+                                        controller.capitalizeName(controller
+                                            .fatherNameController.text);
+
+                                    await Database_Service.saveTeacher(
+                                      controller.schoolId,
+                                      controller.empIDController.text,
+                                      capitalizedName,
+                                      controller.selectedGender.value,
+                                      controller.emailController.text,
+                                      controller.phoneNoController.text,
+                                      controller.cnicController.text,
+                                      capitalizedFatherName,
+                                      controller.selectedClasses.toList(),
+                                      controller.selectedSubjects.toJson(),
+                                      controller.selectedClassTeacher.value,
+                                    ).then(
+                                        (value) => Get.back(result: 'updated'));
+
+                                    Get.back(result: 'updated');
+                                    Navigator.pop(context);
+                                    Get.snackbar('Saved',
+                                        'New teacher added successfully');
+                                  } catch (e) {
+                                    Get.snackbar('Error',
+                                        'Failed to add new teacher: $e');
+                                  }
+                                }
+                              },
+                              text: 'Add',
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
