@@ -1,4 +1,7 @@
 // ignore_for_file: must_be_immutable
+import 'dart:math';
+
+import 'package:classinsight/Services/Auth_Service.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
@@ -43,20 +46,23 @@ class AddTeacherController extends GetxController {
 
   String schoolId = 'buwF2J4lkLCdIVrHfgkP';
 
-  void fetchClassesAndSubjects() async {
-    List<String> classes = await Database_Service.fetchClasses(schoolId);
+void fetchClassesAndSubjects() async {
+  try {
+    Map<String, List<String>> classesAndSubjectsMap = await Database_Service.fetchClassesAndSubjects(schoolId);
+
     List<ClassSubject> fetchedClassesSubjects = [];
 
-    for (String className in classes) {
-      print('Fetching subjects for class $className');
-      List<String> subjects =
-          await Database_Service.fetchSubjects(schoolId, className);
-      fetchedClassesSubjects
-          .add(ClassSubject(className: className, subjects: subjects));
-    }
+    classesAndSubjectsMap.forEach((className, subjects) {
+      print('Fetched subjects for class $className');
+      fetchedClassesSubjects.add(ClassSubject(className: className, subjects: subjects));
+    });
 
     classesSubjects.assignAll(fetchedClassesSubjects);
+  } catch (e) {
+    print('Error fetching classes and subjects: $e');
   }
+}
+
 
   String capitalizeName(String name) {
     List<String> parts = name.split(' ');
@@ -476,6 +482,14 @@ class AddTeacher extends StatelessWidget {
                                     ).then(
                                         (value) => Get.back(result: 'updated'));
 
+                                    String password = generateRandomPassword();
+
+                                    print('Generated password: $password');    
+
+                                    await Auth_Service.registerTeacher(controller.emailController.text, password, controller.schoolId); 
+
+                                    await Auth_Service.sendPasswordEmail(controller.emailController.text, capitalizedName, password);    
+
                                     Get.back(result: 'updated');
                                     Navigator.pop(context);
                                     Get.snackbar('Saved',
@@ -501,4 +515,25 @@ class AddTeacher extends StatelessWidget {
       ),
     );
   }
+}
+String generateRandomPassword() {
+  const int passwordLength = 8;
+  const String upperCaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const String lowerCaseLetters = 'abcdefghijklmnopqrstuvwxyz';
+  const String digits = '0123456789';
+  const String specialChar = '@';
+
+  final Random random = Random();
+
+  String password = '';
+  password += upperCaseLetters[random.nextInt(upperCaseLetters.length)];
+  password += '${digits[random.nextInt(digits.length)]}${digits[random.nextInt(digits.length)]}${digits[random.nextInt(digits.length)]}';
+  password += specialChar;
+
+  int remainingLength = passwordLength - password.length;
+  password += List.generate(remainingLength, (_) => lowerCaseLetters[random.nextInt(lowerCaseLetters.length)]).join('');
+
+  password = String.fromCharCodes(password.runes.toList()..shuffle(random));
+
+  return password;
 }

@@ -6,7 +6,10 @@ import 'package:classinsight/utils/AppColors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server/gmail.dart';
 
 
 
@@ -14,7 +17,7 @@ class Auth_Service {
   
 static FirebaseAuth auth = FirebaseAuth.instance;
 
-static Future<void> login(String email, String password, School school) async {
+static Future<void> loginAdmin(String email, String password, School school) async {
 
   try {
       print("HEREEE" + school.schoolId);
@@ -142,7 +145,7 @@ static Future<void> logout(BuildContext context) async {
 
 
       Get.offAllNamed('/TeacherHome');
-      Get.snackbar('Logged in Successfully', "Welcome, Teacher");
+      Get.snackbar('Logged in Successfully', "Welcome, ${teacher!.name}");
 
 
       return teacher;
@@ -157,41 +160,27 @@ static Future<void> logout(BuildContext context) async {
 
 
 
-//   static Future<void> loginTeacher(String email, String password, String schoolID) async {
-//   try {
-//     Get.snackbar('Logging In', '',
-//         backgroundColor: Colors.white,
-//         showProgressIndicator: true,
-//         progressIndicatorBackgroundColor: AppColors.appDarkBlue);
+static Future<void> sendPasswordEmail(String teacherEmail, String teacherName, String password) async {
+    final smtpServer = gmail(dotenv.env['GOOGLE_EMAIL']!, dotenv.env['GOOGLE_PASSWORD']!);
 
-//     // Access the specific school's Teachers collection
-//     QuerySnapshot snapshot = await FirebaseFirestore.instance
-//         .collection('schools')
-//         .doc(schoolID)
-//         .collection('Teachers')
-//         .where('Email', isEqualTo: email)
-//         .get();
+    final message = Message()
+      ..from = Address(dotenv.env['GOOGLE_EMAIL']!, 'Class Insight')
+      ..recipients.add(teacherEmail)
+      ..subject = 'Login Credentials for Class Insight'
+      ..text = 'Hi $teacherName,\n\nWelcome to Class Insight 😀. Please use the following password to log in to your Teacher Dashboard:\n\nPassword: $password\n\nBest Regards,\nClass Insight Team';
 
-//     // Check if any teacher matches the email
-//     if (snapshot.docs.isNotEmpty) {
-//       // Assuming you want to do something with the teacher's data
-//       // For example, converting the first matching document to a Teacher object
-//       Teacher teacher = Teacher.fromJson(snapshot.docs.first.data() as Map<String, dynamic>);
+    try {
+      final sendReport = await send(message, smtpServer);
+      print('Message sent: ' + sendReport.toString());
+    } on MailerException catch (e) {
+      print('Message not sent.');
+      for (var p in e.problems) {
+        print('Problem: ${p.code}: ${p.msg}');
+      }
+    } catch (e) {
+      print('An unexpected error occurred: $e');
+    }
+  }
 
-//       // Proceed with login or further processing
-//       // For example, showing a success message
-//       Get.snackbar('Login Successful', 'Welcome ${teacher.name}',
-//           backgroundColor: Colors.green);
-//     } else {
-//       // No teacher found with the matching email
-//       Get.snackbar('Login Failed', 'No teacher found with this email',
-//           backgroundColor: Colors.red);
-//     }
-//   } catch (e) {
-//     // Handle errors, for example, showing an error message
-//     Get.snackbar('Error', 'An error occurred during login: $e',
-//         backgroundColor: Colors.red);
-//   }
-// }
 
 }

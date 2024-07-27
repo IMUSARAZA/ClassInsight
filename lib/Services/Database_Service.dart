@@ -246,6 +246,30 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
     }
   }
 
+  static Future<Map<String, List<String>>> fetchClassesAndSubjects(String schoolId) async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Schools')
+        .doc(schoolId)
+        .collection('Classes')
+        .get();
+
+    Map<String, List<String>> classesAndSubjects = {};
+
+    for (var doc in querySnapshot.docs) {
+      String className = doc['className'] as String;
+      List<String> subjects = List<String>.from(doc['subjects'] ?? []);
+      classesAndSubjects[className] = subjects;
+    }
+
+    return classesAndSubjects;
+  } catch (e) {
+    print('Error fetching classes and subjects: $e');
+    return {};
+  }
+}
+
+
   static Future<void> saveTeacher(
     String schoolID,
     String empID,
@@ -377,7 +401,7 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
     }
   }
 
-    static Future<List<Teacher>> searchTeachers(
+    static Future<List<Teacher>> searchTeachersByName(
       String schoolID, String searchText) async {
     try {
       CollectionReference schoolsRef =
@@ -432,6 +456,62 @@ static Future<void> updateFeeStatus(String schoolId, String studentID, String fe
       return [];
     }
   }
+
+  static Future<List<Teacher>> searchTeachersByEmployeeID(
+      String schoolID, String employeeID) async {
+    try {
+      CollectionReference schoolsRef =
+          FirebaseFirestore.instance.collection('Schools');
+
+      QuerySnapshot schoolSnapshot =
+          await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+
+      if (schoolSnapshot.docs.isEmpty) {
+        print('School with ID $schoolID not found');
+        return [];
+      }
+
+      DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+      CollectionReference teachersRef = schoolDocRef.collection('Teachers');
+
+      QuerySnapshot teachersSnapshot;
+
+      if (employeeID.isNotEmpty) {
+        teachersSnapshot = await teachersRef
+            .where('EmployeeID', isEqualTo: employeeID)
+            .get();
+      } else {
+        teachersSnapshot = await teachersRef.get();
+      }
+
+      List<Teacher> teachers = teachersSnapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return Teacher(
+          empID: data['EmployeeID'],
+          name: data['Name'],
+          gender: data['Gender'],
+          email: data['Email'],
+          cnic: data['CNIC'],
+          phoneNo: data['PhoneNo'],
+          fatherName: data['FatherName'],
+          classes: List<String>.from(data['Classes'] ?? []),
+          subjects:
+              (data['Subjects'] as Map<String, dynamic>).map((key, value) {
+            return MapEntry(key, List<String>.from(value));
+          }),
+          classTeacher: data['ClassTeacher'],
+        );
+      }).toList();
+
+      print('Teachers found: ${teachers.length}');
+
+      return teachers;
+    } catch (e) {
+      print('Error searching teachers: $e');
+      return [];
+    }
+  }
+
 
   static Future<void> deleteClassByName(
       String schoolName, String className) async {
@@ -509,6 +589,7 @@ static Future<String> fetchCounts(
     String empID,
     String name,
     String gender,
+    String email,
     String phoneNo,
     String cnic,
     String fatherName,
@@ -545,6 +626,7 @@ static Future<String> fetchCounts(
       await teacherDocRef.update({
         'Name': name,
         'Gender': gender,
+        'Email': email,
         'PhoneNo': phoneNo,
         'CNIC': cnic,
         'FatherName': fatherName,

@@ -5,6 +5,7 @@ import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
@@ -29,11 +30,13 @@ class EditTeacherController extends GetxController {
 
   TextEditingController nameController = TextEditingController();
   TextEditingController updatedController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController cnicController = TextEditingController();
   TextEditingController phoneNoController = TextEditingController();
   TextEditingController fatherNameController = TextEditingController();
 
   var genderValid = true.obs;
+  var emailValid = true.obs;
   var cnicValid = true.obs;
   var nameValid = true.obs;
   var fatherNameValid = true.obs;
@@ -58,21 +61,20 @@ class EditTeacherController extends GetxController {
   }
 
 
-  void fetchClassesAndSubjects() async {
-    isLoading.value = true;
-    List<String> classesFetched = await Database_Service.fetchClasses(schoolId.value);
-    List<ClassSubject> fetchedClassesSubjects = [];
+void fetchClassesAndSubjects() async {
+  isLoading.value = true;
+  
+  Map<String, List<String>> classesAndSubjectsMap = await Database_Service.fetchClassesAndSubjects(schoolId.value);
+  List<ClassSubject> fetchedClassesSubjects = [];
 
-    for (String className in classesFetched) {
-      List<String> subjects =
-          await Database_Service.fetchSubjects(schoolId.value, className);
-      fetchedClassesSubjects
-          .add(ClassSubject(className: className, subjects: subjects));
-    }
+  classesAndSubjectsMap.forEach((className, subjects) {
+    fetchedClassesSubjects.add(ClassSubject(className: className, subjects: subjects));
+  });
 
-    classesSubjects.assignAll(fetchedClassesSubjects);
-    isLoading.value = false;
-  }
+  classesSubjects.assignAll(fetchedClassesSubjects);
+  isLoading.value = false;
+}
+
 
   void initializeData(Teacher teacher) {
     name.value = teacher.name;
@@ -81,6 +83,7 @@ class EditTeacherController extends GetxController {
     phoneNoController.text = teacher.phoneNo;
     fatherNameController.text = teacher.fatherName;
     selectedGender.value = teacher.gender;
+    emailController.text = teacher.email;
     existingClassTeacher.value = teacher.classTeacher;
     selectedClassTeacher.value = teacher.classTeacher;
     existingClasses = teacher.classes;
@@ -198,6 +201,7 @@ class EditTeacher extends StatelessWidget {
                           if (
                             controller.selectedGender.value.isEmpty ||
                             controller.phoneNoController.text.isEmpty ||
+                            controller.emailController.text.isEmpty ||
                             controller.cnicController.text.isEmpty ||
                             controller.fatherNameController.text.isEmpty ||
                             controller.selectedClasses.isEmpty ||
@@ -218,6 +222,7 @@ class EditTeacher extends StatelessWidget {
                                 controller.teacher!.empID,
                                 capitalizedName,
                                 controller.selectedGender.value,
+                                controller.emailController.text,
                                 controller.phoneNoController.text,
                                 controller.cnicController.text,
                                 capitalizedFatherName,
@@ -389,6 +394,15 @@ class EditTeacher extends StatelessWidget {
                                   }).toList(),
                                 ),
                               ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: CustomTextField(
+                              controller: controller.emailController,
+                              hintText: 'jhondoe@....com',
+                              labelText: 'Email',
+                              isValid: controller.emailValid.value,
                             ),
                           ),
                           Padding(

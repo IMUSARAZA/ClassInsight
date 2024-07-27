@@ -18,11 +18,13 @@ class LoginController extends GetxController {
 
 class LoginScreen extends StatelessWidget {
   final LoginController _controller = Get.put(LoginController());
-  School schools = Get.arguments;
 
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> arguments = Get.arguments;
+      School school = arguments['school'];
+     bool adminOrNot = arguments['adminOrNot'];
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
@@ -112,11 +114,19 @@ class LoginScreen extends StatelessWidget {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        Auth_Service.login(
+                        if(adminOrNot){
+                          Auth_Service.loginTeacher(
                           _controller.emailController.value.text,
                           _controller.passwordController.value.text,
-                          schools
+                          school.schoolId
                           );
+                        }else{
+                        Auth_Service.loginAdmin(
+                          _controller.emailController.value.text,
+                          _controller.passwordController.value.text,
+                          school
+                          );
+                        }
                       },
                       child: Text(
                         "Login",
