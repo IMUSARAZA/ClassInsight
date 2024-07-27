@@ -58,22 +58,44 @@ class _ManageTeachersState extends State<ManageTeachers> {
     }).join(' ');
   }
 
+
+ bool _containsDigits(String value) {
+    return value.contains(RegExp(r'\d'));
+  }
+
+
   void searchTeacher(String value, BuildContext context) {
     const duration = Duration(milliseconds: 700);
+
+    String schoolID = 'buwF2J4lkLCdIVrHfgkP';
+
 
     if (_debounce?.isActive ?? false) _debounce?.cancel();
 
     _debounce = Timer(duration, () async {
-      String schoolID = 'buwF2J4lkLCdIVrHfgkP';
-      String searchText = capitalize(value);
 
-      try {
+      if(_containsDigits(value))
+      {
+       try {
         setState(() {
-          teachers = Database_Service.searchTeachers(schoolID, searchText);
+          teachers = Database_Service.searchTeachersByEmployeeID(schoolID, value);
         });
       } catch (e) {
         print('Error searching for teacher: $e');
         Get.snackbar('Error', 'Failed to search for teacher');
+      }     
+      }
+      else{
+      String searchText = capitalize(value);
+
+      try {
+        setState(() {
+          teachers = Database_Service.searchTeachersByName(schoolID, searchText);
+        });
+      } catch (e) {
+        print('Error searching for teacher: $e');
+        Get.snackbar('Error', 'Failed to search for teacher');
+      }
       }
     });
   }
@@ -174,10 +196,6 @@ class _ManageTeachersState extends State<ManageTeachers> {
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
                       Get.back();
-                      // Navigator.pushReplacement(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => AdminHome()),
-                      // );
                     },
                   ),
                   title: Text(
@@ -216,7 +234,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                 padding: const EdgeInsets.fromLTRB(30, 10, 30, 20),
                 child: CustomTextField(
                   controller: searchTeacherController,
-                  hintText: 'Search by name.',
+                  hintText: 'Search by name & Employee ID',
                   labelText: 'Search Teacher',
                   isValid: teachersValid,
                   onChanged: (value) {

@@ -61,21 +61,20 @@ class EditTeacherController extends GetxController {
   }
 
 
-  void fetchClassesAndSubjects() async {
-    isLoading.value = true;
-    List<String> classesFetched = await Database_Service.fetchClasses(schoolId.value);
-    List<ClassSubject> fetchedClassesSubjects = [];
+void fetchClassesAndSubjects() async {
+  isLoading.value = true;
+  
+  Map<String, List<String>> classesAndSubjectsMap = await Database_Service.fetchClassesAndSubjects(schoolId.value);
+  List<ClassSubject> fetchedClassesSubjects = [];
 
-    for (String className in classesFetched) {
-      List<String> subjects =
-          await Database_Service.fetchSubjects(schoolId.value, className);
-      fetchedClassesSubjects
-          .add(ClassSubject(className: className, subjects: subjects));
-    }
+  classesAndSubjectsMap.forEach((className, subjects) {
+    fetchedClassesSubjects.add(ClassSubject(className: className, subjects: subjects));
+  });
 
-    classesSubjects.assignAll(fetchedClassesSubjects);
-    isLoading.value = false;
-  }
+  classesSubjects.assignAll(fetchedClassesSubjects);
+  isLoading.value = false;
+}
+
 
   void initializeData(Teacher teacher) {
     name.value = teacher.name;

@@ -43,20 +43,23 @@ class AddTeacherController extends GetxController {
 
   String schoolId = 'buwF2J4lkLCdIVrHfgkP';
 
-  void fetchClassesAndSubjects() async {
-    List<String> classes = await Database_Service.fetchClasses(schoolId);
+void fetchClassesAndSubjects() async {
+  try {
+    Map<String, List<String>> classesAndSubjectsMap = await Database_Service.fetchClassesAndSubjects(schoolId);
+
     List<ClassSubject> fetchedClassesSubjects = [];
 
-    for (String className in classes) {
-      print('Fetching subjects for class $className');
-      List<String> subjects =
-          await Database_Service.fetchSubjects(schoolId, className);
-      fetchedClassesSubjects
-          .add(ClassSubject(className: className, subjects: subjects));
-    }
+    classesAndSubjectsMap.forEach((className, subjects) {
+      print('Fetched subjects for class $className');
+      fetchedClassesSubjects.add(ClassSubject(className: className, subjects: subjects));
+    });
 
     classesSubjects.assignAll(fetchedClassesSubjects);
+  } catch (e) {
+    print('Error fetching classes and subjects: $e');
   }
+}
+
 
   String capitalizeName(String name) {
     List<String> parts = name.split(' ');
