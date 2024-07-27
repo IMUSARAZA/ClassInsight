@@ -509,6 +509,7 @@ static Future<String> fetchCounts(
     String empID,
     String name,
     String gender,
+    String email,
     String phoneNo,
     String cnic,
     String fatherName,
@@ -545,6 +546,7 @@ static Future<String> fetchCounts(
       await teacherDocRef.update({
         'Name': name,
         'Gender': gender,
+        'Email': email,
         'PhoneNo': phoneNo,
         'CNIC': cnic,
         'FatherName': fatherName,
