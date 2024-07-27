@@ -1,5 +1,4 @@
 import 'package:classinsight/Services/Database_Service.dart';
-import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
@@ -22,6 +21,7 @@ void main() async {
   }
   runApp(MaterialApp(debugShowCheckedModeBanner: false, home: MarksScreen()));
 }
+
 class MarksScreenController extends GetxController {
   var subjectsList = <String>[].obs;
   var marksTypeList = <String>[].obs;
@@ -38,10 +38,14 @@ class MarksScreenController extends GetxController {
   Database_Service databaseService = Database_Service();
   var schoolId = "buwF2J4lkLCdIVrHfgkP";
 
+  // Define a map to store TextEditingControllers for obtained marks
+  var obtainedMarksControllers = <String, TextEditingController>{}.obs;
+
   @override
   void onInit() {
     super.onInit();
-    className.value = Get.arguments['className'] ?? '1-A'; // Initialize with passed value or default
+    className.value = Get.arguments['className'] ??
+        '1-A'; // Initialize with passed value or default
     fetchInitialData();
     ever(selectedSubject, (_) => updateStudentResults());
   }
@@ -51,10 +55,15 @@ class MarksScreenController extends GetxController {
 
     subjectsList.value =
         await Database_Service.fetchSubjects(schoolId, className.value);
-    studentsList.value =
-        await Database_Service.getStudentsOfASpecificClass(schoolId, className.value);
+    studentsList.value = await Database_Service.getStudentsOfASpecificClass(
+        schoolId, className.value);
     marksTypeList.value =
         await databaseService.fetchExamStructure(schoolId, className.value);
+
+    // Initialize controllers for each student
+    for (var student in studentsList) {
+      obtainedMarksControllers[student.studentID] = TextEditingController();
+    }
   }
 
   Future<Map<String, String>> fetchStudentResults(String studentID) async {
@@ -68,8 +77,8 @@ class MarksScreenController extends GetxController {
 
     subjectsList.value =
         await Database_Service.fetchSubjects(schoolId, className.value);
-    studentsList.value =
-        await Database_Service.getStudentsOfASpecificClass(schoolId, className.value);
+    studentsList.value = await Database_Service.getStudentsOfASpecificClass(
+        schoolId, className.value);
     marksTypeList.value =
         await databaseService.fetchExamStructure(schoolId, className.value);
   }
@@ -82,7 +91,6 @@ class MarksScreenController extends GetxController {
     return totalMarksController.text.isEmpty ? "-" : totalMarksController.text;
   }
 }
-
 
 class MarksScreen extends StatelessWidget {
   final MarksScreenController controller = Get.put(MarksScreenController());
@@ -123,8 +131,81 @@ class MarksScreen extends StatelessWidget {
                         width: 48.0,
                       ),
                       TextButton(
-                        onPressed: () {
-                          // Save action here
+                        onPressed: () async {
+                          String subject = controller.selectedSubject.value;
+                          String examType = controller.selectedMarksType.value;
+                          String totalMarks = controller.getTotalMarks();
+
+                          // Validate if totalMarks is a number
+                          if (totalMarks.isEmpty ||
+                              !RegExp(r'^[0-9]+$').hasMatch(totalMarks)) {
+                            // Show error message and exit if totalMarks is invalid
+                            Get.snackbar(
+                                'Error', 'Total Marks must be a valid number.',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white);
+                            return; // Exit the method
+                          }
+
+                          bool allValid =
+                              true; // Flag to check if all obtained marks are valid
+
+                          // Convert totalMarks to an integer for comparison
+                          int totalMarksInt = int.tryParse(totalMarks) ?? 0;
+
+                          for (var student in controller.studentsList) {
+                            String studentRollNo = student.studentRollNo ?? '';
+                            String studentName = student.name;
+                            String obtainedMarks = controller
+                                    .obtainedMarksControllers[student.studentID]
+                                    ?.text ??
+                                '-';
+
+                            // Validate if obtainedMarks is a number and within range
+                            if (obtainedMarks.isNotEmpty &&
+                                !RegExp(r'^[0-9]+$').hasMatch(obtainedMarks)) {
+                              obtainedMarks = '-';
+                              allValid =
+                                  false; // Mark as invalid if any obtainedMarks is incorrect
+                            } else if (obtainedMarks != '-' &&
+                                    (int.tryParse(obtainedMarks) ?? -1) < 0 ||
+                                (int.tryParse(obtainedMarks) ?? 0) >
+                                    totalMarksInt) {
+                              obtainedMarks = '-';
+                              allValid =
+                                  false; // Mark as invalid if obtainedMarks is out of range
+                            }
+
+                            // Print the values (for debugging or logging purposes)
+                            print(
+                                'Roll No.: $studentRollNo, Name: $studentName, Obtained Marks: $obtainedMarks, Total Marks: $totalMarks, Subject: $subject, Exam Type: $examType');
+
+                            // Update or add marks to the database
+                            Database_Service database_service =
+                                new Database_Service();
+                            await database_service.updateOrAddMarks(
+                                controller.school.schoolId.value,
+                                student.studentID,
+                                subject,
+                                examType,
+                                obtainedMarks);
+                          }
+
+                          // Show success or error message based on validity
+                          if (allValid) {
+                            Get.snackbar('Success',
+                                'Marks have been updated successfully.',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.green,
+                                colorText: Colors.white);
+                          } else {
+                            Get.snackbar('Error',
+                                'Please enter valid marks for all students.',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white);
+                          }
                         },
                         child: Text(
                           "Save",
@@ -332,47 +413,65 @@ class MarksScreen extends StatelessWidget {
                                   DataCell(Text(student.studentRollNo)),
                                   DataCell(Text(student.name)),
                                   DataCell(
-                                    TextFormField(
-                                      decoration: InputDecoration(
-                                        hintText: 'Enter',
-                                        hintStyle: TextStyle(
-                                          color: const Color.fromARGB(255, 162,
-                                              159, 159), // Light gray hint text
+                                    Obx(() {
+                                      // Get the instance of MarksScreenController
+                                      final marksController =
+                                          Get.find<MarksScreenController>();
+
+                                      // Get the TextEditingController for the current student
+                                      TextEditingController controller =
+                                          marksController
+                                                      .obtainedMarksControllers[
+                                                  student.studentID] ??
+                                              TextEditingController();
+
+                                      return TextFormField(
+                                        controller: controller,
+                                        decoration: InputDecoration(
+                                          hintText: 'Enter',
+                                          hintStyle: TextStyle(
+                                            color: const Color.fromARGB(
+                                                255,
+                                                162,
+                                                159,
+                                                159), // Light gray hint text
+                                            fontWeight: FontWeight
+                                                .normal, // Ensure hint text is not bold
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical:
+                                                4, // Adjust padding if needed
+                                          ),
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide
+                                                .none, // Remove the bottom border
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide
+                                                .none, // Remove the bottom border when focused
+                                          ),
+                                          errorBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide
+                                                .none, // Remove the bottom border on error
+                                          ),
+                                          focusedErrorBorder:
+                                              UnderlineInputBorder(
+                                            borderSide: BorderSide
+                                                .none, // Remove the bottom border on error focus
+                                          ),
+                                        ),
+                                        style: TextStyle(
+                                          color:
+                                              Colors.black, // Style input text
                                           fontWeight: FontWeight
-                                              .normal, // Ensure hint text is not bold
+                                              .normal, // Ensure input text is not bold
                                         ),
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical:
-                                              4, // Adjust padding if needed
-                                        ),
-                                        enabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide
-                                              .none, // Remove the bottom border
-                                        ),
-                                        focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide
-                                              .none, // Remove the bottom border when focused
-                                        ),
-                                        errorBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide
-                                              .none, // Remove the bottom border on error
-                                        ),
-                                        focusedErrorBorder:
-                                            UnderlineInputBorder(
-                                          borderSide: BorderSide
-                                              .none, // Remove the bottom border on error focus
-                                        ),
-                                      ),
-                                      style: TextStyle(
-                                        color: Colors.black, // Style input text
-                                        fontWeight: FontWeight
-                                            .normal, // Ensure input text is not bold
-                                      ),
-                                      onChanged: (value) {
-                                        // Handle obtained marks input if needed
-                                      },
-                                    ),
+                                        onChanged: (value) {
+                                          // Optional: Handle obtained marks input if needed
+                                        },
+                                      );
+                                    }),
                                   ),
                                   DataCell(
                                     Text(totalMarks),
