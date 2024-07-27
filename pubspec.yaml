@@ -40,6 +40,8 @@ dependencies:
   google_fonts: ^4.0.3 
   get_storage:
   intl:
+  mailer:
+  flutter_dotenv:
 
     
 
@@ -90,7 +92,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - .env
     
   
 
