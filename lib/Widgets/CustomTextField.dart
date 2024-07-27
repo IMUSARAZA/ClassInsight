@@ -40,7 +40,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
         labelText: widget.labelText,
         labelStyle: TextStyle(color: Colors.black),
         floatingLabelStyle: TextStyle(color: Colors.black),
-        suffixIcon: widget.suffixIcon, 
+        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        suffixIcon: widget.suffixIcon,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
           borderSide: BorderSide(
@@ -51,7 +52,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
           borderSide: BorderSide(
-            color: AppColors.appLightBlue, 
+            color: AppColors.appLightBlue,
             width: 2.0,
           ),
         ),

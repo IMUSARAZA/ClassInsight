@@ -12,41 +12,56 @@ import 'package:get/get.dart';
 class StudentController extends GetxController {
   var studentsList = <Student>[].obs;
   var classesList = <String>[].obs;
-  var selectedClass = ''.obs; // Initialize as an empty string
+  var selectedClass = ''.obs; 
+  var selectedNewClass = ''.obs; 
   var searchValid = true.obs;
 
-  final AdminHomeController school = Get.find();
+  final AdminHomeController school = Get.put(AdminHomeController());
+
+
 
   @override
   void onInit() {
     super.onInit();
-    fetchClasses();
+    refreshData();
+
   }
 
-  void fetchStudents() async {
+void fetchStudents() async {
+  try {
     if (selectedClass.isNotEmpty) {
       var students = await Database_Service.getStudentsOfASpecificClass(
           school.schoolId.value, selectedClass.value);
       studentsList.value = students;
     }
+  } catch (e) {
+    print('Error fetching students: $e');
   }
+}
+
 
   void fetchClasses() async {
     var classes = await Database_Service.fetchAllClasses(school.schoolId.value);
     classesList.value = classes;
 
-    // Initialize selectedClass if it's not set or not in the list
     if (classes.isNotEmpty && selectedClass.isEmpty) {
       selectedClass.value = classes.first;
     }
 
-    // Fetch students after classes have been loaded
     fetchStudents();
   }
 
-  void refreshStudentList() {
+  void refreshStudentList(){
     fetchStudents();
   }
+
+
+  Future<void> refreshData() async{
+    fetchStudents();
+    fetchClasses();
+  }
+
+
 
   void searchStudent(String value) async {
     if (_containsDigits(value)) {
@@ -132,375 +147,383 @@ class ManageStudents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    studentController.refreshData();
+  
+  
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Get.back();
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => AdminHome()),
-            // );
-          },
-        ),
-        title: Text(
-          'Students',
-          style: Font_Styles.labelHeadingLight(context),
-        ),
-        centerTitle: true,
-        actions: <Widget>[
-          Container(
-            width: 48.0,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Text(
+            'Students',
+            style: Font_Styles.labelHeadingLight(context),
           ),
-          TextButton(
-            onPressed: () {
-              Get.toNamed("/AddStudent");
-            },
-            child: Text(
-              "Add Student",
-              style: Font_Styles.labelHeadingLight(context),
+          centerTitle: true,
+          actions: <Widget>[
+            Container(
+              width: 48.0,
             ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+            TextButton(
+              onPressed: () async {
+                studentController.selectedNewClass.value = await Get.toNamed("/AddStudent");
+      
+                if (studentController.selectedNewClass.value.isNotEmpty) {
+                  studentController.selectedClass.value = studentController.selectedNewClass.value;
+                  studentController.refreshStudentList();
+      
+                  print('Selected Class: ${studentController.selectedNewClass.value}');}
+              },
               child: Text(
-                'Students',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 30, // Adjust as needed
-                  fontWeight: FontWeight.w900,
-                ),
+                "Add Student",
+                style: Font_Styles.labelHeadingLight(context),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-              child: Text(
-                'Class',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15, // Adjust as needed
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
-              child: Obx(() {
-                return DropdownButtonFormField<String>(
-                  value: studentController.selectedClass.value,
-                  decoration: InputDecoration(
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          BorderSide(color: AppColors.appLightBlue, width: 2.0),
-                    ),
-                  ),
-                  items: studentController.classesList.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    studentController.selectedClass.value = newValue!;
-                    studentController.refreshStudentList();
-                  },
-                );
-              }),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
-              child: CustomTextField(
-                controller: TextEditingController(),
-                hintText: 'Search by name or roll no.',
-                labelText: 'Search Student',
-                isValid: studentController.searchValid.value,
-                onChanged: (String value) {
-                  studentController.searchStudent(value);
-                },
-              ),
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-            Obx(() {
-              if (studentController.studentsList.isEmpty) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.appLightBlue,
-                  ),
-                );
-              } else {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    showCheckboxColumn: false,
-                    showBottomBorder: true,
-                    columns: <DataColumn>[
-                      DataColumn(
-                        label: Text(
-                          'Roll No.',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Student Name',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Gender',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Father Name',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Father Phone',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Father CNIC',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Fee Status',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Result',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Edit',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Delete',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.03,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                    rows: studentController.studentsList
-                        .map(
-                          (student) => DataRow(
-                            color: MaterialStateColor.resolveWith(
-                                (states) => AppColors.appDarkBlue),
-                            cells: [
-                              DataCell(
-                                Text(
-                                  student.studentRollNo,
-                                  style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.03,
-                                  ),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  student.name,
-                                  style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.03,
-                                  ),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  student.gender,
-                                  style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.03,
-                                  ),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  student.fatherName,
-                                  style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.03,
-                                  ),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  student.fatherPhoneNo,
-                                  style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.03,
-                                  ),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  student.fatherCNIC,
-                                  style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.03,
-                                  ),
-                                ),
-                              ),
-                              DataCell(
-                                TextButton(
-                                    child: Text(student.feeStatus),
-                                    onPressed: () {
-                                      _showFeeStatusPopup(context, student);
-                                    }),
-                              ),
-                              DataCell(
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.text_snippet_outlined,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: () {
-                                    print(
-                                        "Result button pressed for student: ${student.name}");
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/StudentResult',
-                                      arguments: Student(
-                                          studentID: student.studentID,
-                                          name: student.name,
-                                          gender: student.gender,
-                                          bFormChallanId:
-                                              student.bFormChallanId,
-                                          fatherName: student.fatherName,
-                                          fatherPhoneNo: student.fatherPhoneNo,
-                                          fatherCNIC: student.fatherCNIC,
-                                          studentRollNo: student.studentRollNo,
-                                          classSection: student.classSection,
-                                          feeStatus: student.feeStatus,
-                                          feeStartDate: student.feeStartDate,
-                                          feeEndDate: student.feeEndDate),
-                                    );
-                                  },
-                                ),
-                              ),
-                              DataCell(
-                                IconButton(
-                                  icon: Icon(FontAwesomeIcons.edit),
-                                  onPressed: () {
-                                    print(student);
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/EditStudent',
-                                      arguments: Student(
-                                          studentID: student.studentID,
-                                          name: student.name,
-                                          gender: student.gender,
-                                          bFormChallanId:
-                                              student.bFormChallanId,
-                                          fatherName: student.fatherName,
-                                          fatherPhoneNo: student.fatherPhoneNo,
-                                          fatherCNIC: student.fatherCNIC,
-                                          studentRollNo: student.studentRollNo,
-                                          classSection: student.classSection,
-                                          feeStatus: student.feeStatus,
-                                          feeStartDate: student.feeStartDate,
-                                          feeEndDate: student.feeEndDate),
-                                    );
-                                  },
-                                ),
-                              ),
-                              DataCell(
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () {
-                                    studentController.deleteStudent(
-                                        context, student.studentID);
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                        .toList(),
-                  ),
-                );
-              }
-            }),
           ],
         ),
-      ),
+        body: RefreshIndicator(
+          onRefresh: studentController.refreshData,
+          child: SingleChildScrollView(
+            child: Obx(()=>
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+                    child: Text(
+                      'Students',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 30, // Adjust as needed
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+                    child: Text(
+                      'Class',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15, // Adjust as needed
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
+                    child: Obx(() {
+                      return DropdownButtonFormField<String>(
+                        value: studentController.selectedClass.value,
+                        decoration: InputDecoration(
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.black),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                BorderSide(color: AppColors.appLightBlue, width: 2.0),
+                          ),
+                        ),
+                        items: studentController.classesList.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          studentController.selectedClass.value = newValue!;
+                          studentController.refreshStudentList();
+                        },
+                      );
+                    }),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                    child: CustomTextField(
+                      controller: TextEditingController(),
+                      hintText: 'Search by name or roll no.',
+                      labelText: 'Search Student',
+                      isValid: studentController.searchValid.value,
+                      onChanged: (String value) {
+                        studentController.searchStudent(value);
+                      },
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  Obx(() {
+                    if (studentController.studentsList.isEmpty) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.appLightBlue,
+                        ),
+                      );
+                    } else {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          showCheckboxColumn: false,
+                          showBottomBorder: true,
+                          columns: <DataColumn>[
+                            DataColumn(
+                              label: Text(
+                                'Roll No.',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Student Name',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Gender',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Father Name',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Father Phone',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Father CNIC',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Fee Status',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Result',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Edit',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Delete',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                          rows: studentController.studentsList
+                              .map(
+                                (student) => DataRow(
+                                  color: WidgetStateColor.resolveWith(
+                                      (states) => AppColors.appDarkBlue),
+                                  cells: [
+                                    DataCell(
+                                      Text(
+                                        student.studentRollNo,
+                                        style: TextStyle(
+                                          fontSize:
+                                              MediaQuery.of(context).size.width *
+                                                  0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        student.name,
+                                        style: TextStyle(
+                                          fontSize:
+                                              MediaQuery.of(context).size.width *
+                                                  0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        student.gender,
+                                        style: TextStyle(
+                                          fontSize:
+                                              MediaQuery.of(context).size.width *
+                                                  0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        student.fatherName,
+                                        style: TextStyle(
+                                          fontSize:
+                                              MediaQuery.of(context).size.width *
+                                                  0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        student.fatherPhoneNo,
+                                        style: TextStyle(
+                                          fontSize:
+                                              MediaQuery.of(context).size.width *
+                                                  0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        student.fatherCNIC,
+                                        style: TextStyle(
+                                          fontSize:
+                                              MediaQuery.of(context).size.width *
+                                                  0.03,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      TextButton(
+                                          child: Text(student.feeStatus),
+                                          onPressed: () {
+                                            _showFeeStatusPopup(context, student);
+                                          }),
+                                    ),
+                                    DataCell(
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.text_snippet_outlined,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () {
+                                          print(
+                                              "Result button pressed for student: ${student.name}");
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/StudentResult',
+                                            arguments: Student(
+                                                studentID: student.studentID,
+                                                name: student.name,
+                                                gender: student.gender,
+                                                bFormChallanId:
+                                                    student.bFormChallanId,
+                                                fatherName: student.fatherName,
+                                                fatherPhoneNo: student.fatherPhoneNo,
+                                                fatherCNIC: student.fatherCNIC,
+                                                studentRollNo: student.studentRollNo,
+                                                classSection: student.classSection,
+                                                feeStatus: student.feeStatus,
+                                                feeStartDate: student.feeStartDate,
+                                                feeEndDate: student.feeEndDate),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    DataCell(
+                                      IconButton(
+                                        icon: Icon(FontAwesomeIcons.edit),
+                                        onPressed: () async {
+                                          print(student);
+                                          var result = await Get.toNamed(
+                                            '/EditStudent',
+                                            arguments: Student(
+                                                studentID: student.studentID,
+                                                name: student.name,
+                                                gender: student.gender,
+                                                bFormChallanId:
+                                                    student.bFormChallanId,
+                                                fatherName: student.fatherName,
+                                                fatherPhoneNo: student.fatherPhoneNo,
+                                                fatherCNIC: student.fatherCNIC,
+                                                studentRollNo: student.studentRollNo,
+                                                classSection: student.classSection,
+                                                feeStatus: student.feeStatus,
+                                                feeStartDate: student.feeStartDate,
+                                                feeEndDate: student.feeEndDate),
+                                          );
+
+                                          if(result == 'student_added'){
+                                            studentController.refreshStudentList();
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    DataCell(
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () {
+                                          studentController.deleteStudent(
+                                              context, student.studentID);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      );
+                    }
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ),
+      
     );
   }
 }
@@ -508,7 +531,7 @@ class ManageStudents extends StatelessWidget {
 void _showFeeStatusPopup(BuildContext context, Student student) {
   TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
-  final AdminHomeController school = Get.find();
+  final AdminHomeController school = Get.put(AdminHomeController());
 
   // Initialize with existing values
   String feeStatus = student.feeStatus;
@@ -624,14 +647,15 @@ void _showFeeStatusPopup(BuildContext context, Student student) {
                 Navigator.of(context).pop();
               } catch (e) {
                 print('Error updating fee status: $e');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Failed to update fee status')),
-                );
+               Get.snackbar("Failed updating", "Error updating fee status");
               }
             },
           ),
         ],
       );
     },
-  );
+  ).whenComplete(() {
+    startDateController.dispose();
+    endDateController.dispose();
+  });
 }

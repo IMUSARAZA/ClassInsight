@@ -1,6 +1,5 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
 import 'dart:async';
-
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
@@ -159,358 +158,380 @@ class _ManageTeachersState extends State<ManageTeachers> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          height: screenHeight,
-          width: screenWidth,
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  height: screenHeight * 0.10,
-                  width: screenWidth,
-                  child: AppBar(
-                    backgroundColor: Colors.white,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        Get.back();
-                        // Navigator.pushReplacement(
-                        //   context,
-                        //   MaterialPageRoute(builder: (context) => AdminHome()),
-                        // );
-                      },
-                    ),
-                    title: Text(
-                      'Teachers',
-                      style: Font_Styles.labelHeadingLight(context),
-                    ),
-                    centerTitle: true,
-                    actions: <Widget>[
-                      Container(
-                        width: 48.0,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Get.toNamed("/AddTeacher");
-                        },
-                        child: Text(
-                          "Add Teacher",
-                          style: Font_Styles.labelHeadingLight(context),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-                  child: Text(
-                    'Teachers',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 25,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(30, 10, 30, 20),
-                  child: CustomTextField(
-                    controller: searchTeacherController,
-                    hintText: 'Search by name.',
-                    labelText: 'Search Teacher',
-                    isValid: teachersValid,
-                    onChanged: (value) {
-                      print('Search teacher value: $value');
-                      searchTeacher(value, context);
+      body: Container(
+        height: screenHeight,
+        width: screenWidth,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                height: screenHeight * 0.10,
+                width: screenWidth,
+                child: AppBar(
+                  backgroundColor: Colors.white,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      Get.back();
+                      // Navigator.pushReplacement(
+                      //   context,
+                      //   MaterialPageRoute(builder: (context) => AdminHome()),
+                      // );
                     },
                   ),
+                  title: Text(
+                    'Teachers',
+                    style: Font_Styles.labelHeadingLight(context),
+                  ),
+                  centerTitle: true,
+                  actions: <Widget>[
+                    Container(
+                      width: 48.0,
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Get.toNamed("/AddTeacher");
+                      },
+                      child: Text(
+                        "Add Teacher",
+                        style: Font_Styles.labelHeadingLight(context),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-                FutureBuilder<List<Teacher>>(
-                  future: teachers,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Teacher>> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.appLightBlue,
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+                child: Text(
+                  'Teachers',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30, 10, 30, 20),
+                child: CustomTextField(
+                  controller: searchTeacherController,
+                  hintText: 'Search by name.',
+                  labelText: 'Search Teacher',
+                  isValid: teachersValid,
+                  onChanged: (value) {
+                    print('Search teacher value: $value');
+                    searchTeacher(value, context);
+                  },
+                ),
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+              FutureBuilder<List<Teacher>>(
+                future: teachers,
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<Teacher>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.appLightBlue,
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    print('Snapshot error: ${snapshot.error}');
+                    return Center(
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                          fontWeight: FontWeight.w600,
                         ),
-                      );
-                    } else if (snapshot.hasError) {
-                      print('Snapshot error: ${snapshot.error}');
-                      return Center(
-                        child: Text(
-                          'Error: ${snapshot.error}',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: MediaQuery.of(context).size.width * 0.04,
-                            fontWeight: FontWeight.w600,
+                      ),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    print('No teachers found in the snapshot');
+                    return Center(
+                      child: Text(
+                        'No Teachers found',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    );
+                  } else {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        showCheckboxColumn: false,
+                        showBottomBorder: true,
+                        columns: <DataColumn>[
+                          DataColumn(
+                            label: Text(
+                              'Employee ID',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.03,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
-                      );
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      print('No teachers found in the snapshot');
-                      return Center(
-                        child: Text(
-                          'No Teachers found',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.04,
-                            fontWeight: FontWeight.w600,
+                          DataColumn(
+                            label: Text(
+                              'Name',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.03,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
-                      );
-                    } else {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          showCheckboxColumn: false,
-                          showBottomBorder: true,
-                          columns: <DataColumn>[
-                            DataColumn(
-                              label: Text(
-                                'Employee ID',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                          DataColumn(
+                            label: Text(
+                              'Gender',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.03,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            DataColumn(
-                              label: Text(
-                                'Name',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Gender',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Father Name',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Classes',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Container(
-                                width: MediaQuery.of(context).size.width * 0.5,
-                                child: Text(
-                                  'Subjects',
+                          ),
+                          DataColumn(
+                                label: Text(
+                                  'Email',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.03,
+                                        MediaQuery.of(context).size.width * 0.03,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
+                          DataColumn(
+                            label: Text(
+                              'Father Name',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.03,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            DataColumn(
-                              label: Text(
-                                'Edit',
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Classes',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.03,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: Text(
+                                'Subjects',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
+                                      MediaQuery.of(context).size.width *
+                                          0.03,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                            DataColumn(
-                              label: Text(
-                                'Delete',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Edit',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.03,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ],
-                          rows: snapshot.data!
-                              .map(
-                                (Teacher teacher) => DataRow(
-                                  color: MaterialStateColor.resolveWith(
-                                      (states) => AppColors.appDarkBlue),
-                                  cells: [
-                                    DataCell(
-                                      Text(
-                                        teacher.empID,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.03,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.03,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                        rows: snapshot.data!
+                            .map(
+                              (Teacher teacher) => DataRow(
+                                color: MaterialStateColor.resolveWith(
+                                    (states) => AppColors.appDarkBlue),
+                                cells: [
+                                  DataCell(
+                                    Text(
+                                      teacher.empID,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width *
+                                            0.03,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    DataCell(
-                                      Text(
-                                        teacher.name,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.03,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      teacher.name,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width *
+                                            0.03,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    DataCell(
-                                      Text(
-                                        teacher.gender,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.03,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      teacher.gender,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width *
+                                            0.03,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    DataCell(
-                                      Text(
-                                        teacher.fatherName,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.03,
-                                          fontWeight: FontWeight.w600,
+                                  ),
+                                  DataCell(
+                                        Text(
+                                          teacher.email,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.03,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    DataCell(
-                                      Text(
-                                        teacher.classes.join(', '),
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.03,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                  DataCell(
+                                    Text(
+                                      teacher.fatherName,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width *
+                                            0.03,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    DataCell(
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                                        child: Container(
-                                          width:
-                                              MediaQuery.of(context).size.width *
-                                                  0.5,
-                                          child: SingleChildScrollView(
-                                            child: Padding(
-                                              padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: teacher.subjects.entries
-                                                    .map((entry) {
-                                                  return Tooltip(
-                                                    message: entry.value.join(', '),
-                                                    child: Text(
-                                                      '${entry.key}: ${entry.value.join(', ')}',
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize:
-                                                            MediaQuery.of(context)
-                                                                    .size
-                                                                    .width *
-                                                                0.03,
-                                                        fontWeight: FontWeight.w600,
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      teacher.classes.join(', '),
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: MediaQuery.of(context)
+                                                .size
+                                                .width *
+                                            0.03,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.5,
+                                        child: SingleChildScrollView(
+                                          child: Padding(
+                                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: teacher.subjects.entries
+                                                  .map((entry) {
+                                                return Tooltip(
+                                                  message: entry.value.join(', '),
+                                                  child: Text(
+                                                    '${entry.key}: ${entry.value.join(', ')}',
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.03,
+                                                      fontWeight: FontWeight.w600,
                                                     ),
-                                                  );
-                                                }).toList(),
-                                              ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                );
+                                              }).toList(),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                    DataCell(
-                                      GestureDetector(
-                                        onTap: () {
-                                          print(
-                                              "Edit button pressed for teacher: ${teacher.name}");
-
-                                          Get.toNamed("/EditTeacher",
-                                              arguments: teacher);
-                                        },
-                                        child: const Icon(
-                                          FontAwesomeIcons.penToSquare,
-                                          color: Colors.black,
-                                        ),
+                                  ),
+                                  DataCell(
+                                    GestureDetector(
+                                      onTap: () {
+                                        print(
+                                            "Edit button pressed for teacher: ${teacher.name}");
+          
+                                        Get.toNamed("/EditTeacher",
+                                            arguments: teacher);
+                                      },
+                                      child: const Icon(
+                                        FontAwesomeIcons.penToSquare,
+                                        color: Colors.black,
                                       ),
                                     ),
-                                    DataCell(
-                                      GestureDetector(
-                                        onTap: () {
-                                          print(
-                                              "Delete button pressed for teacher: ${teacher.name}");
-                                          deleteTeacher(context, teacher.empID);
-                                        },
-                                        child: const Icon(
-                                          Icons.delete,
-                                          color: Colors.red,
-                                        ),
+                                  ),
+                                  DataCell(
+                                    GestureDetector(
+                                      onTap: () {
+                                        print(
+                                            "Delete button pressed for teacher: ${teacher.name}");
+                                        deleteTeacher(context, teacher.empID);
+                                      },
+                                      child: const Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ],
-            ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),

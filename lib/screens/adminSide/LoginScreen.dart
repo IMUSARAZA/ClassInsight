@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, must_be_immutable
 
 import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/Services/Auth_Service.dart';
@@ -18,7 +18,7 @@ class LoginController extends GetxController {
 
 class LoginScreen extends StatelessWidget {
   final LoginController _controller = Get.put(LoginController());
-  static School schools = Get.arguments;
+  School schools = Get.arguments;
 
 
   @override

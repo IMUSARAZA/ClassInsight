@@ -57,6 +57,7 @@ class LoginAs extends StatelessWidget {
             // Get.toNamed("/")         
             }:
             () {
+              print("LOGINAS:"+school.schoolId);
             Get.toNamed("/LoginScreen",arguments: school);        
             }
             ,

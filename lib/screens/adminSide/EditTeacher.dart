@@ -1,6 +1,7 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/models/TeacherModel.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,8 @@ class EditTeacherController extends GetxController {
   var nameValid = true.obs;
   var fatherNameValid = true.obs;
   var phoneNoValid = true.obs;
+  AdminHomeController school = Get.put(AdminHomeController());
+  RxString schoolId = ''.obs;
   var selectedGender = ''.obs;
   var selectedClassTeacher = ''.obs;
   var existingClassTeacher = ''.obs;
@@ -49,20 +52,20 @@ class EditTeacherController extends GetxController {
   void onInit() {
     super.onInit();
     teacher = Get.arguments;
+    schoolId.value = school.schoolId.value;
     initializeData(teacher!);
     fetchClassesAndSubjects();
   }
 
-  String schoolId = 'buwF2J4lkLCdIVrHfgkP';
 
   void fetchClassesAndSubjects() async {
     isLoading.value = true;
-    List<String> classesFetched = await Database_Service.fetchClasses(schoolId);
+    List<String> classesFetched = await Database_Service.fetchClasses(schoolId.value);
     List<ClassSubject> fetchedClassesSubjects = [];
 
     for (String className in classesFetched) {
       List<String> subjects =
-          await Database_Service.fetchSubjects(schoolId, className);
+          await Database_Service.fetchSubjects(schoolId.value, className);
       fetchedClassesSubjects
           .add(ClassSubject(className: className, subjects: subjects));
     }
@@ -85,6 +88,17 @@ class EditTeacherController extends GetxController {
     selectedClasses.assignAll(teacher.classes);
     selectedSubjects.assignAll(teacher.subjects);
   }
+
+  String capitalizeName(String name) {
+    List<String> parts = name.split(' ');
+    return parts.map((part) => _capitalize(part)).join(' ');
+  }
+
+  String _capitalize(String word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
+  }
+
 
   void showEditNameDialog(BuildContext context) {
     showDialog(
@@ -182,14 +196,13 @@ class EditTeacher extends StatelessWidget {
                       TextButton(
                         onPressed: () {
                           if (
-                            controller.nameController.text.isEmpty ||
-                              controller.selectedGender.value.isEmpty ||
-                              controller.selectedClassTeacher.value.isEmpty ||
-                              controller.phoneNoController.text.isEmpty ||
-                              controller.cnicController.text.isEmpty ||
-                              controller.fatherNameController.text.isEmpty ||
-                              controller.selectedClasses.isEmpty ||
-                              controller.selectedSubjects.isEmpty) {
+                            controller.selectedGender.value.isEmpty ||
+                            controller.phoneNoController.text.isEmpty ||
+                            controller.cnicController.text.isEmpty ||
+                            controller.fatherNameController.text.isEmpty ||
+                            controller.selectedClasses.isEmpty ||
+                            controller.selectedSubjects.isEmpty
+                              ) {
                             Get.snackbar('No Changes Made',
                                 'Please make some changes to update the teacher');
                           } 
@@ -197,14 +210,17 @@ class EditTeacher extends StatelessWidget {
                           else {
                         print(controller.selectedClassTeacher.value);
 
+                          String capitalizedName = controller.capitalizeName(controller.name.value);
+                          String capitalizedFatherName = controller.capitalizeName(controller.fatherNameController.text);
+
                             Database_Service.updateTeacher(
-                                'buwF2J4lkLCdIVrHfgkP',
+                                controller.schoolId.value,
                                 controller.teacher!.empID,
-                                controller.name.value,
+                                capitalizedName,
                                 controller.selectedGender.value,
                                 controller.phoneNoController.text,
                                 controller.cnicController.text,
-                                controller.fatherNameController.text,
+                                capitalizedFatherName,
                                 controller.selectedClasses,
                                 controller.selectedSubjects,
                                 controller.selectedClassTeacher.value);

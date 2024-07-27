@@ -20,9 +20,8 @@ import 'package:classinsight/screens/adminSide/ManageTimetable.dart';
 import 'package:classinsight/screens/adminSide/StudentResult.dart';
 import 'package:classinsight/screens/adminSide/SubjectResult.dart';
 import 'package:classinsight/screens/onBoarding.dart';
+import 'package:classinsight/screens/teacherSide/MarksScreen.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/routes/get_route.dart';
 
 class MainRoutes {
   static List<GetPage> routes = [
@@ -103,6 +102,10 @@ class MainRoutes {
     GetPage(
       name: "/SubjectResult",
       page: () => SubjectResult(),
+    ),
+    GetPage(
+      name: "/MarksScreen",
+      page: () => MarksScreen(),
     ),
   ];
 }
