@@ -73,6 +73,7 @@ class OnBoarding extends StatelessWidget {
                 return OnBoardDropDown(
                   items: schoolController.schools,
                   onChanged: (item) {
+                    print("CLICKED"+item!.schoolId);
                     Get.toNamed("/loginAs", arguments: item);
                   },
                 );

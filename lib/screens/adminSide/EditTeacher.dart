@@ -1,9 +1,11 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/models/TeacherModel.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
@@ -28,15 +30,19 @@ class EditTeacherController extends GetxController {
 
   TextEditingController nameController = TextEditingController();
   TextEditingController updatedController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController cnicController = TextEditingController();
   TextEditingController phoneNoController = TextEditingController();
   TextEditingController fatherNameController = TextEditingController();
 
   var genderValid = true.obs;
+  var emailValid = true.obs;
   var cnicValid = true.obs;
   var nameValid = true.obs;
   var fatherNameValid = true.obs;
   var phoneNoValid = true.obs;
+  AdminHomeController school = Get.put(AdminHomeController());
+  RxString schoolId = ''.obs;
   var selectedGender = ''.obs;
   var selectedClassTeacher = ''.obs;
   var existingClassTeacher = ''.obs;
@@ -45,78 +51,93 @@ class EditTeacherController extends GetxController {
   var headingFontSize = 33.0;
   var isLoading = true.obs;
 
-
   @override
   void onInit() {
     super.onInit();
     teacher = Get.arguments;
+    schoolId.value = school.schoolId.value;
     initializeData(teacher!);
     fetchClassesAndSubjects();
   }
 
-  String schoolId = 'buwF2J4lkLCdIVrHfgkP';
 
-  void fetchClassesAndSubjects() async {
-    isLoading.value = true; 
-    List<String> classesFetched = await Database_Service.fetchClasses(schoolId);
-    List<ClassSubject> fetchedClassesSubjects = [];
+void fetchClassesAndSubjects() async {
+  isLoading.value = true;
+  
+  Map<String, List<String>> classesAndSubjectsMap = await Database_Service.fetchClassesAndSubjects(schoolId.value);
+  List<ClassSubject> fetchedClassesSubjects = [];
 
-    for (String className in classesFetched) {
-      List<String> subjects = await Database_Service.fetchSubjects(schoolId, className);
-      fetchedClassesSubjects.add(ClassSubject(className: className, subjects: subjects));
-    }
+  classesAndSubjectsMap.forEach((className, subjects) {
+    fetchedClassesSubjects.add(ClassSubject(className: className, subjects: subjects));
+  });
 
-    classesSubjects.assignAll(fetchedClassesSubjects);
-    isLoading.value = false; 
-  }
+  classesSubjects.assignAll(fetchedClassesSubjects);
+  isLoading.value = false;
+}
+
 
   void initializeData(Teacher teacher) {
     name.value = teacher.name;
+    updatedController.text = teacher.name;
     cnicController.text = teacher.cnic;
     phoneNoController.text = teacher.phoneNo;
     fatherNameController.text = teacher.fatherName;
     selectedGender.value = teacher.gender;
+    emailController.text = teacher.email;
     existingClassTeacher.value = teacher.classTeacher;
+    selectedClassTeacher.value = teacher.classTeacher;
     existingClasses = teacher.classes;
     existingSubjects = teacher.subjects;
+    selectedClasses.assignAll(teacher.classes);
+    selectedSubjects.assignAll(teacher.subjects);
   }
 
-void showEditNameDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Edit Name'),
-        backgroundColor: AppColors.appLightBlue,
-        content: TextField(
-          controller: updatedController,
-          decoration: const InputDecoration(
-            hintText: 'Enter new name',
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
-          ),
-          TextButton(
-            onPressed: () {
-              print(updatedController.text);
-              // Step 2: Update the reactive variable with the new name
-              name.value = updatedController.text;
-              Navigator.of(context).pop();
-            },
-            child: const Text('Save', style: TextStyle(color: Colors.black)),
-          ),
-        ],
-      );
-    },
-  );
-}
-}
+  String capitalizeName(String name) {
+    List<String> parts = name.split(' ');
+    return parts.map((part) => _capitalize(part)).join(' ');
+  }
 
+  String _capitalize(String word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
+  }
+
+
+  void showEditNameDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Name'),
+          backgroundColor: AppColors.appLightBlue,
+          content: TextField(
+            controller: updatedController,
+            decoration: const InputDecoration(
+              hintText: 'Enter new name',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () {
+                print(updatedController.text);
+                name.value = updatedController.text;
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
 
 class EditTeacher extends StatelessWidget {
   EditTeacher({Key? key}) : super(key: key);
@@ -177,25 +198,34 @@ class EditTeacher extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
-
-                          if (controller.nameController.text.isEmpty && controller.selectedGender.value.isEmpty &&
-                              controller.selectedClassTeacher.value.isEmpty &&
-                              controller.phoneNoController.text.isEmpty &&
-                              controller.cnicController.text.isEmpty &&
-                              controller.fatherNameController.text.isEmpty &&
-                              controller.selectedClasses.isEmpty &&
-                              controller.selectedSubjects.isEmpty) {
+                          if (
+                            controller.selectedGender.value.isEmpty ||
+                            controller.phoneNoController.text.isEmpty ||
+                            controller.emailController.text.isEmpty ||
+                            controller.cnicController.text.isEmpty ||
+                            controller.fatherNameController.text.isEmpty ||
+                            controller.selectedClasses.isEmpty ||
+                            controller.selectedSubjects.isEmpty
+                              ) {
                             Get.snackbar('No Changes Made',
                                 'Please make some changes to update the teacher');
-                          } else {
+                          } 
+
+                          else {
+                        print(controller.selectedClassTeacher.value);
+
+                          String capitalizedName = controller.capitalizeName(controller.name.value);
+                          String capitalizedFatherName = controller.capitalizeName(controller.fatherNameController.text);
+
                             Database_Service.updateTeacher(
-                                'buwF2J4lkLCdIVrHfgkP',
+                                controller.schoolId.value,
                                 controller.teacher!.empID,
-                                controller.name.value,
+                                capitalizedName,
                                 controller.selectedGender.value,
+                                controller.emailController.text,
                                 controller.phoneNoController.text,
                                 controller.cnicController.text,
-                                controller.fatherNameController.text,
+                                capitalizedFatherName,
                                 controller.selectedClasses,
                                 controller.selectedSubjects,
                                 controller.selectedClassTeacher.value);
@@ -258,28 +288,35 @@ class EditTeacher extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.fromLTRB(30, 0, 20, 0),
-                                    child: Row(
-                                      children: [
-                                       Obx(() => Text(
-                                          controller.name.value,
-                                          style: TextStyle(
-                                            fontSize: controller.headingFontSize - 10,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                       ),
-                                        IconButton(
-                                          icon: const Icon(Icons.edit),
-                                          onPressed: () {
-                                            controller.showEditNameDialog(context);
-                                          },
-                                        ),
-                                      ],
-                                    ),
+                                    child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(30, 0, 20, 0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Obx(() => Text(
+                                              controller.name.value,
+                                              style: TextStyle(
+                                                fontSize:
+                                                    controller.headingFontSize -
+                                                        10,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              softWrap: true,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            )),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.edit),
+                                        onPressed: () {
+                                          controller
+                                              .showEditNameDialog(context);
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                ),
+                                )),
                                 Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(0, 0, 30, 0),
@@ -362,6 +399,15 @@ class EditTeacher extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
                             child: CustomTextField(
+                              controller: controller.emailController,
+                              hintText: 'jhondoe@....com',
+                              labelText: 'Email',
+                              isValid: controller.emailValid.value,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
+                            child: CustomTextField(
                               controller: controller.cnicController,
                               hintText: '352020xxxxxxxx91',
                               labelText: 'CNIC No',
@@ -389,19 +435,21 @@ class EditTeacher extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
                             child: Obx(() {
-                            if (controller.isLoading.value) {
-                              return const Center(
-                                child: CircularProgressIndicator(color: AppColors.appDarkBlue),
-                              );
-                            } else {
-                              return Column(
-                                children: [
-                                   MultiSelectDialogField(
+                              if (controller.isLoading.value) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                      color: AppColors.appDarkBlue),
+                                );
+                              } else {
+                                return Column(
+                                  children: [
+                                    MultiSelectDialogField(
                                       backgroundColor: AppColors.appLightBlue,
                                       items: controller.classesSubjects
-                                          .map((classSubject) => MultiSelectItem(
-                                              classSubject.className,
-                                              classSubject.className))
+                                          .map((classSubject) =>
+                                              MultiSelectItem(
+                                                  classSubject.className,
+                                                  classSubject.className))
                                           .toList(),
                                       title: const Text("Available Classes"),
                                       selectedColor: Colors.black,
@@ -441,130 +489,147 @@ class EditTeacher extends StatelessWidget {
                                           fontSize: 16,
                                         ),
                                       ),
+                                      initialValue: controller
+                                          .selectedClasses,
                                       onConfirm: (results) {
-                                        controller.selectedClasses.assignAll(results);
+                                        controller.selectedClasses
+                                            .assignAll(results);
                                       },
                                     ),
-                                  
-                                  Obx(() => Column(
-                                        children: [
-                                          for (var className
-                                              in controller.selectedClasses)
-                                            Padding(
-                                              padding: const EdgeInsets.fromLTRB(
-                                                  0, 20, 0, 20),
-                                              child: MultiSelectDialogField(
-                                                backgroundColor:
-                                                    AppColors.appLightBlue,
-                                                items: controller.classesSubjects
-                                                    .firstWhere(
-                                                        (classSubject) =>
-                                                            classSubject.className ==
-                                                            className)
-                                                    .subjects
-                                                    .map((subject) =>
-                                                        MultiSelectItem(
-                                                            subject, subject))
-                                                    .toList(),
-                                                title: Text(
-                                                    "Subjects for $className"),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      const BorderRadius.all(
-                                                    Radius.circular(10),
+                                    Obx(() => Column(
+                                          children: [
+                                            for (var className
+                                                in controller.selectedClasses)
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        0, 20, 0, 20),
+                                                child: MultiSelectDialogField(
+                                                  backgroundColor:
+                                                      AppColors.appLightBlue,
+                                                  items: controller
+                                                      .classesSubjects
+                                                      .firstWhere(
+                                                          (classSubject) =>
+                                                              classSubject
+                                                                  .className ==
+                                                              className)
+                                                      .subjects
+                                                      .map((subject) =>
+                                                          MultiSelectItem(
+                                                              subject, subject))
+                                                      .toList(),
+                                                  title: Text(
+                                                      "Subjects for $className"),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                      Radius.circular(10),
+                                                    ),
+                                                    border: Border.all(
+                                                      color: Colors.black,
+                                                      width: 1,
+                                                    ),
                                                   ),
-                                                  border: Border.all(
+                                                  buttonIcon: const Icon(
+                                                    Icons.subject,
                                                     color: Colors.black,
-                                                    width: 1,
                                                   ),
-                                                ),
-                                                buttonIcon: const Icon(
-                                                  Icons.subject,
-                                                  color: Colors.black,
-                                                ),
-                                                buttonText: Text(
-                                                  "Select Subjects for $className",
-                                                  style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 16,
+                                                  buttonText: Text(
+                                                    "Select Subjects for $className",
+                                                    style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 16,
+                                                    ),
                                                   ),
-                                                ),
-                                                selectedColor: Colors.black,
-                                                cancelText: const Text(
-                                                  "CANCEL",
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 16,
+                                                  selectedColor: Colors.black,
+                                                  cancelText: const Text(
+                                                    "CANCEL",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 16,
+                                                    ),
                                                   ),
-                                                ),
-                                                confirmText: const Text(
-                                                  "OK",
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 16,
+                                                  confirmText: const Text(
+                                                    "OK",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 16,
+                                                    ),
                                                   ),
+                                                  checkColor: Colors.white,
+                                                  initialValue: controller
+                                                              .selectedSubjects[
+                                                          className] ??
+                                                      [],
+                                                  onConfirm: (results) {
+                                                    controller.selectedSubjects[
+                                                            className] =
+                                                        results
+                                                            .map((e) =>
+                                                                e.toString())
+                                                            .toList();
+                                                  },
                                                 ),
-                                                checkColor: Colors.white,
-                                                onConfirm: (results) {
-                                                  controller
-                                                          .selectedSubjects[
-                                                      className] = results;
-                                                },
                                               ),
-                                            ),
-                                        ],
-                                      )),
-                                ],
-                              );
-                            }
-                          }),
+                                          ],
+                                        )),
+                                  ],
+                                );
+                              }
+                            }),
                           ),
-
                           Padding(
                             padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
-                            child: Obx(() => DropdownButtonFormField<String>(
-                                  decoration: const InputDecoration(
-                                    hintText: "Class Teacher",
-                                    labelText:
-                                        "Select Section For Class Teacher",
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(10)),
-                                      borderSide: BorderSide(
-                                          color: AppColors.appLightBlue,
-                                          width: 2.0),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(10)),
-                                      borderSide: BorderSide(
-                                          color: Colors.black, width: 1.0),
+                            child: Obx(() {
+                              if (controller.isLoading.value) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                      color: AppColors.appDarkBlue),
+                                );
+                              } else {
+                                final filteredClasses = controller
+                                    .classesSubjects
+                                    .where((classSubject) => controller
+                                        .selectedClasses
+                                        .contains(classSubject.className))
+                                    .map((classSubject) =>
+                                        classSubject.className)
+                                    .toList();
+
+                                final items = [
+                                  const DropdownMenuItem<String>(
+                                    value: '',
+                                    child: Text('None'),
+                                  ),
+                                  ...filteredClasses.map(
+                                      (className) => DropdownMenuItem<String>(
+                                            value: className,
+                                            child: Text(className),
+                                          )),
+                                ];
+
+                                return DropdownButtonFormField<String>(
+                                  value: items
+                                          .map((item) => item.value)
+                                          .contains(controller
+                                              .existingClassTeacher.value)
+                                      ? controller.existingClassTeacher.value
+                                      : null,
+                                  items: items,
+                                  onChanged: (newValue) {
+          controller.selectedClassTeacher.value = newValue ?? '';
+        },
+                                  decoration: InputDecoration(
+                                    labelText: "Class Teacher",
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  value: controller
-                                          .selectedClassTeacher.value.isEmpty
-                                      ? null
-                                      : controller.selectedClassTeacher.value,
-                                  onChanged: (newValue) {
-                                    controller.selectedClassTeacher.value =
-                                        newValue!;
-                                  },
-                                  items: [
-                                    const DropdownMenuItem<String>(
-                                      value: '',
-                                      child: Text('None'),
-                                    ),
-                                    ...controller.selectedClasses
-                                        .map<DropdownMenuItem<String>>(
-                                            (String className) {
-                                      return DropdownMenuItem<String>(
-                                        value: className,
-                                        child: Text(className),
-                                      );
-                                    }).toList(),
-                                  ],
-                                )),
+                                );
+                              }
+                            }),
                           ),
                         ],
                       ),

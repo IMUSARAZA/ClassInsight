@@ -4,7 +4,6 @@ import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -22,7 +21,7 @@ class TimetableController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchClasses();
+    refresh();
   }
 
   void fetchClasses() async {
@@ -50,8 +49,9 @@ class TimetableController extends GetxController {
     }
   }
 
-  void refreshData() {
+  Future<void> refreshData() async {
     fetchClasses();
+    fetchTimetable();
   }
 }
 
@@ -64,187 +64,194 @@ class ManageTimetable extends StatelessWidget {
   Widget build(BuildContext context) {
     controller.refreshData();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Manage Timetable", style: Font_Styles.labelHeadingLight(context)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Get.back();
-          },
-        ),
-        actions: [
-          TextButton(
+    return RefreshIndicator(
+      onRefresh: controller.refreshData,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Manage Timetable", style: Font_Styles.labelHeadingLight(context)),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Get.toNamed("/AddTimetable");
+              Get.back();
             },
-            child: Padding(
-              padding: EdgeInsets.all(4.0),
-              child: Text(
-                'Add',
-                style: Font_Styles.labelHeadingLight(context),
-              ),
-            ),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          Get.toNamed("/DeleteTimetable");
-        },
-        child: Icon(Icons.delete_rounded, color: AppColors.appOrange),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(30, 20, 30, 5),
-              child: Obx(() {
-                if (controller.classesList.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'No classes found',
-                      style: Font_Styles.labelHeadingRegular(context),
-                    ),
-                  );
+          ),
+          actions: [
+            TextButton(
+              onPressed: ()async {
+                var result  =await Get.toNamed("/AddTimetable");
+                print(result);
+                if(result == 'updated'){
+                  controller.refreshData();
                 }
-                return DropdownButtonFormField<String>(
-                  value: controller.selectedClass.value,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: AppColors.appOrange, width: 2.0),
-                    ),
-                  ),
-                  items: controller.classesList.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      controller.selectedClass.value = newValue;
-                      // Fetch timetable for the newly selected class
-                      controller.fetchTimetable();
-                    }
-                  },
-                );
-              }),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(30, 10, 30, 20),
-              child: Obx(() {
-                if (controller.days.isEmpty) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.appOrange,
-                      ),
-                    ),
-                  );
-                }
-                return DropdownButtonFormField<String>(
-                  value: controller.selectedDay.value,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: AppColors.appOrange, width: 2.0),
-                    ),
-                  ),
-                  items: controller.days.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      controller.selectedDay.value = newValue;
-                      controller.fetchTimetable();
-                    }
-                  },
-                );
-              }),
-            ),
-            Obx(() {
-              if (controller.timetable.isEmpty) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                  child: Center(
-                    child: Text(
-                      'No timetable found for the selected class and day',
-                      style: Font_Styles.labelHeadingRegular(context),
-                    ),
-                  ),
-                );
-              }
-
-              var timetableForClass = controller.timetable.value;
-  
-              var sortedEntries = timetableForClass.entries.toList()
-                  ..sort((a, b) {
-                    var startTimeA = _extractStartTime(a.value);
-                    var startTimeB = _extractStartTime(b.value);
-                    return startTimeA.compareTo(startTimeB);
-                  });
-
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columnSpacing: 80,
-                  showCheckboxColumn: false,
-                  showBottomBorder: true,
-                  columns: <DataColumn>[
-                    DataColumn(
-                      label: Text(
-                        'Subject',
-                        style: Font_Styles.labelHeadingRegular(context),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Text(
-                        'Start Time',
-                        style: Font_Styles.labelHeadingRegular(context),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Text(
-                        'End Time',
-                        style: Font_Styles.labelHeadingRegular(context),
-                      ),
-                    ),
-                  ],
-                  rows: sortedEntries.map((entry) {
-                    var subjectDetails = entry.value.split('-');
-
-                    return DataRow(
-                      color: MaterialStateColor.resolveWith((states) => AppColors.appOrange),
-                      cells: [
-                        DataCell(Text(entry.key)),
-                        DataCell(Text(_formatTime(_extractStartTime(subjectDetails[0])))), // Display sorted start time
-                        DataCell(Text(subjectDetails[1])),
-                      ],
-                    );
-                  }).toList(),
+              },
+              child: Padding(
+                padding: EdgeInsets.all(4.0),
+                child: Text(
+                  'Add',
+                  style: Font_Styles.labelHeadingLight(context),
                 ),
-              );
-            }),
+              ),
+            )
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.white,
+          onPressed: () {
+            Get.toNamed("/DeleteTimetable");
+          },
+          child: Icon(Icons.delete_rounded, color: AppColors.appOrange),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(30, 20, 30, 5),
+                child: Obx(() {
+                  if (controller.classesList.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No classes found',
+                        style: Font_Styles.labelHeadingRegular(context),
+                      ),
+                    );
+                  }
+                  return DropdownButtonFormField<String>(
+                    value: controller.selectedClass.value,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: AppColors.appOrange, width: 2.0),
+                      ),
+                    ),
+                    items: controller.classesList.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        controller.selectedClass.value = newValue;
+                        // Fetch timetable for the newly selected class
+                        controller.fetchTimetable();
+                      }
+                    },
+                  );
+                }),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(30, 10, 30, 20),
+                child: Obx(() {
+                  if (controller.days.isEmpty) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.appOrange,
+                        ),
+                      ),
+                    );
+                  }
+                  return DropdownButtonFormField<String>(
+                    value: controller.selectedDay.value,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: AppColors.appOrange, width: 2.0),
+                      ),
+                    ),
+                    items: controller.days.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        controller.selectedDay.value = newValue;
+                        controller.fetchTimetable();
+                      }
+                    },
+                  );
+                }),
+              ),
+              Obx(() {
+                if (controller.timetable.isEmpty) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                    child: Center(
+                      child: Text(
+                        'No timetable found for the selected class and day',
+                        style: Font_Styles.labelHeadingRegular(context),
+                      ),
+                    ),
+                  );
+                }
+      
+                var timetableForClass = controller.timetable.value;
+        
+                var sortedEntries = timetableForClass.entries.toList()
+                    ..sort((a, b) {
+                      var startTimeA = _extractStartTime(a.value);
+                      var startTimeB = _extractStartTime(b.value);
+                      return startTimeA.compareTo(startTimeB);
+                    });
+      
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columnSpacing: 80,
+                    showCheckboxColumn: false,
+                    showBottomBorder: true,
+                    columns: <DataColumn>[
+                      DataColumn(
+                        label: Text(
+                          'Subject',
+                          style: Font_Styles.labelHeadingRegular(context),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'Start Time',
+                          style: Font_Styles.labelHeadingRegular(context),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'End Time',
+                          style: Font_Styles.labelHeadingRegular(context),
+                        ),
+                      ),
+                    ],
+                    rows: sortedEntries.map((entry) {
+                      var subjectDetails = entry.value.split('-');
+      
+                      return DataRow(
+                        color: WidgetStateColor.resolveWith((states) => AppColors.appOrange),
+                        cells: [
+                          DataCell(Text(entry.key)),
+                          DataCell(Text(_formatTime(_extractStartTime(subjectDetails[0])))), // Display sorted start time
+                          DataCell(Text(subjectDetails[1])),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );

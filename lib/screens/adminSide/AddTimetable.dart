@@ -44,7 +44,7 @@ class AddTimetableController extends GetxController {
 class AddTimetable extends StatelessWidget {
   final AddTimetableController controller = Get.put(AddTimetableController());
 
-  void saveTimetable() async {
+  Future<void> saveTimetable() async {
     Map<String, Map<String, String>> timetableData = {};
 
     controller.subjects.forEach((subject) {
@@ -85,6 +85,8 @@ class AddTimetable extends StatelessWidget {
       timetableData,
     );
 
+    Get.back(result: 'updated');
+
     controller.startTimes.clear();
     controller.endTimes.clear();
 
@@ -119,10 +121,8 @@ class AddTimetable extends StatelessWidget {
           Obx(
             () => TextButton(
               onPressed: controller.isSaveEnabled.value
-                  ? () {
-                      saveTimetable();
-                      CircularProgressIndicator(value: 2,);
-                      Future.delayed(Duration(seconds: 2)).then((value) => Get.back());
+                  ? ()async {
+                      await saveTimetable();
                       
                       
                     }
