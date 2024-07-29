@@ -4,7 +4,9 @@ import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
+import 'package:classinsight/screens/teacherSide/MarksScreen.dart';
 import 'package:classinsight/utils/AppColors.dart';
+import 'package:classinsight/utils/fontStyles.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,17 +22,29 @@ void main() async {
   } catch (e) {
     print(e.toString());
   }
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: DisplayMarks()));
+
+  runApp(
+    GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/displayMarks',
+      getPages: [
+        GetPage(name: '/displayMarks', page: () => DisplayMarks()),
+        GetPage(
+            name: '/MarksScreen',
+            page: () => MarksScreen()), // Add your MarksScreen route
+      ],
+    ),
+  );
 }
 
 class DisplayMarksController extends GetxController {
   var subjectsList = <String>[].obs;
   var studentsList = <Student>[].obs;
   var examsList = <String>[].obs;
-  final AdminHomeController school = Get.find();
+  final AdminHomeController school = Get.put(AdminHomeController());
 
   var selectedSubject = ''.obs;
-  final String className = "2-A"; // Initialize with "2-A"
+  final String className = "1-B"; // Initialize with "2-A"
 
   Database_Service databaseService = Database_Service();
   var schoolId = "buwF2J4lkLCdIVrHfgkP";
@@ -97,26 +111,35 @@ class DisplayMarks extends StatelessWidget {
                   height: screenHeight * 0.10,
                   width: screenWidth,
                   child: AppBar(
-                    elevation: 0,
+                    backgroundColor: Colors.white,
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        // Implement navigation logic if needed
+                        Get.back();
                       },
                     ),
-                    title: Center(
-                      child: Text(
-                        'Marks',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                    title: Text(
+                      'Marks',
+                      style: Font_Styles.labelHeadingLight(context),
                     ),
+                    centerTitle: true,
                     actions: <Widget>[
                       Container(
-                        width: 48.0, // Adjust as needed
+                        width: 48.0,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Get.to(
+                            () => MarksScreen(),
+                            arguments: {
+                              'className': controller.className,
+                            },
+                          );
+                        },
+                        child: Text(
+                          "Edit",
+                          style: Font_Styles.labelHeadingLight(context),
+                        ),
                       ),
                     ],
                   ),
@@ -232,8 +255,7 @@ class DisplayMarks extends StatelessWidget {
                             ],
                             rows: students.map((student) {
                               return DataRow(
-                                color: WidgetStateProperty.resolveWith<
-                                    Color?>(
+                                color: WidgetStateProperty.resolveWith<Color?>(
                                   (Set<WidgetState> states) {
                                     return AppColors.appOrange;
                                   },
@@ -244,7 +266,8 @@ class DisplayMarks extends StatelessWidget {
                                   for (var exam in examsList)
                                     DataCell(FutureBuilder<String>(
                                       future: controller
-                                          .fetchStudentResults(student.studentID)
+                                          .fetchStudentResults(
+                                              student.studentID)
                                           .then((resultMap) {
                                         return resultMap[exam] ?? '-';
                                       }),

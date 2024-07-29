@@ -53,9 +53,18 @@ class AddStudentController extends GetxController {
     nameValid.value = nameController.text.isNotEmpty;
     genderValid.value = selectedGender.value.isNotEmpty;
     bFormChallanIdValid.value = bFormChallanIdController.text.isNotEmpty;
-    fatherNameValid.value = fatherNameController.text.isNotEmpty;
-    fatherPhoneNoValid.value = numeric11Digits.hasMatch(fatherPhoneNoController.text);
-    fatherCNICValid.value = numeric13Digits.hasMatch(fatherCNICController.text);
+    if (fatherPhoneNoController.text.isNotEmpty) {
+      fatherPhoneNoValid.value =
+          numeric11Digits.hasMatch(fatherPhoneNoController.text);
+    } else {
+      fatherPhoneNoValid.value = true;
+    }
+    if (fatherCNICController.text.isNotEmpty) {
+      fatherCNICValid.value =
+          numeric13Digits.hasMatch(fatherCNICController.text);
+    } else {
+      fatherCNICValid.value = true;
+    }
     studentRollNoValid.value = studentRollNoController.text.isNotEmpty;
     selectedClassValid.value = selectedClass.value.isNotEmpty;
 
@@ -306,8 +315,8 @@ class AddStudent extends StatelessWidget {
                               padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
                               child: CustomTextField(
                                 controller: controller.fatherNameController,
-                                hintText: "Father's name",
-                                labelText: "Father's name",
+                                hintText: "Father/Guardian's name",
+                                labelText: "Father/Guardian's name",
                                 isValid: controller.fatherNameValid.value,
                               ),
                             ),
@@ -316,7 +325,7 @@ class AddStudent extends StatelessWidget {
                               child: CustomTextField(
                                 controller: controller.fatherPhoneNoController,
                                 hintText: "03xxxxxxxxx",
-                                labelText: "Father's phone number",
+                                labelText: "Father/Guardian's phone number",
                                 isValid: controller.fatherPhoneNoValid.value,
                               ),
                             ),
@@ -325,7 +334,7 @@ class AddStudent extends StatelessWidget {
                               child: CustomTextField(
                                 controller: controller.fatherCNICController,
                                 hintText: "35202xxxxxxxx",
-                                labelText: "Father's CNIC",
+                                labelText: "Father/Guardian's CNIC",
                                 isValid: controller.fatherCNICValid.value,
                               ),
                             ),

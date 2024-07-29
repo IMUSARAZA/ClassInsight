@@ -70,6 +70,48 @@ class Database_Service extends GetxService {
     }
   }
 
+  Future<void> updateOrAddMarks(
+    String schoolID, 
+    String studentID, 
+    String subject, 
+    String examType, 
+    String obtainedMarks) async {
+  try {
+    // Reference to the student's document
+    DocumentReference studentDocRef = FirebaseFirestore.instance
+        .collection('Schools')
+        .doc(schoolID)
+        .collection('Students')
+        .doc(studentID);
+
+    // Fetch the student's document
+    DocumentSnapshot studentDoc = await studentDocRef.get();
+
+    if (studentDoc.exists) {
+      // Get the current resultMap
+      Map<String, dynamic> resultMap = studentDoc['resultMap'] ?? {};
+
+      // Update or add the marks for the specified subject and exam type
+      if (!resultMap.containsKey(subject)) {
+        resultMap[subject] = {};
+      }
+
+      // Update the exam type with the obtained marks
+      resultMap[subject][examType] = obtainedMarks;
+
+      // Save the updated resultMap back to the student's document
+      await studentDocRef.update({'resultMap': resultMap});
+
+      print('Marks updated successfully.');
+    } else {
+      print('Student document does not exist.');
+    }
+  } catch (e) {
+    print('Error updating or adding marks: $e');
+  }
+}
+
+
   Future<List<String>> fetchExamStructure(
       String schoolID, String className) async {
     try {
