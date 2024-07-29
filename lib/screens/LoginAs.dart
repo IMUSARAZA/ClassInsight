@@ -58,6 +58,7 @@ class LoginAs extends StatelessWidget {
                   // Get.toNamed("/")
                 }
               : () {
+                print('teacher clicked');
                   if (text == "Teacher") {
                     adminOrNot = false;
                     Get.toNamed("/LoginScreen", arguments: {

@@ -1,7 +1,6 @@
 // ignore_for_file: unused_local_variable
 
 import 'package:classinsight/models/SchoolModel.dart';
-import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -96,67 +95,49 @@ static Future<void> logout(BuildContext context) async {
     }
   }
 
-  static Future<Teacher?> loginTeacher(String email, String password, String schoolID ) async {
-
-    Teacher? teacher = null;
-    try {
-      Get.snackbar('Logging In', '',
-          backgroundColor: Colors.white, 
-          showProgressIndicator: true,
-          progressIndicatorBackgroundColor: AppColors.appDarkBlue
-          );
 
 
-      QuerySnapshot schoolSnapshot = await FirebaseFirestore.instance
-        .collection('schools')
-        .where('SchoolID', isEqualTo: schoolID)
-        .get();
+static Future<void> loginTeacher(String email, String password, String schoolID) async {
+  try {
 
-    if (schoolSnapshot.docs.isNotEmpty) {
-      School school = School.fromSnapshot(schoolSnapshot.docs.first);
+        Get.snackbar('Logging In', '',
+        backgroundColor: Colors.white, 
+        showProgressIndicator: true,
+        progressIndicatorBackgroundColor: AppColors.appDarkBlue
+    );
 
-      QuerySnapshot teacherSnapshot = await FirebaseFirestore.instance
-          .collection('schools')
-          .doc(schoolSnapshot.docs.first.id)
-          .collection('Teachers')
-          .where('Email', isEqualTo: email)
-          .get();
+    CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
 
+    QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
 
-      if (teacherSnapshot.docs.isNotEmpty) {
-        
-      teacher = Teacher.fromJson(teacherSnapshot.docs.first.data() as Map<String, dynamic>);
-
+    if (schoolSnapshot.docs.isEmpty) {
+      Get.snackbar('Error', 'School with ID $schoolID not found');
+      return;
     }
+
+    DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+    CollectionReference teachersRef = schoolDocRef.collection('Teachers');
+
+    QuerySnapshot teacherSnapshot = await teachersRef.where('Email', isEqualTo: email).get();
+
+    if (teacherSnapshot.docs.isEmpty) {
+      Get.snackbar('Error', 'No teacher found with this email');
+      return;
     }
-     else {
-      Get.snackbar('Login Failed', 'No teacher found with this email',
-          backgroundColor: Colors.red);
 
-      return teacher;    
-    }     
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
 
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-     final User user = userCredential.user!;
-
-
-      Get.offAllNamed('/TeacherHome');
-      Get.snackbar('Logged in Successfully', "Welcome, ${teacher!.name}");
-
-
-      return teacher;
-
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar('Login Error', e.message ?? 'An error occurred');
-    } catch (e) {
-      Get.snackbar('Error', e.toString());
+    if (userCredential.user != null) {
+      Get.snackbar('Success', 'Login successful');
+      Get.offAllNamed('/TeacherDashboard');
     }
-    return null;
+  } catch (e) {
+    Get.snackbar('Error', 'Email or password incorrect');
   }
+}
 
 
 
