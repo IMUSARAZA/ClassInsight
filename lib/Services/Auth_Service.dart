@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable
 
 import 'package:classinsight/models/SchoolModel.dart';
+import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -103,8 +104,7 @@ static Future<void> loginTeacher(String email, String password, String schoolID)
         Get.snackbar('Logging In', '',
         backgroundColor: Colors.white, 
         showProgressIndicator: true,
-        progressIndicatorBackgroundColor: AppColors.appDarkBlue
-    );
+        progressIndicatorBackgroundColor: AppColors.appDarkBlue);
 
     CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
 
@@ -120,25 +120,50 @@ static Future<void> loginTeacher(String email, String password, String schoolID)
 
     QuerySnapshot teacherSnapshot = await teachersRef.where('Email', isEqualTo: email).get();
 
+    print(teacherSnapshot.docs);
+
     if (teacherSnapshot.docs.isEmpty) {
       Get.snackbar('Error', 'No teacher found with this email');
       return;
     }
+
+  
 
     UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
 
+    
     if (userCredential.user != null) {
+      DocumentSnapshot teacherDoc = teacherSnapshot.docs.first;
+      Map<String, dynamic> data = teacherDoc.data() as Map<String, dynamic>;
+
+      Teacher teacher = Teacher(
+        empID: data['EmployeeID'],
+        name: data['Name'],
+        gender: data['Gender'],
+        email: data['Email'],
+        cnic: data['CNIC'],
+        phoneNo: data['PhoneNo'],
+        fatherName: data['FatherName'],
+        classes: List<String>.from(data['Classes'] ?? []),
+        subjects: (data['Subjects'] as Map<String, dynamic>).map((key, value) {
+          return MapEntry(key, List<String>.from(value));
+        }),
+        classTeacher: data['ClassTeacher'],
+      );
+
+      print('Hi ${teacher.email}');
+
       Get.snackbar('Success', 'Login successful');
-      Get.offAllNamed('/TeacherDashboard');
+
+      Get.offAllNamed('/TeacherDashboard', arguments: teacher);
     }
   } catch (e) {
     Get.snackbar('Error', 'Email or password incorrect');
   }
 }
-
 
 
 static Future<void> sendPasswordEmail(String teacherEmail, String teacherName, String password) async {

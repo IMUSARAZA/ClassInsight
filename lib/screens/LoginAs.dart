@@ -58,19 +58,19 @@ class LoginAs extends StatelessWidget {
                   // Get.toNamed("/")
                 }
               : () {
-                print('teacher clicked');
+                  print('teacher clicked');
                   if (text == "Teacher") {
                     adminOrNot = false;
                     Get.toNamed("/LoginScreen", arguments: {
-  'school': school,
-  'adminOrNot': adminOrNot,
-});
+                      'school': school,
+                      'adminOrNot': adminOrNot,
+                    });
                   } else {
-                    adminOrNot = false;
+                    adminOrNot = true;
                     Get.toNamed("/LoginScreen", arguments: {
-  'school': school,
-  'adminOrNot': adminOrNot,
-});
+                      'school': school,
+                      'adminOrNot': adminOrNot,
+                    });
                   }
                 },
           style: TextButton.styleFrom(
