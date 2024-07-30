@@ -1022,4 +1022,34 @@ static Future<String> fetchCounts(
       print('Error saving announcement: $e');
     }
   }
+
+static Future<void> updateAttendance(String schoolId, Map<String, String> studentStatusMap, String day) async {
+  try {
+    // Create a new batch
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    // Loop through the studentStatusMap to get studentId and their status
+    studentStatusMap.forEach((studentId, status) {
+      // Reference to the specific student's document
+      DocumentReference studentRef = FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolId)
+          .collection('Students')
+          .doc(studentId);
+
+      // Add the update operation to the batch
+      batch.update(studentRef, {'attendance.$day': status});
+    });
+
+    // Commit the batch
+    await batch.commit();
+
+    Get.back();
+    Get.snackbar('Attendance submitted','Date: ${day}');
+    print('Attendance updated successfully for all students');
+  } catch (e) {
+    print('Error updating attendance in bulk: $e');
+  }
+}
+
 }

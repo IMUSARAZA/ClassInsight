@@ -207,7 +207,7 @@ class StudentResult extends StatelessWidget {
                           ],
                           rows: subjects.map(
                             (subject) => DataRow(
-                              color: WidgetStateColor.resolveWith(
+                              color: MaterialStateColor.resolveWith(
                                   (states) => AppColors.appOrange),
                               cells: [
                                 DataCell(Text(

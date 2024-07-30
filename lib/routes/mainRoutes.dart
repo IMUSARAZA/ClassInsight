@@ -21,6 +21,7 @@ import 'package:classinsight/screens/adminSide/StudentResult.dart';
 import 'package:classinsight/screens/adminSide/SubjectResult.dart';
 import 'package:classinsight/screens/onBoarding.dart';
 import 'package:classinsight/screens/teacherSide/TeacherDashboard.dart';
+import 'package:classinsight/screens/teacherSide/MarkAttendance.dart';
 import 'package:classinsight/screens/teacherSide/MarksScreen.dart';
 import 'package:get/get.dart';
 
@@ -111,6 +112,10 @@ class MainRoutes {
       GetPage(
       name: "/MarksScreen",
       page: () => MarksScreen(),
+    ),
+    GetPage(
+      name: "/MarkAttendance",
+      page: () => MarkAttendance(),
     ),
   ];
 }

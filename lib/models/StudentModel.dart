@@ -12,6 +12,7 @@ class Student {
   late String feeStartDate;
   late String feeEndDate;
   late Map<String, Map<String, String>> resultMap;
+  late Map<String, String> attendance;
 
   Student({
     required this.name,
@@ -27,7 +28,10 @@ class Student {
     required this.feeStartDate,
     required this.feeEndDate,
     Map<String, Map<String, String>>? resultMap,
-  }) : resultMap = resultMap ?? {};
+    Map<String, String>? attendance,
+  }) : 
+  resultMap = resultMap ?? {},
+  attendance = attendance ?? {};
 
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
@@ -44,6 +48,7 @@ class Student {
       feeStartDate: json['FeeStartDate'] ?? '',
       feeEndDate: json['FeeEndDate'] ?? '',
       resultMap: Map<String, Map<String, String>>.from(json['ResultMap'] ?? {}),
+      attendance: Map<String, String>.from(json['Attendance'] ?? {}),
     );
   }
 
@@ -62,6 +67,7 @@ class Student {
       'FeeStartDate': feeStartDate,
       'FeeEndDate': feeEndDate,
       'ResultMap': resultMap,
+      'Attendance': attendance,
     };
   }
 
@@ -80,11 +86,12 @@ class Student {
       'FeeStartDate': feeStartDate,
       'FeeEndDate': feeEndDate,
       'ResultMap': resultMap,
+      'Attendance': attendance,
     };
   }
 
   @override
   String toString() {
-    return 'Student{name: $name, gender: $gender, bForm_challanId: $bFormChallanId, fatherName: $fatherName, fatherPhoneNo: $fatherPhoneNo, fatherCNIC: $fatherCNIC, studentRollNo: $studentRollNo, studentID: $studentID, classSection: $classSection}, feeStatus: $feeStatus, feeStartDate: $feeStartDate, feeEndDate: $feeEndDate';
+    return 'Student{name: $name, gender: $gender, bForm_challanId: $bFormChallanId, fatherName: $fatherName, fatherPhoneNo: $fatherPhoneNo, fatherCNIC: $fatherCNIC, studentRollNo: $studentRollNo, studentID: $studentID, classSection: $classSection, feeStatus: $feeStatus, feeStartDate: $feeStartDate, feeEndDate: $feeEndDate}';
   }
 }
