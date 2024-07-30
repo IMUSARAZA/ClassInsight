@@ -41,7 +41,7 @@ dependencies:
   get_storage:
   intl:
   mailer:
-  flutter_dotenv:
+  flutter_dotenv: any
 
     
 

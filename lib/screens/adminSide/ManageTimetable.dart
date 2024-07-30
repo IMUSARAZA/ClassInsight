@@ -239,7 +239,7 @@ class ManageTimetable extends StatelessWidget {
                       var subjectDetails = entry.value.split('-');
       
                       return DataRow(
-                        color: WidgetStateColor.resolveWith((states) => AppColors.appOrange),
+                        color: MaterialStateColor.resolveWith((states) => AppColors.appOrange),
                         cells: [
                           DataCell(Text(entry.key)),
                           DataCell(Text(_formatTime(_extractStartTime(subjectDetails[0])))), // Display sorted start time

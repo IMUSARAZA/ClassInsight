@@ -115,16 +115,18 @@ class LoginScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         if(adminOrNot){
-                          Auth_Service.loginTeacher(
-                          _controller.emailController.value.text,
-                          _controller.passwordController.value.text,
-                          school.schoolId
-                          );
-                        }else{
-                        Auth_Service.loginAdmin(
+
+                          Auth_Service.loginAdmin(
                           _controller.emailController.value.text,
                           _controller.passwordController.value.text,
                           school
+                          );
+                          
+                        }else{
+                        Auth_Service.loginTeacher(
+                          _controller.emailController.value.text,
+                          _controller.passwordController.value.text,
+                          school.schoolId
                           );
                         }
                       },

@@ -155,7 +155,7 @@ class MarksScreen extends StatelessWidget {
                           int totalMarksInt = int.tryParse(totalMarks) ?? 0;
 
                           for (var student in controller.studentsList) {
-                            String studentRollNo = student.studentRollNo ?? '';
+                            String studentRollNo = student.studentRollNo;
                             String studentName = student.name;
                             String obtainedMarks = controller
                                     .obtainedMarksControllers[student.studentID]
@@ -404,8 +404,8 @@ class MarksScreen extends StatelessWidget {
                             ],
                             rows: students.map((student) {
                               return DataRow(
-                                color: WidgetStateProperty.resolveWith<Color?>(
-                                  (Set<WidgetState> states) {
+                                color: MaterialStateProperty.resolveWith<Color?>(
+                                  (Set<MaterialState> states) {
                                     return AppColors.appOrange;
                                   },
                                 ),

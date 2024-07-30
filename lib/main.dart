@@ -1,5 +1,5 @@
 import 'package:classinsight/firebase_options.dart';
-import 'package:classinsight/routes/mainRoutes.dart';
+import 'package:classinsight/screens/teacherSide/MarkAttendance.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -51,14 +51,14 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
         textTheme: GoogleFonts.poppinsTextTheme(
           Theme.of(context).textTheme,
         ),
       ),
-      initialRoute: _getInitialLocation(user),
-      getPages: MainRoutes.routes,
+      // initialRoute: _getInitialLocation(user),
+      // getPages: MainRoutes.routes,
+      home: MarkAttendance(),
     );
   }
 

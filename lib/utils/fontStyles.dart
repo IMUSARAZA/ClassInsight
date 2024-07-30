@@ -8,38 +8,45 @@ class Font_Styles {
     return size * scaleFactor;
   }
 
-  static TextStyle largeHeadingBold(BuildContext context) {
+  static TextStyle largeHeadingBold(BuildContext context,{Color? color}) {
     return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 40),
       fontWeight: FontWeight.bold,
+      color: color
     );
   }
 
-  static TextStyle mediumHeadingBold(BuildContext context) {
+  static TextStyle mediumHeadingBold(BuildContext context,{Color? color}) {
     return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 35),
       fontWeight: FontWeight.bold,
+      color: color
     );
   }
 
-  static TextStyle labelHeadingLight(BuildContext context) {
+  static TextStyle labelHeadingLight(BuildContext context,{Color? color}) {
     return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 15),
       fontWeight: FontWeight.w400,
+      color: color
     );
   }
 
-  static TextStyle labelHeadingRegular(BuildContext context) {
+  static TextStyle labelHeadingRegular(BuildContext context,{Color? color}) {
     return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 15),
       fontWeight: FontWeight.normal, 
+      color: color
     );
   }
 
-  static TextStyle cardLabel(BuildContext context) {
+  static TextStyle cardLabel(BuildContext context,{Color? color}) {
     return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 25),
       fontWeight: FontWeight.w600, 
+      color: color
     );
   }
 }
+
+  

@@ -292,9 +292,9 @@ class SubjectResult extends StatelessWidget {
                                   ],
                                   rows: students.map((student) {
                                     return DataRow(
-                                      color: WidgetStateProperty.resolveWith<
+                                      color: MaterialStateProperty.resolveWith<
                                           Color?>(
-                                        (Set<WidgetState> states) {
+                                        (Set<MaterialState> states) {
                                           return AppColors
                                               .appOrange; // Set the desired color here
                                         },

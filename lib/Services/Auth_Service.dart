@@ -96,68 +96,74 @@ static Future<void> logout(BuildContext context) async {
     }
   }
 
-  static Future<Teacher?> loginTeacher(String email, String password, String schoolID ) async {
-
-    Teacher? teacher = null;
-    try {
-      Get.snackbar('Logging In', '',
-          backgroundColor: Colors.white, 
-          showProgressIndicator: true,
-          progressIndicatorBackgroundColor: AppColors.appDarkBlue
-          );
 
 
-      QuerySnapshot schoolSnapshot = await FirebaseFirestore.instance
-        .collection('schools')
-        .where('SchoolID', isEqualTo: schoolID)
-        .get();
+static Future<void> loginTeacher(String email, String password, String schoolID) async {
+  try {
 
-    if (schoolSnapshot.docs.isNotEmpty) {
-      School school = School.fromSnapshot(schoolSnapshot.docs.first);
+        Get.snackbar('Logging In', '',
+        backgroundColor: Colors.white, 
+        showProgressIndicator: true,
+        progressIndicatorBackgroundColor: AppColors.appDarkBlue);
 
-      QuerySnapshot teacherSnapshot = await FirebaseFirestore.instance
-          .collection('schools')
-          .doc(schoolSnapshot.docs.first.id)
-          .collection('Teachers')
-          .where('Email', isEqualTo: email)
-          .get();
+    CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
 
+    QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
 
-      if (teacherSnapshot.docs.isNotEmpty) {
-        
-      teacher = Teacher.fromJson(teacherSnapshot.docs.first.data() as Map<String, dynamic>);
-
+    if (schoolSnapshot.docs.isEmpty) {
+      Get.snackbar('Error', 'School with ID $schoolID not found');
+      return;
     }
+
+    DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+    CollectionReference teachersRef = schoolDocRef.collection('Teachers');
+
+    QuerySnapshot teacherSnapshot = await teachersRef.where('Email', isEqualTo: email).get();
+
+    print(teacherSnapshot.docs);
+
+    if (teacherSnapshot.docs.isEmpty) {
+      Get.snackbar('Error', 'No teacher found with this email');
+      return;
     }
-     else {
-      Get.snackbar('Login Failed', 'No teacher found with this email',
-          backgroundColor: Colors.red);
 
-      return teacher;    
-    }     
+  
 
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    
+    if (userCredential.user != null) {
+      DocumentSnapshot teacherDoc = teacherSnapshot.docs.first;
+      Map<String, dynamic> data = teacherDoc.data() as Map<String, dynamic>;
+
+      Teacher teacher = Teacher(
+        empID: data['EmployeeID'],
+        name: data['Name'],
+        gender: data['Gender'],
+        email: data['Email'],
+        cnic: data['CNIC'],
+        phoneNo: data['PhoneNo'],
+        fatherName: data['FatherName'],
+        classes: List<String>.from(data['Classes'] ?? []),
+        subjects: (data['Subjects'] as Map<String, dynamic>).map((key, value) {
+          return MapEntry(key, List<String>.from(value));
+        }),
+        classTeacher: data['ClassTeacher'],
       );
 
-     final User user = userCredential.user!;
+      print('Hi ${teacher.email}');
 
+      Get.snackbar('Success', 'Login successful');
 
-      Get.offAllNamed('/TeacherHome');
-      Get.snackbar('Logged in Successfully', "Welcome, ${teacher!.name}");
-
-
-      return teacher;
-
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar('Login Error', e.message ?? 'An error occurred');
-    } catch (e) {
-      Get.snackbar('Error', e.toString());
+      Get.offAllNamed('/TeacherDashboard', arguments: teacher);
     }
-    return null;
+  } catch (e) {
+    Get.snackbar('Error', 'Email or password incorrect');
   }
-
+}
 
 
 static Future<void> sendPasswordEmail(String teacherEmail, String teacherName, String password) async {
