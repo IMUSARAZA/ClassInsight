@@ -1,6 +1,5 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
