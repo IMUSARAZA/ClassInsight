@@ -41,6 +41,8 @@ class ParentDashboardController extends GetxController {
     if (studentAnnouncements != null) {
       teacherComments.assignAll(studentAnnouncements);
     }
+
+    print(teacherComments[0]);
     isLoading.value = false;
   }
 }
@@ -205,6 +207,7 @@ class ParentDashboard extends StatelessWidget {
                                           Obx(() {
                                             return ListView.builder(
                                               shrinkWrap: true,
+                                              physics: NeverScrollableScrollPhysics(),
                                               itemCount: _controller
                                                   .mainAnnouncements.length,
                                               itemBuilder: (context, index) {
@@ -246,11 +249,13 @@ class ParentDashboard extends StatelessWidget {
                                           Obx(() {
                                             return ListView.builder(
                                               shrinkWrap: true,
+                                              physics: NeverScrollableScrollPhysics(),
                                               itemCount: _controller
                                                   .teacherComments.length,
                                               itemBuilder: (context, index) {
                                                 final comment = _controller
                                                     .teacherComments[index];
+                                                    debugPrint(comment.announcementDescription);
                                                 return ListTile(
                                                   title: Text(comment
                                                           .announcementDescription ??
@@ -324,6 +329,7 @@ class ParentDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
+                                print(_controller.student);
                                 Get.toNamed("/ViewAttendance",
                                     arguments: _controller.student);
                               },

@@ -53,7 +53,7 @@ class OnBoarding extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Class Insights",
+              "Class Insight",
               style: Font_Styles.largeHeadingBold(context),
             ),
             Text(

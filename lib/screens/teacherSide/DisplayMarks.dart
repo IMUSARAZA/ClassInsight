@@ -277,11 +277,8 @@ class DisplayMarks extends StatelessWidget {
                             ],
                             rows: students.map((student) {
                               return DataRow(
-                                color: WidgetStateProperty.resolveWith<Color?>(
-                                  (Set<WidgetState> states) {
-                                    return AppColors.appOrange;
-                                  },
-                                ),
+                                color: MaterialStateColor.resolveWith((states) => AppColors.appOrange),
+                                
                                 cells: [
                                   DataCell(Text(student.studentRollNo)),
                                   DataCell(Text(student.name)),
