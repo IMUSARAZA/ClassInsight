@@ -40,7 +40,7 @@ class Font_Styles {
     );
   }
 
-  static TextStyle cardLabel(BuildContext context,{Color? color}) {
+  static TextStyle cardLabel(BuildContext context, {Color? color}) {
     return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 25),
       fontWeight: FontWeight.w600, 

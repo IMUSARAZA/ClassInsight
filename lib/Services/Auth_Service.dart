@@ -159,7 +159,7 @@ static Future<void> loginTeacher(String email, String password, String schoolID)
 
       Get.snackbar('Success', 'Login successful');
 
-      Get.offAllNamed('/TeacherDashboard', arguments: teacher);
+      Get.offAllNamed('/TeacherDashboard', arguments: [teacher,schoolID]);
     }
   } catch (e) {
     Get.snackbar('Error', 'Email or password incorrect');
@@ -224,7 +224,7 @@ static Future<void> sendPasswordEmail(String teacherEmail, String teacherName, S
       Student student = Student.fromJson(data);
 
         Get.snackbar('Success', 'Login successful');
-        Get.offAllNamed('/ParentDashboard', arguments: student);
+        Get.offAllNamed('/ParentDashboard', arguments: [student,schoolID]);
       
     } catch (e) {
       Get.snackbar('Error', 'An error occurred');

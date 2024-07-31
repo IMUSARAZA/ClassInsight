@@ -11,17 +11,21 @@ class AttendanceController extends GetxController {
   TextEditingController datepicker = TextEditingController();
   RxList<Student> studentsList = RxList<Student>();
   RxString selectedHeaderValue = ''.obs;
-  String schoolId = 'buwF2J4lkLCdIVrHfgkP';
+  final arguments = Get.arguments as List;
+  RxString schoolId = ''.obs;
+  RxString selectedClass = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     datepicker.text = "${DateTime.now().toLocal()}".split(' ')[0]; // Initialize with current date
+    schoolId.value = arguments[0] as String;
+    selectedClass.value = arguments[1] as String;
     fetchStudents();
   }
 
   Future<void> fetchStudents() async {
-    studentsList.value = await Database_Service.getStudentsOfASpecificClass(schoolId, '1-A');
+    studentsList.value = await Database_Service.getStudentsOfASpecificClass(schoolId.value, selectedClass.value);
     print(studentsList);
     _initializeAttendanceForDate();
   }
@@ -87,7 +91,7 @@ class MarkAttendance extends StatelessWidget {
               if (controller.selectedHeaderValue.value.isEmpty) {
                 Get.snackbar("Attendance unmarked", 'Kindly mark the attendance for submission');
               } else {
-                await Database_Service.updateAttendance(controller.schoolId, controller.getStudentStatusMap(), controller.datepicker.text);
+                await Database_Service.updateAttendance(controller.schoolId.value, controller.getStudentStatusMap(), controller.datepicker.text);
               }
             },
             child: Text('Submit', style: Font_Styles.labelHeadingRegular(context, color: Colors.black)),

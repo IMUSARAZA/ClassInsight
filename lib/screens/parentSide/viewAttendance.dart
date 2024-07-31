@@ -23,10 +23,10 @@ class ViewAttendController extends GetxController {
   }
 
   Future<void> fetchData() async {
-    student.value = await Database_Service.getStudentByID('buwF2J4lkLCdIVrHfgkP', 'WNuXkVjdJQ6F16XD72ot');
+    student.value = Get.arguments as Student;
     if (student.value != null) {
       filterAttendance();
-      calculatePercentage(); // Calculate percentage after fetching data
+      calculatePercentage(); 
     }
   }
 
@@ -37,7 +37,6 @@ class ViewAttendController extends GetxController {
   }
 
   void calculatePercentage() {
-    // Example percentage calculation logic, update as needed
     int totalDays = attendance.length;
     int presentDays = attendance.values.where((status) => status == "Present").length;
     percentage.value = (totalDays > 0) ? (presentDays / totalDays) * 100 : 0.0;

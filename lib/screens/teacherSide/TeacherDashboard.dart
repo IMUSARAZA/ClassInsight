@@ -8,14 +8,18 @@ import 'package:get/get.dart';
 class TeacherDashboardController extends GetxController {
   RxInt height = 120.obs;
   late Teacher teacher; 
+  final arguments = Get.arguments as List;
+
 
   var classesList = <String>[].obs;
   var selectedClass = ''.obs;
+  var schoolId;
 
   @override
   void onInit() {
     super.onInit();
-    teacher = Get.arguments as Teacher; 
+    teacher = arguments[0] as Teacher; 
+    schoolId = arguments[1] as String; 
     fetchClasses();
   }
 
@@ -168,8 +172,7 @@ class TeacherDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                // Get.toNamed('/teacherClass',
-                                //     arguments: _controller.selectedClass.value);
+                               Get.toNamed("/MarkAttendance",arguments: [_controller.schoolId,_controller.selectedClass]);
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
@@ -199,10 +202,7 @@ class TeacherDashboard extends StatelessWidget {
                                       padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                                       child: Text(
                                         'Attendance',
-                                        style: TextStyle(
-                                          color: AppColors.appDarkBlue,
-                                          fontSize: 20, // Adjust as needed
-                                        ),
+                                        style: Font_Styles.cardLabel(context, color:AppColors.appLightBlue)
                                       ),
                                     ),
                                   ],),

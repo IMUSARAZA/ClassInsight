@@ -12,26 +12,29 @@ class ParentDashboardController extends GetxController {
   late Student student;
   RxList<Announcement> mainAnnouncements = <Announcement>[].obs;
   RxList<Announcement> teacherComments = <Announcement>[].obs;
-  var classesList = <String>[].obs;
   var selectedClass = ''.obs;
+  final arguments = Get.arguments as List;
+  var schoolId;
 
   @override
   void onInit() {
     super.onInit();
     fetchAnnouncements();
-    student = Get.arguments as Student;
+    student = arguments[0] as Student;
+    schoolId = arguments[1] as String;
+
   }
 
   void fetchAnnouncements() async {
     final adminAnnouncements =
-        await Database_Service.fetchAdminAnnouncements('buwF2J4lkLCdIVrHfgkP');
+        await Database_Service.fetchAdminAnnouncements(schoolId);
     if (adminAnnouncements != null) {
       mainAnnouncements.assignAll(adminAnnouncements);
     }
 
     final studentAnnouncements =
         await Database_Service.fetchStudentAnnouncements(
-            'buwF2J4lkLCdIVrHfgkP', student.studentID);
+            schoolId, student.studentID);
     if (studentAnnouncements != null) {
       teacherComments.assignAll(studentAnnouncements);
     }
@@ -94,7 +97,7 @@ class ParentDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                 child: Text(
-                  _controller.student.fatherName,
+                  'Father Name: ' + _controller.student.fatherName,
                   style: Font_Styles.labelHeadingRegular(context),
                 ),
               ),
@@ -151,7 +154,7 @@ class ParentDashboard extends StatelessWidget {
                               height: screenHeight * 0.16,
                               width: screenWidth - 100,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
+                                borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: Colors.grey,
                                   width: 2,
@@ -253,8 +256,7 @@ class ParentDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                // Get.toNamed('/teacherClass',
-                                //     arguments: _controller.selectedClass.value);
+                             Get.toNamed("/ViewTimetable",arguments: [_controller.schoolId.v,_controller.student]);
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
@@ -301,8 +303,8 @@ class ParentDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                // Get.toNamed('/teacherClass',
-                                //     arguments: _controller.selectedClass.value);
+                                Get.toNamed("/ViewAttendance",arguments: _controller.student);
+
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
@@ -350,8 +352,6 @@ class ParentDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                // Get.toNamed('/teacherClass',
-                                //     arguments: _controller.selectedClass.value);
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
