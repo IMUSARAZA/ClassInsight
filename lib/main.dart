@@ -1,4 +1,5 @@
 import 'package:classinsight/firebase_options.dart';
+import 'package:classinsight/screens/parentSide/viewAttendance.dart';
 import 'package:classinsight/screens/teacherSide/MarkAttendance.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
