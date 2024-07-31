@@ -37,7 +37,6 @@ class TeacherDashboard extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
-    // Adjust height based on screen width
     if (screenWidth > 350 && screenWidth <= 400) {
       _controller.height.value = 135;
     } else if (screenWidth > 400 && screenWidth <= 500) {

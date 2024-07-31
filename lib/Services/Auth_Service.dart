@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable
 
 import 'package:classinsight/models/SchoolModel.dart';
+import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -185,6 +186,48 @@ static Future<void> sendPasswordEmail(String teacherEmail, String teacherName, S
       }
     } catch (e) {
       print('An unexpected error occurred: $e');
+    }
+  }
+
+
+
+  static Future<void> loginParent(String schoolID, String challanIDbForm) async {
+    try {
+      Get.snackbar('Logging In', '',
+          backgroundColor: Colors.white, 
+          showProgressIndicator: true,
+          progressIndicatorBackgroundColor: AppColors.appDarkBlue
+          );
+
+      CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
+
+      QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+
+      if (schoolSnapshot.docs.isEmpty) {
+        Get.snackbar('Error', 'School with ID $schoolID not found');
+        return;
+      }
+
+      DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+      CollectionReference studentsRef = schoolDocRef.collection('Students');
+
+      QuerySnapshot studentSnapshot = await studentsRef.where('BForm_challanId', isEqualTo: challanIDbForm).get();
+
+      if (studentSnapshot.docs.isEmpty) {
+        Get.snackbar('Error', 'No student found with this Challan ID');
+        return;
+      }
+
+      DocumentSnapshot studentDoc = studentSnapshot.docs.first;
+      Map<String, dynamic> data = studentDoc.data() as Map<String, dynamic>;
+
+      Student student = Student.fromJson(data);
+
+        Get.snackbar('Success', 'Login successful');
+        Get.offAllNamed('/ParentDashboard', arguments: student);
+      
+    } catch (e) {
+      Get.snackbar('Error', 'An error occurred');
     }
   }
 

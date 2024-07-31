@@ -4,6 +4,7 @@ class AppColors {
   static const Color appLightBlue = Color(0xFFD2E5FF);
   static const Color appDarkBlue = Color(0xFF83ADFF);
   static const Color appOrange = Color(0xFFFF9446);
+  static const Color appPink = Color(0xFFD00070);
 
   static const LinearGradient blueGradient = LinearGradient(
       begin: Alignment.topLeft,

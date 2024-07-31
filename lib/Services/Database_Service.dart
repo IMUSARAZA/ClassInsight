@@ -1052,4 +1052,83 @@ static Future<void> updateAttendance(String schoolId, Map<String, String> studen
   }
 }
 
+static Future<List<Announcement>?> fetchAdminAnnouncements(String schoolID) async {
+  print('Fetching admin announcements');
+  try {
+    CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
+
+    QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+
+    if (schoolSnapshot.docs.isEmpty) {
+      print('School with ID $schoolID not found');
+      return null;
+    }
+
+    DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+    CollectionReference announcementsRef = schoolDocRef.collection('Announcements');
+
+    QuerySnapshot announcementsSnapshot = await announcementsRef
+        .where('AnnouncementBy', isEqualTo: 'Admin')
+        .get();
+
+    List<Announcement> announcements = announcementsSnapshot.docs.map((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      return Announcement(
+        announcementBy: data['AnnouncementBy'],
+        announcementDate: data['AnnouncementDate'],
+        announcementDescription: data['AnnouncementDescription'],
+        studentID: data['StudentID'],
+        adminAnnouncement: data['AdminAnnouncement'],
+      );
+    }).toList();
+
+    print('Admin Announcements found: ${announcements.length}');
+
+    return announcements;
+  } catch (e) {
+    print('Error fetching announcements: $e');
+  }
+  return null;
+}
+
+
+
+static Future<List<Announcement>?> fetchStudentAnnouncements(String schoolID, String studentID) async {
+  try {
+    CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
+
+    QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+
+    if (schoolSnapshot.docs.isEmpty) {
+      print('School with ID $schoolID not found');
+      return null;
+    }
+
+    DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+    CollectionReference announcementsRef = schoolDocRef.collection('Announcements');
+
+    QuerySnapshot announcementsSnapshot = await announcementsRef
+        .where('StudentID', isEqualTo: studentID)
+        .get();
+
+    List<Announcement> announcements = announcementsSnapshot.docs.map((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      return Announcement(
+        announcementBy: data['AnnouncementBy'],
+        announcementDate: data['AnnouncementDate'],
+        announcementDescription: data['AnnouncementDescription'],
+        studentID: data['StudentID'],
+        adminAnnouncement: data['AdminAnnouncement'],
+      );
+    }).toList();
+
+    print('Student Announcements found: ${announcements.length}');
+
+    return announcements;
+  } catch (e) {
+    print('Error fetching announcements: $e');
+  }
+  return null;
+}
+
 }
