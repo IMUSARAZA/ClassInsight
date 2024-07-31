@@ -14,6 +14,7 @@ class AttendanceController extends GetxController {
   final arguments = Get.arguments as List;
   RxString schoolId = ''.obs;
   RxString selectedClass = ''.obs;
+  
 
   @override
   void onInit() {

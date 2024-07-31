@@ -200,7 +200,7 @@ class MarksScreen extends StatelessWidget {
                           int totalMarksInt = int.tryParse(totalMarks) ?? 0;
 
                           for (var student in controller.studentsList) {
-                            String studentRollNo = student.studentRollNo ?? '';
+                            String studentRollNo = student.studentRollNo;
                             String studentName = student.name;
                             String obtainedMarks = controller
                                     .obtainedMarksControllers[student.studentID]
