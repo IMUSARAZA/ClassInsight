@@ -1,9 +1,6 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:classinsight/Services/Database_Service.dart';
-import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/models/StudentModel.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
+import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/screens/teacherSide/MarksScreen.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
@@ -15,9 +12,7 @@ import 'package:get_storage/get_storage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    await Firebase.initializeApp();
     await GetStorage.init();
   } catch (e) {
     print(e.toString());
@@ -38,50 +33,76 @@ void main() async {
 }
 
 class DisplayMarksController extends GetxController {
-  var subjectsList = <String>[].obs;
   var studentsList = <Student>[].obs;
   var examsList = <String>[].obs;
-  final AdminHomeController school = Get.put(AdminHomeController());
+  var subjectsListTeachers = <String>[].obs;
 
   var selectedSubject = ''.obs;
-  final String className = "1-B"; // Initialize with "2-A"
+  late String className;
+  String? schoolId;
+  late Teacher teacher;
 
   Database_Service databaseService = Database_Service();
-  var schoolId = "buwF2J4lkLCdIVrHfgkP";
 
   @override
   void onInit() {
     super.onInit();
+    final List<dynamic>? arguments = Get.arguments as List<dynamic>?;
+
+    if (arguments != null && arguments.length >= 3) {
+      schoolId =
+          arguments[0] as String? ?? ''; // Default to empty string if null
+      className =
+          arguments[1] as String? ?? ''; // Default to empty string if null
+      teacher = arguments[2] as Teacher;
+    } else {
+      print('Error: Arguments are null or insufficient');
+    }
+
     fetchInitialData();
     ever(selectedSubject, (_) => updateStudentResults());
   }
 
-  void fetchInitialData() async {
-    schoolId = school.schoolId.value;
+  Future<void> fetchSubjects() async {
+    subjectsListTeachers.clear();
+    print(schoolId);
+    print(teacher.empID);
 
-    subjectsList.value =
-        await Database_Service.fetchSubjects(schoolId, className);
-    studentsList.value =
-        await Database_Service.getStudentsOfASpecificClass(schoolId, className);
-    examsList.value =
-        await databaseService.fetchExamStructure(schoolId, className);
+    // Use the fetchUniqueSubjects method to get the subjects taught by the teacher
+    var subjectsList =
+        await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
+
+    Set<String> uniqueSubjects = {};
+
+    uniqueSubjects.addAll(subjectsList);
+
+    subjectsListTeachers.addAll(uniqueSubjects.toList());
+    if (subjectsListTeachers.isNotEmpty && selectedSubject.value.isEmpty) {
+      selectedSubject.value = subjectsListTeachers.first;
+    }
+  }
+
+  Future<void> fetchInitialData() async {
+    if (schoolId != null) {
+      await fetchSubjects(); // Correctly await the async method
+      studentsList.value = await Database_Service.getStudentsOfASpecificClass(
+          schoolId!, className);
+      examsList.value =
+          await databaseService.fetchExamStructure(schoolId!, className);
+    } else {
+      print('Error: schoolId is null');
+    }
   }
 
   Future<Map<String, String>> fetchStudentResults(String studentID) async {
-    Map<String, Map<String, String>>? studentResult =
-        await databaseService.fetchStudentResultMap(schoolId, studentID);
-    return studentResult[selectedSubject.value] ?? {};
-  }
-
-  void updateData() async {
-    schoolId = school.schoolId.value;
-
-    subjectsList.value =
-        await Database_Service.fetchSubjects(schoolId, className);
-    studentsList.value =
-        await Database_Service.getStudentsOfASpecificClass(schoolId, className);
-    examsList.value =
-        await databaseService.fetchExamStructure(schoolId, className);
+    if (schoolId != null) {
+      Map<String, Map<String, String>>? studentResult =
+          await databaseService.fetchStudentResultMap(schoolId!, studentID);
+      return studentResult[selectedSubject.value] ?? {};
+    } else {
+      print('Error: schoolId is null');
+      return {};
+    }
   }
 
   void updateStudentResults() async {
@@ -129,12 +150,12 @@ class DisplayMarks extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          Get.to(
-                            () => MarksScreen(),
-                            arguments: {
-                              'className': controller.className,
-                            },
-                          );
+                          print(controller.className);
+                          Get.toNamed('/MarksScreen', arguments: [
+                            controller.schoolId,
+                            controller.className,
+                            controller.teacher
+                          ]);
                         },
                         child: Text(
                           "Edit",
@@ -160,7 +181,7 @@ class DisplayMarks extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
                   child: Obx(() {
-                    var subjectsList = controller.subjectsList;
+                    var subjectsList = controller.subjectsListTeachers;
                     if (subjectsList.isEmpty) {
                       return Center(child: CircularProgressIndicator());
                     } else {
@@ -188,7 +209,8 @@ class DisplayMarks extends StatelessWidget {
                                 color: AppColors.appOrange, width: 2.0),
                           ),
                         ),
-                        items: subjectsList.map((String value) {
+                        items:
+                            controller.subjectsListTeachers.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -255,8 +277,8 @@ class DisplayMarks extends StatelessWidget {
                             ],
                             rows: students.map((student) {
                               return DataRow(
-                                color: MaterialStateProperty.resolveWith<Color?>(
-                                  (Set<MaterialState> states) {
+                                color: WidgetStateProperty.resolveWith<Color?>(
+                                  (Set<WidgetState> states) {
                                     return AppColors.appOrange;
                                   },
                                 ),
@@ -264,28 +286,24 @@ class DisplayMarks extends StatelessWidget {
                                   DataCell(Text(student.studentRollNo)),
                                   DataCell(Text(student.name)),
                                   for (var exam in examsList)
-                                    DataCell(FutureBuilder<String>(
-                                      future: controller
-                                          .fetchStudentResults(
-                                              student.studentID)
-                                          .then((resultMap) {
-                                        return resultMap[exam] ?? '-';
-                                      }),
-                                      builder: (context, resultSnapshot) {
-                                        if (resultSnapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Padding(
-                                            padding: EdgeInsets.only(left: 30),
-                                            child: Text('Loading...'),
-                                          );
-                                        } else if (resultSnapshot.hasError) {
-                                          return Text('Error');
-                                        } else {
-                                          return Text(
-                                              resultSnapshot.data ?? '-');
-                                        }
-                                      },
-                                    )),
+                                    DataCell(
+                                      FutureBuilder<Map<String, String>>(
+                                        future: controller.fetchStudentResults(
+                                            student.studentID),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Text('');
+                                          } else if (snapshot.hasError) {
+                                            return Text('Error');
+                                          } else {
+                                            final marks =
+                                                snapshot.data?[exam] ?? '-';
+                                            return Text(marks);
+                                          }
+                                        },
+                                      ),
+                                    ),
                                 ],
                               );
                             }).toList(),
@@ -294,7 +312,7 @@ class DisplayMarks extends StatelessWidget {
                       );
                     }
                   }),
-                )
+                ),
               ],
             ),
           ),

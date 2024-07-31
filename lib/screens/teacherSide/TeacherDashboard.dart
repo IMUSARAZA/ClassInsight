@@ -1,5 +1,4 @@
 import 'package:classinsight/Services/Auth_Service.dart';
-import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
@@ -8,21 +7,19 @@ import 'package:get/get.dart';
 
 class TeacherDashboardController extends GetxController {
   RxInt height = 120.obs;
-  late Teacher teacher; 
+  late Teacher teacher;
   final arguments = Get.arguments as List;
-  RxBool isClassTeacher = false.obs;
 
   var classesList = <String>[].obs;
   var selectedClass = ''.obs;
-  late School school;
+  var schoolId;
 
   @override
   void onInit() {
     super.onInit();
-    teacher = arguments[0] as Teacher; 
-    school = arguments[1] as School; 
+    teacher = arguments[0] as Teacher;
+    schoolId = arguments[1] as String;
     fetchClasses();
-    checkClassTeacher();
   }
 
   void fetchClasses() {
@@ -31,20 +28,13 @@ class TeacherDashboardController extends GetxController {
       selectedClass.value = classesList.first;
     }
   }
-
-  void checkClassTeacher(){
-    if(teacher.classTeacher == selectedClass.value){
-      isClassTeacher.value = true;
-    } else {
-      isClassTeacher.value = false;
-    }
-  }
 }
 
 class TeacherDashboard extends StatelessWidget {
   TeacherDashboard({super.key});
 
-  final TeacherDashboardController _controller = Get.put(TeacherDashboardController());
+  final TeacherDashboardController _controller =
+      Get.put(TeacherDashboardController());
 
   @override
   Widget build(BuildContext context) {
@@ -85,28 +75,32 @@ class TeacherDashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
                   "Hi, ${_controller.teacher.name}",
                   style: Font_Styles.largeHeadingBold(context),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
                   _controller.teacher.email,
                   style: Font_Styles.labelHeadingRegular(context),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Text(
                   'Class Teacher: ${_controller.teacher.classTeacher}',
                   style: Font_Styles.labelHeadingLight(context),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Text(
                   _controller.teacher.subjects.toString(),
                   style: Font_Styles.labelHeadingLight(context),
@@ -161,86 +155,86 @@ class TeacherDashboard extends StatelessWidget {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide: BorderSide(
-                                        color: AppColors.appLightBlue, width: 2.0),
+                                        color: AppColors.appLightBlue,
+                                        width: 2.0),
                                   ),
                                 ),
-                                items: _controller.classesList.map((String value) {
+                                items:
+                                    _controller.classesList.map((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),
                                   );
                                 }).toList(),
                                 onChanged: (String? newValue) {
-                                  _controller.selectedClass.value = newValue ?? '';
-                                  if(_controller.teacher.classTeacher == newValue) {
-                                    _controller.isClassTeacher.value = true;
-                                  } else {
-                                    _controller.isClassTeacher.value = false;
-                                  }
+                                  _controller.selectedClass.value =
+                                      newValue ?? '';
                                 },
                               ),
                             ),
                           ),
-
                           SizedBox(height: screenHeight * 0.01),
-
-                          Visibility(
-                            visible: _controller.isClassTeacher.value,
-                            child: Center(
-                              child: GestureDetector(
-                                onTap: () {
-                                 Get.toNamed("/MarkAttendance",arguments: [_controller.school.schoolId,_controller.selectedClass.value]);
-                                },
-                                child: Container(
-                                  height: screenHeight * 0.16,
-                                  width: screenWidth-100,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    border: Border.all(
-                                      color: AppColors.appDarkBlue,
-                                      width: 1,
-                                    ),
-                                    color: Colors.white,
+                          Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                Get.toNamed("/MarkAttendance", arguments: [
+                                  _controller.schoolId,
+                                  _controller.selectedClass
+                                ]);
+                              },
+                              child: Container(
+                                height: screenHeight * 0.16,
+                                width: screenWidth - 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(
+                                    color: AppColors.appDarkBlue,
+                                    width: 1,
                                   ),
-                                  
-                                  child: Padding(
-                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                                                  
+                                  color: Colors.white,
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
                                       Padding(
-                                        padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                        child: Icon(Icons.people, size: 50, color: AppColors.appDarkBlue),
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        child: Icon(Icons.people,
+                                            size: 50,
+                                            color: AppColors.appDarkBlue),
                                       ),
-                                                                  
                                       Padding(
-                                        padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                        child: Text(
-                                          'Attendance',
-                                          style: Font_Styles.cardLabel(context, color:AppColors.appLightBlue)
-                                        ),
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        child: Text('Attendance',
+                                            style: Font_Styles.cardLabel(
+                                                context,
+                                                color: AppColors.appLightBlue)),
                                       ),
-                                    ],),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
-
                           SizedBox(height: screenHeight * 0.03),
-
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                print(_controller.selectedClass.value);
-                              Get.toNamed("/MarksScreen", arguments: [_controller.selectedClass.value, _controller.school]);
-
+                                // Assuming _controller.selectedTeacher is the teacher you want to pass
+                                Get.toNamed('/DisplayMarks', arguments: [
+                                  _controller.schoolId,
+                                  _controller.selectedClass.value,
+                                  _controller.teacher
+                                ]);
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
-                                width: screenWidth-100,
+                                width: screenWidth - 100,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(30),
                                   border: Border.all(
@@ -249,30 +243,33 @@ class TeacherDashboard extends StatelessWidget {
                                   ),
                                   color: Colors.white,
                                 ),
-                                
                                 child: Padding(
                                   padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                                                
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                      child: Icon(Icons.book, size: 50, color: AppColors.appOrange),
-                                    ),
-                                                                
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                      child: Text(
-                                        'Marks',
-                                        style: TextStyle(
-                                          color: AppColors.appOrange,
-                                          fontSize: 20, // Adjust as needed
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        child: Icon(Icons.book,
+                                            size: 50,
+                                            color: AppColors.appOrange),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        child: Text(
+                                          'Marks',
+                                          style: TextStyle(
+                                            color: AppColors.appOrange,
+                                            fontSize: 20, // Adjust as needed
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

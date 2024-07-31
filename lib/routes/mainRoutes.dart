@@ -26,6 +26,7 @@ import 'package:classinsight/screens/parentSide/viewAttendance.dart';
 import 'package:classinsight/screens/teacherSide/TeacherDashboard.dart';
 import 'package:classinsight/screens/teacherSide/MarkAttendance.dart';
 import 'package:classinsight/screens/teacherSide/MarksScreen.dart';
+import 'package:classinsight/screens/teacherSide/DisplayMarks.dart';
 import 'package:get/get.dart';
 
 class MainRoutes {
@@ -120,9 +121,13 @@ class MainRoutes {
       name: "/ParentLogin",
       page: () => ParentLoginScreen(),
     ),
-      GetPage(
+    GetPage(
       name: "/MarksScreen",
       page: () => MarksScreen(),
+    ),
+    GetPage(
+      name: "/DisplayMarks",
+      page: () => DisplayMarks(),
     ),
     GetPage(
       name: "/MarkAttendance",
