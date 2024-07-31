@@ -31,7 +31,7 @@ class MarksScreenController extends GetxController {
 
   var selectedSubject = ''.obs;
   var selectedMarksType = ''.obs;
-  final RxString className = ''.obs; // Use RxString for reactive updates
+  final RxString className = ''.obs; 
 
   var totalMarksValid = true.obs;
 
@@ -44,8 +44,7 @@ class MarksScreenController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    className.value = Get.arguments['className'] ??
-        '1-A'; // Initialize with passed value or default
+    className.value = Get.arguments as String;
     fetchInitialData();
     ever(selectedSubject, (_) => updateStudentResults());
   }

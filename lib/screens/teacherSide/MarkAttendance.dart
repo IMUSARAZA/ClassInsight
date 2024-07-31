@@ -12,8 +12,11 @@ class AttendanceController extends GetxController {
   RxString selectedHeaderValue = ''.obs;
   String schoolId = 'buwF2J4lkLCdIVrHfgkP';
 
-  Future<void> fetchStudents() async {
-    studentsList.value = await Database_Service.getStudentsOfASpecificClass(schoolId, '1-A');
+
+
+
+  Future<void> fetchStudents(String classToFetch) async {
+    studentsList.value = await Database_Service.getStudentsOfASpecificClass(schoolId, classToFetch);
   }
 
   void updateRowSelection(int index, String value) {
@@ -45,6 +48,14 @@ class AttendanceController extends GetxController {
       studentStatusMap[student.studentID] = student.attendance[datepicker.text] ?? '';
     }
     return studentStatusMap;
+  }
+
+
+  @override
+  void onInit() {
+    super.onInit();
+    String classToFetch = Get.arguments as String;
+    fetchStudents(classToFetch);
   }
 
 }
@@ -102,7 +113,7 @@ class MarkAttendance extends StatelessWidget {
           SizedBox(height: screenHeight * 0.03),
           Expanded(
             child: FutureBuilder<void>(
-              future: controller.fetchStudents(),
+              future: controller.fetchStudents(Get.arguments as String),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());

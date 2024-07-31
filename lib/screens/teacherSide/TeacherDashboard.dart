@@ -168,8 +168,7 @@ class TeacherDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                // Get.toNamed('/teacherClass',
-                                //     arguments: _controller.selectedClass.value);
+                              Get.toNamed("/MarkAttendance", arguments: _controller.selectedClass.value);
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
@@ -216,8 +215,8 @@ class TeacherDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                // Get.toNamed('/teacherClass',
-                                //     arguments: _controller.selectedClass.value);
+                              Get.toNamed("/MarksScreen", arguments: _controller.selectedClass.value);
+
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
