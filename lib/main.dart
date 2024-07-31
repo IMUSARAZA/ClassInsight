@@ -1,4 +1,5 @@
 import 'package:classinsight/firebase_options.dart';
+import 'package:classinsight/routes/mainRoutes.dart';
 import 'package:classinsight/screens/teacherSide/MarkAttendance.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -56,9 +57,9 @@ class _MyAppState extends State<MyApp> {
           Theme.of(context).textTheme,
         ),
       ),
-      // initialRoute: _getInitialLocation(user),
-      // getPages: MainRoutes.routes,
-      home: MarkAttendance(),
+      initialRoute: _getInitialLocation(user),
+      getPages: MainRoutes.routes,
+      // home: MarkAttendance(),
     );
   }
 

@@ -4,7 +4,7 @@ import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:classinsight/Widgets/BaseScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // Import GetX
+import 'package:get/get.dart'; 
 
 // ignore: must_be_immutable
 class LoginAs extends StatelessWidget {
@@ -50,12 +50,12 @@ class LoginAs extends StatelessWidget {
 
   Widget buildButton(BuildContext context, String text, double screenHeight,
       double screenWidth, bool parent) {
-    Rx<Color> borderColor = Colors.black.obs; // Rx variable for border color
+    Rx<Color> borderColor = Colors.black.obs; 
 
     return Obx(() => TextButton(
           onPressed: parent
               ? () {
-                  // Get.toNamed("/")
+                  Get.toNamed("/ParentLogin", arguments: school);
                 }
               : () {
                   print('teacher clicked');
@@ -74,13 +74,13 @@ class LoginAs extends StatelessWidget {
                   }
                 },
           style: TextButton.styleFrom(
-            backgroundColor: Colors.white, // Background color remains unchanged
+            backgroundColor: Colors.white, 
             foregroundColor: Colors.black,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(9),
               side: BorderSide(
                 color: borderColor
-                    .value, // Use borderColor for dynamic border color
+                    .value, 
               ),
             ),
             fixedSize: Size(screenWidth * 0.7, screenHeight * 0.05),
