@@ -126,7 +126,7 @@ class LoginScreen extends StatelessWidget {
                         Auth_Service.loginTeacher(
                           _controller.emailController.value.text,
                           _controller.passwordController.value.text,
-                          school.schoolId
+                          school
                           );
                         }
                       },

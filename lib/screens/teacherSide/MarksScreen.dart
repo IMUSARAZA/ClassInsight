@@ -1,7 +1,11 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/firebase_options.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/StudentModel.dart';
+<<<<<<< HEAD
 import 'package:classinsight/models/TeacherModel.dart';
+=======
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,6 +30,7 @@ class MarksScreenController extends GetxController {
   var marksTypeList = <String>[].obs;
   var studentsList = <Student>[].obs;
   final totalMarksController = TextEditingController();
+<<<<<<< HEAD
   var subjectsListTeachers = <String>[].obs;
   List<dynamic>? arguments;
   String? schoolId;
@@ -34,6 +39,13 @@ class MarksScreenController extends GetxController {
 
   var selectedSubject = ''.obs;
   var selectedMarksType = ''.obs;
+=======
+  late School school;
+  final arguments = Get.arguments as List;
+  var selectedSubject = ''.obs;
+  var selectedMarksType = ''.obs;
+  final RxString className = ''.obs; 
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
 
   var totalMarksValid = true.obs;
 
@@ -45,6 +57,7 @@ class MarksScreenController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+<<<<<<< HEAD
     final List<dynamic>? arguments = Get.arguments as List<dynamic>?;
 
     if (arguments != null && arguments.length >= 3) {
@@ -57,14 +70,23 @@ class MarksScreenController extends GetxController {
       print('Error: Arguments are null or insufficient');
     }
 
+=======
+    className.value = arguments[0] as String;
+    school = arguments[1] as School;
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
     fetchInitialData();
     ever(selectedSubject, (_) => updateStudentResults());
   }
 
+<<<<<<< HEAD
   Future<void> fetchSubjects() async {
     subjectsListTeachers.clear();
     print(schoolId);
     print(teacher.empID);
+=======
+  void fetchInitialData() async {
+    schoolId = school.schoolId;
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
 
     var subjectsList =
         await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
@@ -105,8 +127,15 @@ class MarksScreenController extends GetxController {
   }
 
   void updateData() async {
+<<<<<<< HEAD
     subjectsListTeachers.value =
         await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
+=======
+    schoolId = school.schoolId;
+
+    subjectsList.value =
+        await Database_Service.fetchSubjects(schoolId, className.value);
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
     studentsList.value = await Database_Service.getStudentsOfASpecificClass(
         schoolId!, className);
     marksTypeList.value =
@@ -237,12 +266,20 @@ class MarksScreen extends StatelessWidget {
                             Database_Service database_service =
                                 Database_Service();
                             await database_service.updateOrAddMarks(
+<<<<<<< HEAD
                               schoolId,
                               student.studentID,
                               subject,
                               examType,
                               obtainedMarks,
                             );
+=======
+                                controller.school.schoolId,
+                                student.studentID,
+                                subject,
+                                examType,
+                                obtainedMarks);
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
                           }
 
                           // Show success or error message based on validity

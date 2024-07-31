@@ -1,4 +1,5 @@
 import 'package:classinsight/Services/Auth_Service.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
@@ -9,23 +10,41 @@ class TeacherDashboardController extends GetxController {
   RxInt height = 120.obs;
   late Teacher teacher;
   final arguments = Get.arguments as List;
+<<<<<<< HEAD
+=======
+  RxBool isClassTeacher = false.obs;
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
 
   var classesList = <String>[].obs;
   var selectedClass = ''.obs;
-  var schoolId;
+  late School school;
 
   @override
   void onInit() {
     super.onInit();
+<<<<<<< HEAD
     teacher = arguments[0] as Teacher;
     schoolId = arguments[1] as String;
+=======
+    teacher = arguments[0] as Teacher; 
+    school = arguments[1] as School; 
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
     fetchClasses();
+    checkClassTeacher();
   }
 
   void fetchClasses() {
     classesList.value = teacher.classes;
     if (classesList.isNotEmpty && selectedClass.isEmpty) {
       selectedClass.value = classesList.first;
+    }
+  }
+
+  void checkClassTeacher(){
+    if(teacher.classTeacher == selectedClass.value){
+      isClassTeacher.value = true;
+    } else {
+      isClassTeacher.value = false;
     }
   }
 }
@@ -167,13 +186,23 @@ class TeacherDashboard extends StatelessWidget {
                                   );
                                 }).toList(),
                                 onChanged: (String? newValue) {
+<<<<<<< HEAD
                                   _controller.selectedClass.value =
                                       newValue ?? '';
+=======
+                                  _controller.selectedClass.value = newValue ?? '';
+                                  if(_controller.teacher.classTeacher == newValue) {
+                                    _controller.isClassTeacher.value = true;
+                                  } else {
+                                    _controller.isClassTeacher.value = false;
+                                  }
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
                                 },
                               ),
                             ),
                           ),
                           SizedBox(height: screenHeight * 0.01),
+<<<<<<< HEAD
                           Center(
                             child: GestureDetector(
                               onTap: () {
@@ -216,6 +245,48 @@ class TeacherDashboard extends StatelessWidget {
                                                 color: AppColors.appLightBlue)),
                                       ),
                                     ],
+=======
+
+                          Visibility(
+                            visible: _controller.isClassTeacher.value,
+                            child: Center(
+                              child: GestureDetector(
+                                onTap: () {
+                                 Get.toNamed("/MarkAttendance",arguments: [_controller.school.schoolId,_controller.selectedClass.value]);
+                                },
+                                child: Container(
+                                  height: screenHeight * 0.16,
+                                  width: screenWidth-100,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(
+                                      color: AppColors.appDarkBlue,
+                                      width: 1,
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  
+                                  child: Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                                                  
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        child: Icon(Icons.people, size: 50, color: AppColors.appDarkBlue),
+                                      ),
+                                                                  
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        child: Text(
+                                          'Attendance',
+                                          style: Font_Styles.cardLabel(context, color:AppColors.appLightBlue)
+                                        ),
+                                      ),
+                                    ],),
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
                                   ),
                                 ),
                               ),
@@ -225,12 +296,18 @@ class TeacherDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
+<<<<<<< HEAD
                                 // Assuming _controller.selectedTeacher is the teacher you want to pass
                                 Get.toNamed('/DisplayMarks', arguments: [
                                   _controller.schoolId,
                                   _controller.selectedClass.value,
                                   _controller.teacher
                                 ]);
+=======
+                                print(_controller.selectedClass.value);
+                              Get.toNamed("/MarksScreen", arguments: [_controller.selectedClass.value, _controller.school]);
+
+>>>>>>> a8ec7eae492b82b9c0b8c1d79ce24798d51fe702
                               },
                               child: Container(
                                 height: screenHeight * 0.16,

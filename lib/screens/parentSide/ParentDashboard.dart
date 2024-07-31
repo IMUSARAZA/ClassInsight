@@ -1,6 +1,7 @@
 import 'package:classinsight/Services/Auth_Service.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/AnnouncementsModel.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
@@ -13,31 +14,34 @@ class ParentDashboardController extends GetxController {
   RxList<Announcement> mainAnnouncements = <Announcement>[].obs;
   RxList<Announcement> teacherComments = <Announcement>[].obs;
   var selectedClass = ''.obs;
-  final arguments = Get.arguments as List;
-  var schoolId;
+  late School school;
+  RxBool isLoading = true.obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchAnnouncements();
+    final arguments = Get.arguments as List;
     student = arguments[0] as Student;
-    schoolId = arguments[1] as String;
-
+    school = arguments[1] as School;
+    fetchAnnouncements();
   }
 
   void fetchAnnouncements() async {
+    isLoading.value = true;
+
     final adminAnnouncements =
-        await Database_Service.fetchAdminAnnouncements(schoolId);
+        await Database_Service.fetchAdminAnnouncements(school.schoolId);
     if (adminAnnouncements != null) {
       mainAnnouncements.assignAll(adminAnnouncements);
     }
 
     final studentAnnouncements =
         await Database_Service.fetchStudentAnnouncements(
-            schoolId, student.studentID);
+            school.schoolId, student.studentID);
     if (studentAnnouncements != null) {
       teacherComments.assignAll(studentAnnouncements);
     }
+    isLoading.value = false;
   }
 }
 
@@ -150,113 +154,130 @@ class ParentDashboard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Center(
-                            child: Container(
-                              height: screenHeight * 0.16,
-                              width: screenWidth - 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 2,
-                                ),
-                                color: Colors.white,
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.fromLTRB(15, 0, 0, 0),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              'Announcements:',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: screenWidth * 0.04,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.02),
-                                            Icon(Icons.announcement,
-                                                size: screenWidth * 0.05,
-                                                color: AppColors.appPink),
-                                          ],
-                                        ),
-                                      ),
-                                      Obx(() {
-                                        return ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: _controller
-                                              .mainAnnouncements.length,
-                                          itemBuilder: (context, index) {
-                                            final announcement = _controller
-                                                .mainAnnouncements[index];
-                                            return ListTile(
-                                              title: Text(announcement
-                                                      .announcementDescription ??
-                                                  ''),
-                                              subtitle: Text(
-                                                  announcement.announcementBy ??
-                                                      ''),
-                                            );
-                                          },
-                                        );
-                                      }),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.fromLTRB(15, 0, 0, 0),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              'Teacher Weekly Comments:',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: screenWidth * 0.04,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.02),
-                                            Icon(Icons.comment,
-                                                size: screenWidth * 0.05,
-                                                color: AppColors.appPink),
-                                          ],
-                                        ),
-                                      ),
-                                      Obx(() {
-                                        return ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: _controller
-                                              .teacherComments.length,
-                                          itemBuilder: (context, index) {
-                                            final comment = _controller
-                                                .teacherComments[index];
-                                            return ListTile(
-                                              title: Text(comment
-                                                      .announcementDescription ??
-                                                  ''),
-                                              subtitle: Text(
-                                                  comment.announcementBy ?? ''),
-                                            );
-                                          },
-                                        );
-                                      }),
-                                    ],
+                            child: Obx(() {
+                              if (_controller.isLoading.value) {
+                                return Center(
+                                    child:
+                                        CircularProgressIndicator(backgroundColor: AppColors.appLightBlue)); // Show loading indicator
+                              } else {
+                                return Container(
+                                  height: screenHeight * 0.16,
+                                  width: screenWidth - 100,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Colors.grey,
+                                      width: 2,
+                                    ),
+                                    color: Colors.white,
                                   ),
-                                ),
-                              ),
-                            ),
+                                  child: Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                15, 0, 0, 0),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Announcements:',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize:
+                                                        screenWidth * 0.04,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                    width: screenWidth * 0.02),
+                                                Icon(Icons.announcement,
+                                                    size: screenWidth * 0.05,
+                                                    color: AppColors.appPink),
+                                              ],
+                                            ),
+                                          ),
+                                          Obx(() {
+                                            return ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount: _controller
+                                                  .mainAnnouncements.length,
+                                              itemBuilder: (context, index) {
+                                                final announcement = _controller
+                                                    .mainAnnouncements[index];
+                                                return ListTile(
+                                                  title: Text(announcement
+                                                          .announcementDescription ??
+                                                      ''),
+                                                  subtitle: Text(announcement
+                                                          .announcementBy ??
+                                                      ''),
+                                                );
+                                              },
+                                            );
+                                          }),
+                                          Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                15, 0, 0, 0),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Teacher Weekly Comments:',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize:
+                                                        screenWidth * 0.04,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                    width: screenWidth * 0.02),
+                                                Icon(Icons.comment,
+                                                    size: screenWidth * 0.05,
+                                                    color: AppColors.appPink),
+                                              ],
+                                            ),
+                                          ),
+                                          Obx(() {
+                                            return ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount: _controller
+                                                  .teacherComments.length,
+                                              itemBuilder: (context, index) {
+                                                final comment = _controller
+                                                    .teacherComments[index];
+                                                return ListTile(
+                                                  title: Text(comment
+                                                          .announcementDescription ??
+                                                      ''),
+                                                  subtitle: Text(
+                                                      comment.announcementBy ??
+                                                          ''),
+                                                );
+                                              },
+                                            );
+                                          }),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }),
                           ),
                           SizedBox(height: screenHeight * 0.03),
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                             Get.toNamed("/ViewTimetable",arguments: [_controller.schoolId.v,_controller.student]);
+                                Get.toNamed("/ViewTimetable", arguments: [
+                                  _controller.school.schoolId,
+                                  _controller.student
+                                ]);
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
@@ -303,8 +324,8 @@ class ParentDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                Get.toNamed("/ViewAttendance",arguments: _controller.student);
-
+                                Get.toNamed("/ViewAttendance",
+                                    arguments: _controller.student);
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
@@ -351,8 +372,7 @@ class ParentDashboard extends StatelessWidget {
                           SizedBox(height: screenHeight * 0.03),
                           Center(
                             child: GestureDetector(
-                              onTap: () {
-                              },
+                              onTap: () {},
                               child: Container(
                                 height: screenHeight * 0.16,
                                 width: screenWidth - 100,

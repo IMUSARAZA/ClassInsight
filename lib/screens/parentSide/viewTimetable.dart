@@ -1,8 +1,6 @@
 // ignore_for_file: invalid_use_of_protected_member
-
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
@@ -10,27 +8,27 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class ViewTimetableController extends GetxController {
-  Student? student;
+  late Student student;
   var timetable = <String, dynamic>{}.obs;
   var selectedDay = 'Monday'.obs;
   var schoolId;
-  final arguments = Get.arguments as List;
   RxList<String> days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].obs;
 
 
   @override
   void onInit() {
     super.onInit();
+    final arguments = Get.arguments as List;
     schoolId = arguments[0] as String;
     student = arguments[1] as Student;
-    refresh();
+    refreshData();
   }
 
 
   void fetchTimetable() async {
     try {
         Map<String, dynamic> fetchedTimetable =
-          await Database_Service.fetchTimetable(schoolId, student!.classSection, selectedDay.value);
+          await Database_Service.fetchTimetable(schoolId, student.classSection, selectedDay.value);
       timetable.value = fetchedTimetable;
     } catch (e) {
       print("Error fetching timetable: $e");
