@@ -99,7 +99,7 @@ static Future<void> logout(BuildContext context) async {
 
 
 
-static Future<void> loginTeacher(String email, String password, String schoolID) async {
+static Future<void> loginTeacher(String email, String password, School school) async {
   try {
 
         Get.snackbar('Logging In', '',
@@ -109,10 +109,10 @@ static Future<void> loginTeacher(String email, String password, String schoolID)
 
     CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
 
-    QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+    QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: school.schoolId).get();
 
     if (schoolSnapshot.docs.isEmpty) {
-      Get.snackbar('Error', 'School with ID $schoolID not found');
+      Get.snackbar('Error', 'School with ID ${school.schoolId} not found');
       return;
     }
 
@@ -159,7 +159,7 @@ static Future<void> loginTeacher(String email, String password, String schoolID)
 
       Get.snackbar('Success', 'Login successful');
 
-      Get.offAllNamed('/TeacherDashboard', arguments: teacher);
+      Get.offAllNamed('/TeacherDashboard', arguments: [teacher,school]);
     }
   } catch (e) {
     Get.snackbar('Error', 'Email or password incorrect');
@@ -191,7 +191,7 @@ static Future<void> sendPasswordEmail(String teacherEmail, String teacherName, S
 
 
 
-  static Future<void> loginParent(String schoolID, String challanIDbForm) async {
+  static Future<void> loginParent(School school, String challanIDbForm) async {
     try {
       Get.snackbar('Logging In', '',
           backgroundColor: Colors.white, 
@@ -201,10 +201,10 @@ static Future<void> sendPasswordEmail(String teacherEmail, String teacherName, S
 
       CollectionReference schoolsRef = FirebaseFirestore.instance.collection('Schools');
 
-      QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+      QuerySnapshot schoolSnapshot = await schoolsRef.where('SchoolID', isEqualTo: school.schoolId).get();
 
       if (schoolSnapshot.docs.isEmpty) {
-        Get.snackbar('Error', 'School with ID $schoolID not found');
+        Get.snackbar('Error', 'School with ID ${school.schoolId} not found');
         return;
       }
 
@@ -224,7 +224,7 @@ static Future<void> sendPasswordEmail(String teacherEmail, String teacherName, S
       Student student = Student.fromJson(data);
 
         Get.snackbar('Success', 'Login successful');
-        Get.offAllNamed('/ParentDashboard', arguments: student);
+        Get.offAllNamed('/ParentDashboard', arguments: [student,school]);
       
     } catch (e) {
       Get.snackbar('Error', 'An error occurred');

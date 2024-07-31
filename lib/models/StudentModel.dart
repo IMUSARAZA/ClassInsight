@@ -48,7 +48,7 @@ class Student {
       feeStartDate: json['FeeStartDate'] ?? '',
       feeEndDate: json['FeeEndDate'] ?? '',
       resultMap: Map<String, Map<String, String>>.from(json['ResultMap'] ?? {}),
-      attendance: Map<String, String>.from(json['Attendance'] ?? {}),
+      attendance: Map<String, String>.from(json['attendance'] ?? {}),
     );
   }
 
@@ -67,7 +67,7 @@ class Student {
       'FeeStartDate': feeStartDate,
       'FeeEndDate': feeEndDate,
       'ResultMap': resultMap,
-      'Attendance': attendance,
+      'attendance': attendance,
     };
   }
 
@@ -86,7 +86,7 @@ class Student {
       'FeeStartDate': feeStartDate,
       'FeeEndDate': feeEndDate,
       'ResultMap': resultMap,
-      'Attendance': attendance,
+      'attendance': attendance,
     };
   }
 

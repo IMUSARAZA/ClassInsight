@@ -1,7 +1,7 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/firebase_options.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/StudentModel.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,9 +26,9 @@ class MarksScreenController extends GetxController {
   var subjectsList = <String>[].obs;
   var marksTypeList = <String>[].obs;
   var studentsList = <Student>[].obs;
-  final AdminHomeController school = Get.put(AdminHomeController());
   final totalMarksController = TextEditingController();
-
+  late School school;
+  final arguments = Get.arguments as List;
   var selectedSubject = ''.obs;
   var selectedMarksType = ''.obs;
   final RxString className = ''.obs; 
@@ -44,13 +44,14 @@ class MarksScreenController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    className.value = Get.arguments as String;
+    className.value = arguments[0] as String;
+    school = arguments[1] as School;
     fetchInitialData();
     ever(selectedSubject, (_) => updateStudentResults());
   }
 
   void fetchInitialData() async {
-    schoolId = school.schoolId.value;
+    schoolId = school.schoolId;
 
     subjectsList.value =
         await Database_Service.fetchSubjects(schoolId, className.value);
@@ -72,7 +73,7 @@ class MarksScreenController extends GetxController {
   }
 
   void updateData() async {
-    schoolId = school.schoolId.value;
+    schoolId = school.schoolId;
 
     subjectsList.value =
         await Database_Service.fetchSubjects(schoolId, className.value);
@@ -184,7 +185,7 @@ class MarksScreen extends StatelessWidget {
                             Database_Service database_service =
                                 new Database_Service();
                             await database_service.updateOrAddMarks(
-                                controller.school.schoolId.value,
+                                controller.school.schoolId,
                                 student.studentID,
                                 subject,
                                 examType,

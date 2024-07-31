@@ -69,7 +69,7 @@ class ParentLoginScreen extends StatelessWidget {
                         onPressed: () {
 
                           if (_controller.challanIDbFormController.value.text.isNotEmpty) {
-                              Auth_Service.loginParent(_controller.school.schoolId, _controller.challanIDbFormController.value.text);
+                              Auth_Service.loginParent(_controller.school, _controller.challanIDbFormController.value.text);
 
                           } else {
                           }
