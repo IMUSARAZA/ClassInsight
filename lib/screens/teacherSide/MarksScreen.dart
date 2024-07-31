@@ -1,7 +1,7 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/models/StudentModel.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
+import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,20 +23,21 @@ void main() async {
 }
 
 class MarksScreenController extends GetxController {
-  var subjectsList = <String>[].obs;
   var marksTypeList = <String>[].obs;
   var studentsList = <Student>[].obs;
-  final AdminHomeController school = Get.put(AdminHomeController());
   final totalMarksController = TextEditingController();
+  var subjectsListTeachers = <String>[].obs;
+  List<dynamic>? arguments;
+  String? schoolId;
+  late String className;
+  late Teacher teacher;
 
   var selectedSubject = ''.obs;
   var selectedMarksType = ''.obs;
-  final RxString className = ''.obs; // Use RxString for reactive updates
 
   var totalMarksValid = true.obs;
 
   Database_Service databaseService = Database_Service();
-  var schoolId = "buwF2J4lkLCdIVrHfgkP";
 
   // Define a map to store TextEditingControllers for obtained marks
   var obtainedMarksControllers = <String, TextEditingController>{}.obs;
@@ -44,21 +45,52 @@ class MarksScreenController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    className.value = Get.arguments['className'] ??
-        '1-A'; // Initialize with passed value or default
+    final List<dynamic>? arguments = Get.arguments as List<dynamic>?;
+
+    if (arguments != null && arguments.length >= 3) {
+      schoolId =
+          arguments[0] as String? ?? ''; // Default to empty string if null
+      className =
+          arguments[1] as String? ?? ''; // Default to empty string if null
+      teacher = arguments[2] as Teacher;
+    } else {
+      print('Error: Arguments are null or insufficient');
+    }
+
     fetchInitialData();
     ever(selectedSubject, (_) => updateStudentResults());
   }
 
-  void fetchInitialData() async {
-    schoolId = school.schoolId.value;
+  Future<void> fetchSubjects() async {
+    subjectsListTeachers.clear();
+    print(schoolId);
+    print(teacher.empID);
 
-    subjectsList.value =
-        await Database_Service.fetchSubjects(schoolId, className.value);
-    studentsList.value = await Database_Service.getStudentsOfASpecificClass(
-        schoolId, className.value);
-    marksTypeList.value =
-        await databaseService.fetchExamStructure(schoolId, className.value);
+    var subjectsList =
+        await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
+
+    Set<String> uniqueSubjects = {};
+
+    uniqueSubjects.addAll(subjectsList);
+
+    subjectsListTeachers.addAll(uniqueSubjects.toList());
+    if (subjectsListTeachers.isNotEmpty && selectedSubject.value.isEmpty) {
+      selectedSubject.value = subjectsListTeachers.first;
+    }
+  }
+
+  void fetchInitialData() async {
+    if (schoolId != null) {
+      subjectsListTeachers.value =
+          await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
+      studentsList.value = await Database_Service.getStudentsOfASpecificClass(
+          schoolId!, className);
+      marksTypeList.value =
+          await databaseService.fetchExamStructure(schoolId!, className);
+    } else {
+      // Handle the case where schoolId is null
+      print('Error: schoolId is null');
+    }
 
     // Initialize controllers for each student
     for (var student in studentsList) {
@@ -68,19 +100,17 @@ class MarksScreenController extends GetxController {
 
   Future<Map<String, String>> fetchStudentResults(String studentID) async {
     Map<String, Map<String, String>>? studentResult =
-        await databaseService.fetchStudentResultMap(schoolId, studentID);
+        await databaseService.fetchStudentResultMap(schoolId!, studentID);
     return studentResult[selectedSubject.value] ?? {};
   }
 
   void updateData() async {
-    schoolId = school.schoolId.value;
-
-    subjectsList.value =
-        await Database_Service.fetchSubjects(schoolId, className.value);
+    subjectsListTeachers.value =
+        await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
     studentsList.value = await Database_Service.getStudentsOfASpecificClass(
-        schoolId, className.value);
+        schoolId!, className);
     marksTypeList.value =
-        await databaseService.fetchExamStructure(schoolId, className.value);
+        await databaseService.fetchExamStructure(schoolId!, className);
   }
 
   void updateStudentResults() async {
@@ -132,6 +162,19 @@ class MarksScreen extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () async {
+                          String? schoolId =
+                              controller.schoolId; // Nullable schoolId
+                          if (schoolId == null) {
+                            Get.snackbar(
+                              'Error',
+                              'School ID is missing.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                            return; // Exit the method if schoolId is null
+                          }
+
                           String subject = controller.selectedSubject.value;
                           String examType = controller.selectedMarksType.value;
                           String totalMarks = controller.getTotalMarks();
@@ -141,10 +184,12 @@ class MarksScreen extends StatelessWidget {
                               !RegExp(r'^[0-9]+$').hasMatch(totalMarks)) {
                             // Show error message and exit if totalMarks is invalid
                             Get.snackbar(
-                                'Error', 'Total Marks must be a valid number.',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.red,
-                                colorText: Colors.white);
+                              'Error',
+                              'Total Marks must be a valid number.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
                             return; // Exit the method
                           }
 
@@ -155,26 +200,33 @@ class MarksScreen extends StatelessWidget {
                           int totalMarksInt = int.tryParse(totalMarks) ?? 0;
 
                           for (var student in controller.studentsList) {
-                            String studentRollNo = student.studentRollNo;
+                            String studentRollNo = student.studentRollNo ?? '';
                             String studentName = student.name;
                             String obtainedMarks = controller
                                     .obtainedMarksControllers[student.studentID]
                                     ?.text ??
-                                '-';
+                                '';
 
-                            // Validate if obtainedMarks is a number and within range
-                            if (obtainedMarks.isNotEmpty &&
-                                !RegExp(r'^[0-9]+$').hasMatch(obtainedMarks)) {
+                            // If obtainedMarks is empty, set it to '-'
+                            if (obtainedMarks.isEmpty) {
                               obtainedMarks = '-';
-                              allValid =
-                                  false; // Mark as invalid if any obtainedMarks is incorrect
-                            } else if (obtainedMarks != '-' &&
-                                    (int.tryParse(obtainedMarks) ?? -1) < 0 ||
-                                (int.tryParse(obtainedMarks) ?? 0) >
-                                    totalMarksInt) {
-                              obtainedMarks = '-';
-                              allValid =
-                                  false; // Mark as invalid if obtainedMarks is out of range
+                            } else {
+                              // Validate if obtainedMarks is a number and within range
+                              if (!RegExp(r'^[0-9]+$')
+                                  .hasMatch(obtainedMarks)) {
+                                obtainedMarks =
+                                    '-'; // Set to '-' if obtainedMarks is not numeric
+                                allValid =
+                                    false; // Mark as invalid if obtainedMarks is incorrect
+                              } else if ((int.tryParse(obtainedMarks) ?? -1) <
+                                      0 ||
+                                  (int.tryParse(obtainedMarks) ?? 0) >
+                                      totalMarksInt) {
+                                obtainedMarks =
+                                    '-'; // Set to '-' if obtainedMarks is out of range
+                                allValid =
+                                    false; // Mark as invalid if obtainedMarks is out of range
+                              }
                             }
 
                             // Print the values (for debugging or logging purposes)
@@ -183,28 +235,33 @@ class MarksScreen extends StatelessWidget {
 
                             // Update or add marks to the database
                             Database_Service database_service =
-                                new Database_Service();
+                                Database_Service();
                             await database_service.updateOrAddMarks(
-                                controller.school.schoolId.value,
-                                student.studentID,
-                                subject,
-                                examType,
-                                obtainedMarks);
+                              schoolId,
+                              student.studentID,
+                              subject,
+                              examType,
+                              obtainedMarks,
+                            );
                           }
 
                           // Show success or error message based on validity
                           if (allValid) {
-                            Get.snackbar('Success',
-                                'Marks have been updated successfully.',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.green,
-                                colorText: Colors.white);
+                            Get.snackbar(
+                              'Success',
+                              'Marks have been updated successfully.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.green,
+                              colorText: Colors.white,
+                            );
                           } else {
-                            Get.snackbar('Error',
-                                'Please enter valid marks for all students.',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.red,
-                                colorText: Colors.white);
+                            Get.snackbar(
+                              'Error',
+                              'Please enter valid marks for all students.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
                           }
                         },
                         child: Text(
@@ -219,7 +276,7 @@ class MarksScreen extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
                   child: Obx(() {
-                    var subjectsList = controller.subjectsList;
+                    var subjectsList = controller.subjectsListTeachers;
                     if (subjectsList.isEmpty) {
                       return Center(child: CircularProgressIndicator());
                     } else {
@@ -247,7 +304,8 @@ class MarksScreen extends StatelessWidget {
                                 color: AppColors.appOrange, width: 2.0),
                           ),
                         ),
-                        items: subjectsList.map((String value) {
+                        items:
+                            controller.subjectsListTeachers.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -404,7 +462,8 @@ class MarksScreen extends StatelessWidget {
                             ],
                             rows: students.map((student) {
                               return DataRow(
-                                color: MaterialStateProperty.resolveWith<Color?>(
+                                color:
+                                    MaterialStateProperty.resolveWith<Color?>(
                                   (Set<MaterialState> states) {
                                     return AppColors.appOrange;
                                   },
