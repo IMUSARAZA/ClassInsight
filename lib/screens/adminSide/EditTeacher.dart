@@ -492,6 +492,7 @@ class EditTeacher extends StatelessWidget {
                                       initialValue: controller
                                           .selectedClasses,
                                       onConfirm: (results) {
+                                        controller.selectedClasses.clear();
                                         controller.selectedClasses
                                             .assignAll(results);
                                       },
@@ -564,6 +565,7 @@ class EditTeacher extends StatelessWidget {
                                                           className] ??
                                                       [],
                                                   onConfirm: (results) {
+                                                    controller.selectedSubjects.clear();
                                                     controller.selectedSubjects[
                                                             className] =
                                                         results
