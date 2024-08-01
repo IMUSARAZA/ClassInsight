@@ -1,5 +1,6 @@
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
+import 'package:classinsight/utils/fontStyles.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
@@ -131,11 +132,7 @@ class StudentResult extends StatelessWidget {
                         title: Center(
                           child: Text(
                             'Result',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: resultFontSize,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Font_Styles.labelHeadingLight(context),
                           ),
                         ),
                         actions: <Widget>[
@@ -153,10 +150,7 @@ class StudentResult extends StatelessWidget {
                       child: Text(
                         controller.student.value.name,
                         textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontSize: headingFontSize,
-                          fontWeight: FontWeight.w900,
-                        ),
+                        style: Font_Styles.dataTableTitle(context, headingFontSize),
                       ),
                     ),
                     SingleChildScrollView(
@@ -171,37 +165,25 @@ class StudentResult extends StatelessWidget {
                             DataColumn(
                               label: Text(
                                 'Subjects',
-                                style: TextStyle(
-                                  fontSize: resultFontSize,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
                               ),
                             ),
                             ...exams.map((exam) => DataColumn(
                                   label: Text(
                                     exam,
-                                    style: TextStyle(
-                                      fontSize: resultFontSize,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
                                   ),
                                 )),
                             DataColumn(
                               label: Text(
                                 'Total',
-                                style: TextStyle(
-                                  fontSize: resultFontSize,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Grade',
-                                style: TextStyle(
-                                  fontSize: resultFontSize,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
                               ),
                             ),
                           ],
@@ -212,27 +194,19 @@ class StudentResult extends StatelessWidget {
                               cells: [
                                 DataCell(Text(
                                   subject,
-                                  style: TextStyle(
-                                    fontSize: resultFontSize,
-                                  ),
+                                  style: Font_Styles.dataTableRows(context, resultFontSize),
                                 )),
                                 ...exams.map((exam) => DataCell(Text(
                                       resultMap[subject]?[exam] ?? '-',
-                                      style: TextStyle(
-                                        fontSize: resultFontSize,
-                                      ),
+                                      style: Font_Styles.dataTableRows(context, resultFontSize),
                                     ))),
                                 DataCell(Text(
                                   '-', // Placeholder for Total
-                                  style: TextStyle(
-                                    fontSize: resultFontSize,
-                                  ),
+                                  style: Font_Styles.dataTableRows(context, resultFontSize),
                                 )),
                                 DataCell(Text(
                                   '-', // Placeholder for Grade
-                                  style: TextStyle(
-                                    fontSize: resultFontSize,
-                                  ),
+                                  style: Font_Styles.dataTableRows(context, resultFontSize),
                                 )),
                               ],
                             ),

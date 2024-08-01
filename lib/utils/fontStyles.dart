@@ -40,6 +40,22 @@ class Font_Styles {
     );
   }
 
+  static TextStyle dataTableTitle(BuildContext context, double size, {Color? color}) {
+    return GoogleFonts.poppins(
+      fontSize: _responsiveFontSize(context, size),
+      fontWeight: FontWeight.bold, 
+      color: color
+    );
+  }
+
+  static TextStyle dataTableRows(BuildContext context, double size, {Color? color}) {
+    return GoogleFonts.poppins(
+      fontSize: _responsiveFontSize(context, size),
+      fontWeight: FontWeight.normal, 
+      color: color
+    );
+  }
+
   static TextStyle cardLabel(BuildContext context, {Color? color}) {
     return GoogleFonts.poppins(
       fontSize: _responsiveFontSize(context, 25),

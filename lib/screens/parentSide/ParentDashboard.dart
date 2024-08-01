@@ -7,6 +7,7 @@ import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ParentDashboardController extends GetxController {
   RxInt height = 120.obs;
@@ -14,8 +15,10 @@ class ParentDashboardController extends GetxController {
   RxList<Announcement> mainAnnouncements = <Announcement>[].obs;
   RxList<Announcement> teacherComments = <Announcement>[].obs;
   var selectedClass = ''.obs;
+  var feedetails = ''.obs;
   late School school;
   RxBool isLoading = true.obs;
+  Color feeColor = Colors.red;
 
   @override
   void onInit() {
@@ -23,7 +26,17 @@ class ParentDashboardController extends GetxController {
     final arguments = Get.arguments as List;
     student = arguments[0] as Student;
     school = arguments[1] as School;
+    feeStatus();
     fetchAnnouncements();
+  }
+
+  void feeStatus(){
+    if(student.feeStatus == 'paid'){
+      feedetails.value = student.feeStatus+' '+'('+ student.feeStartDate +' '+ student.feeEndDate+')';
+      feeColor = Colors.green;
+    } else {
+      feeColor = Colors.red;
+    }
   }
 
   void fetchAnnouncements() async {
@@ -125,8 +138,12 @@ class ParentDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                 child: Text(
-                  'Fee Status: ${_controller.student.feeStatus}',
-                  style: Font_Styles.labelHeadingLight(context),
+                  'Fee Status: ${_controller.feedetails}',
+                  style: GoogleFonts.poppins(
+                      fontSize: screenWidth * 0.03,
+                      fontWeight: FontWeight.bold,
+                      color: _controller.feeColor,
+                    ),
                 ),
               ),
               Expanded(
@@ -158,7 +175,7 @@ class ParentDashboard extends StatelessWidget {
                               if (_controller.isLoading.value) {
                                 return Center(
                                     child:
-                                        CircularProgressIndicator(backgroundColor: AppColors.appLightBlue)); // Show loading indicator
+                                        CircularProgressIndicator(backgroundColor: AppColors.appLightBlue));
                               } else {
                                 return Container(
                                   height: screenHeight * 0.16,

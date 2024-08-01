@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:classinsight/utils/fontStyles.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
@@ -100,11 +101,7 @@ class SubjectResult extends StatelessWidget {
                       title: Center(
                         child: Text(
                           'Marks',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Font_Styles.labelHeadingLight(context),
                         ),
                       ),
                       actions: <Widget>[
@@ -121,10 +118,7 @@ class SubjectResult extends StatelessWidget {
                     padding: EdgeInsets.only(left: 30),
                     child: Text(
                       'Subject Result',
-                      style: TextStyle(
-                        fontSize: 31,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: Font_Styles.largeHeadingBold(context),
                     ),
                   ),
                   Padding(
@@ -232,11 +226,7 @@ class SubjectResult extends StatelessWidget {
                                 padding: EdgeInsets.fromLTRB(30, 20, 0, 0),
                                 child: Text(
                                   'No subjects found...',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
+                                  style: Font_Styles.labelHeadingLight(context),
                                 ),
                               );
                             } else {
@@ -253,6 +243,7 @@ class SubjectResult extends StatelessWidget {
                                 child: Center(
                                   child: Text(
                                     'No exams found for this Class',
+                                    style: Font_Styles.labelHeadingLight(context),
                                   ),
                                 ),
                               );
@@ -264,29 +255,20 @@ class SubjectResult extends StatelessWidget {
                                     DataColumn(
                                       label: Text(
                                         'Roll No.',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
                                       ),
                                     ),
                                     DataColumn(
                                       label: Text(
                                         'Student Name',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
                                       ),
                                     ),
                                     for (var exam in examsList)
                                       DataColumn(
                                         label: Text(
                                           exam,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
                                         ),
                                       ),
                                   ],
