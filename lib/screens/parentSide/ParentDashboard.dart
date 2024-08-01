@@ -157,8 +157,9 @@ class ParentDashboard extends StatelessWidget {
                             child: Obx(() {
                               if (_controller.isLoading.value) {
                                 return Center(
-                                    child:
-                                        CircularProgressIndicator(backgroundColor: AppColors.appLightBlue)); // Show loading indicator
+                                    child: CircularProgressIndicator(
+                                        backgroundColor: AppColors
+                                            .appLightBlue)); // Show loading indicator
                               } else {
                                 return Container(
                                   height: screenHeight * 0.16,
@@ -372,7 +373,18 @@ class ParentDashboard extends StatelessWidget {
                           SizedBox(height: screenHeight * 0.03),
                           Center(
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                print(_controller.student.studentID);
+                                print(_controller.school.schoolId);
+                                Get.toNamed(
+                                  '/Result',
+                                  arguments: {
+                                    'student': _controller.student,
+                                    'schoolId': _controller.school
+                                        .schoolId, // Make sure `schoolId` is accessible here
+                                  },
+                                );
+                              },
                               child: Container(
                                 height: screenHeight * 0.16,
                                 width: screenWidth - 100,

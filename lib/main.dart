@@ -1,5 +1,6 @@
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/routes/mainRoutes.dart';
+import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     await GetStorage.init();
+    Get.put(AdminHomeController());
   } catch (e) {
   }
   runApp(const MyApp());
