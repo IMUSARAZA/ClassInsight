@@ -1,4 +1,5 @@
 import 'package:classinsight/Services/Auth_Service.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
@@ -12,13 +13,13 @@ class TeacherDashboardController extends GetxController {
 
   var classesList = <String>[].obs;
   var selectedClass = ''.obs;
-  var schoolId;
+  late School school;
 
   @override
   void onInit() {
     super.onInit();
     teacher = arguments[0] as Teacher;
-    schoolId = arguments[1] as String;
+    school = arguments[1] as School;
     fetchClasses();
   }
 
@@ -178,8 +179,8 @@ class TeacherDashboard extends StatelessWidget {
                             child: GestureDetector(
                               onTap: () {
                                 Get.toNamed("/MarkAttendance", arguments: [
-                                  _controller.schoolId,
-                                  _controller.selectedClass
+                                  _controller.school.schoolId,
+                                  _controller.selectedClass.value
                                 ]);
                               },
                               child: Container(
@@ -225,9 +226,8 @@ class TeacherDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                // Assuming _controller.selectedTeacher is the teacher you want to pass
                                 Get.toNamed('/DisplayMarks', arguments: [
-                                  _controller.schoolId,
+                                  _controller.school.schoolId,
                                   _controller.selectedClass.value,
                                   _controller.teacher
                                 ]);
@@ -264,7 +264,7 @@ class TeacherDashboard extends StatelessWidget {
                                           'Marks',
                                           style: TextStyle(
                                             color: AppColors.appOrange,
-                                            fontSize: 20, // Adjust as needed
+                                            fontSize: 20,
                                           ),
                                         ),
                                       ),

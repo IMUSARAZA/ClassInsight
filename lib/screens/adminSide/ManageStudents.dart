@@ -190,21 +190,14 @@ class ManageStudents extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
                     child: Text(
                       'Students',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 30, // Adjust as needed
-                        fontWeight: FontWeight.w900,
-                      ),
+                      style: Font_Styles.mediumHeadingBold(context),
                     ),
                   ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
                     child: Text(
                       'Class',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 15, // Adjust as needed
-                      ),
+                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.04),
                     ),
                   ),
                   Padding(
@@ -268,101 +261,61 @@ class ManageStudents extends StatelessWidget {
                             DataColumn(
                               label: Text(
                                 'Roll No.',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Student Name',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Gender',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Father Name',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Father Phone',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Father CNIC',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Fee Status',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Result',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Edit',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                             DataColumn(
                               label: Text(
                                 'Delete',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
                               ),
                             ),
                           ],
@@ -375,61 +328,37 @@ class ManageStudents extends StatelessWidget {
                                     DataCell(
                                       Text(
                                         student.studentRollNo,
-                                        style: TextStyle(
-                                          fontSize:
-                                              MediaQuery.of(context).size.width *
-                                                  0.03,
-                                        ),
+                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
                                       ),
                                     ),
                                     DataCell(
                                       Text(
                                         student.name,
-                                        style: TextStyle(
-                                          fontSize:
-                                              MediaQuery.of(context).size.width *
-                                                  0.03,
-                                        ),
+                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
                                       ),
                                     ),
                                     DataCell(
                                       Text(
                                         student.gender,
-                                        style: TextStyle(
-                                          fontSize:
-                                              MediaQuery.of(context).size.width *
-                                                  0.03,
-                                        ),
+                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
                                       ),
                                     ),
                                     DataCell(
                                       Text(
                                         student.fatherName,
-                                        style: TextStyle(
-                                          fontSize:
-                                              MediaQuery.of(context).size.width *
-                                                  0.03,
-                                        ),
+                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
                                       ),
                                     ),
                                     DataCell(
                                       Text(
                                         student.fatherPhoneNo,
-                                        style: TextStyle(
-                                          fontSize:
-                                              MediaQuery.of(context).size.width *
-                                                  0.03,
-                                        ),
+                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
                                       ),
                                     ),
                                     DataCell(
                                       Text(
                                         student.fatherCNIC,
-                                        style: TextStyle(
-                                          fontSize:
-                                              MediaQuery.of(context).size.width *
-                                                  0.03,
-                                        ),
+                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
                                       ),
                                     ),
                                     DataCell(
@@ -446,8 +375,6 @@ class ManageStudents extends StatelessWidget {
                                           color: Colors.white,
                                         ),
                                         onPressed: () {
-                                          print(
-                                              "Result button pressed for student: ${student.name}");
                                           Navigator.pushNamed(
                                             context,
                                             '/StudentResult',

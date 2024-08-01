@@ -9,12 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/utils/AppColors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 
 
 class AddStudentController extends GetxController {
-  // TextEditingController instances
   final nameController = TextEditingController();
   final bFormChallanIdController = TextEditingController();
   final fatherNameController = TextEditingController();
@@ -24,7 +24,6 @@ class AddStudentController extends GetxController {
 
   final AdminHomeController school = Get.find();
 
-  // Observables for validation
   var nameValid = true.obs;
   var genderValid = true.obs;
   var bFormChallanIdValid = true.obs;
@@ -34,22 +33,28 @@ class AddStudentController extends GetxController {
   var studentRollNoValid = true.obs;
   var selectedClassValid = true.obs;
 
-  // Observable for selected values
   var selectedGender = ''.obs;
   var selectedClass = ''.obs;
 
-  // Fetch classes from the database
   Future<List<String>> fetchClasses() async {
     return await Database_Service.fetchAllClasses(school.schoolId.value);
   }
 
+  String capitalizeName(String name) {
+    List<String> parts = name.split(' ');
+    return parts.map((part) => _capitalize(part)).join(' ');
+  }
+
+  String _capitalize(String word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
+  }
+
 
   bool validateInputs() {
-    // Regular expressions for validation
     RegExp numeric13Digits = RegExp(r'^\d{13}$');
     RegExp numeric11Digits = RegExp(r'^\d{11}$');
 
-    // Validate each field
     nameValid.value = nameController.text.isNotEmpty;
     genderValid.value = selectedGender.value.isNotEmpty;
     bFormChallanIdValid.value = bFormChallanIdController.text.isNotEmpty;
@@ -68,7 +73,6 @@ class AddStudentController extends GetxController {
     studentRollNoValid.value = studentRollNoController.text.isNotEmpty;
     selectedClassValid.value = selectedClass.value.isNotEmpty;
 
-    // Return overall validation status
     return nameValid.value &&
         genderValid.value &&
         bFormChallanIdValid.value &&
@@ -80,8 +84,12 @@ class AddStudentController extends GetxController {
   }
 
   Future<void> addStudent() async {
+
+    String capitalizedName = capitalizeName(nameController.text);
+    
+    String capitalizedFatherName = capitalizeName(fatherNameController.text);
+
     if (validateInputs()) {
-      // Show loading dialog
       Get.dialog(
         Center(
           child: Container(
@@ -101,10 +109,9 @@ class AddStudentController extends GetxController {
                 SizedBox(height: 20),
                 Text(
                   'Adding student...',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     color: AppColors.appLightBlue,
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -114,24 +121,22 @@ class AddStudentController extends GetxController {
         barrierDismissible: false,
       );
 
-      // Create a new Student object
       final student = Student(
-        name: nameController.text,
+        name: capitalizedName,
         gender: selectedGender.value,
         bFormChallanId: bFormChallanIdController.text,
-        fatherName: fatherNameController.text,
+        fatherName: capitalizedFatherName,
         fatherPhoneNo: fatherPhoneNoController.text,
         fatherCNIC: fatherCNICController.text,
         studentRollNo: studentRollNoController.text,
-        studentID: '', // This will be assigned by Firestore
+        studentID: '', 
         classSection: selectedClass.value,
         feeStatus: '-',
         feeStartDate: '-',
         feeEndDate: '-',
-        resultMap: {}, // Initialize resultMap here as an empty map
+        resultMap: {},
       );
 
-      // Call the database service to save the student
       Database_Service databaseService = Database_Service();
       await databaseService.saveStudent(
         school.schoolId.value,
@@ -141,7 +146,7 @@ class AddStudentController extends GetxController {
       
       
       Get.back(); 
-      Get.back(result: selectedClass.value); // Navigate back with the result
+      Get.back(result: selectedClass.value); 
     }
   }
 }
@@ -203,7 +208,7 @@ class AddStudent extends StatelessWidget {
                       title: Center(
                         child: Text(
                           'Add Student',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.black,
                             fontSize: addStdFontSize,
                             fontWeight: FontWeight.w600,
@@ -224,7 +229,7 @@ class AddStudent extends StatelessWidget {
                     child: Text(
                       'Add New Student',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: headingFontSize,
                         fontWeight: FontWeight.w700,
                       ),

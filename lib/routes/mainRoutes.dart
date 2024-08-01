@@ -23,6 +23,7 @@ import 'package:classinsight/screens/onBoarding.dart';
 import 'package:classinsight/screens/parentSide/ParentDashboard.dart';
 import 'package:classinsight/screens/parentSide/ParentLogin.dart';
 import 'package:classinsight/screens/parentSide/viewAttendance.dart';
+import 'package:classinsight/screens/parentSide/viewTimetable.dart';
 import 'package:classinsight/screens/teacherSide/TeacherDashboard.dart';
 import 'package:classinsight/screens/teacherSide/MarkAttendance.dart';
 import 'package:classinsight/screens/teacherSide/MarksScreen.dart';
@@ -141,6 +142,10 @@ class MainRoutes {
     GetPage(
       name: "/ViewAttendance",
       page: () => ViewAttendance(),
+    ),
+    GetPage(
+      name: "/ViewTimetable",
+      page: () => ViewTimetable(),
     ),
   ];
 }

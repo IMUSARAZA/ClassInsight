@@ -9,11 +9,14 @@ import 'package:get/get_rx/get_rx.dart';
 
 class AttendanceController extends GetxController {
   TextEditingController datepicker = TextEditingController();
+  TextEditingController remarkscontroller =  TextEditingController();
   RxList<Student> studentsList = RxList<Student>();
   RxString selectedHeaderValue = ''.obs;
   final arguments = Get.arguments as List;
   RxString schoolId = ''.obs;
   RxString selectedClass = ''.obs;
+
+  
 
   @override
   void onInit() {
@@ -70,6 +73,8 @@ class AttendanceController extends GetxController {
     }
     return studentStatusMap;
   }
+
+
 }
 
 class MarkAttendance extends StatelessWidget {
@@ -88,11 +93,12 @@ class MarkAttendance extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              if (controller.selectedHeaderValue.value.isEmpty) {
-                Get.snackbar("Attendance unmarked", 'Kindly mark the attendance for submission');
-              } else {
+              // if (controller.selectedHeaderValue.value.isEmpty) {
+              //   Get.snackbar("Attendance unmarked", 'Kindly mark the attendance for submission');
+              // } else {
+              //   await Database_Service.updateAttendance(controller.schoolId.value, controller.getStudentStatusMap(), controller.datepicker.text);
+              // }
                 await Database_Service.updateAttendance(controller.schoolId.value, controller.getStudentStatusMap(), controller.datepicker.text);
-              }
             },
             child: Text('Submit', style: Font_Styles.labelHeadingRegular(context, color: Colors.black)),
           ),
@@ -137,6 +143,7 @@ class MarkAttendance extends StatelessWidget {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: DataTable(
+                      sortColumnIndex: 1,
                       dataRowColor: MaterialStateColor.resolveWith((states) => AppColors.appDarkBlue),
                       columns: [
                         DataColumn(
@@ -197,6 +204,8 @@ class MarkAttendance extends StatelessWidget {
                             ],
                           ),
                         ),
+                        DataColumn(
+                          label:Text('Remarks',style: Font_Styles.labelHeadingRegular(context),))
                       ],
                       rows: controller.studentsList.asMap().entries.map((entry) {
                         int index = entry.key;
@@ -240,6 +249,60 @@ class MarkAttendance extends StatelessWidget {
                                 },
                               ),
                             ),
+
+                            DataCell(
+                             IconButton(
+                              icon: Icon(FontAwesomeIcons.bell,color: AppColors.appPink,),
+                              onPressed: () async {
+                                await showAdaptiveDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text('Remarks'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(student.name ,style: TextStyle(fontWeight: FontWeight.bold)),
+                                          SizedBox(height: 16),
+                                          TextField(
+                                            controller: controller.remarkscontroller,
+                                            maxLines: 3,
+                                            decoration: InputDecoration(
+                                              labelText: 'Write your remarks',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Get.back(); 
+                                          },
+                                          child: Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            String remarks = controller.remarkscontroller.text;
+                                            if (remarks.isNotEmpty) {
+                                              print('Remarks for ${student.name}: $remarks');
+                                              await Database_Service.createAnnouncement(controller.schoolId.value, student.studentID, remarks, 'Teacher', false);
+
+                                              Get.back();
+                                            } else {
+                                              Get.snackbar('Error', 'Please enter some remarks before submitting.');
+                                            }
+                                          },
+                                          child: Text('Submit'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                             
+                             )
+                              )
                           ],
                         );
                       }).toList(),

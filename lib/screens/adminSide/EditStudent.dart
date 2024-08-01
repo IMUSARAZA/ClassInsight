@@ -20,7 +20,7 @@ class EditStudent extends StatelessWidget {
 
     return GetBuilder<EditStudentController>(
       init: EditStudentController(
-          student), // Initialize the controller with student data
+          student),
       builder: (controller) {
         return Scaffold(
           backgroundColor: AppColors.appLightBlue,
@@ -52,13 +52,17 @@ class EditStudent extends StatelessWidget {
                             },
                           );
 
+                          String capitalizedName = capitalizeName(controller.nameController.text);
+                          String capitalizedFatherName =capitalizeName(controller
+                                            .fatherNameController.text);
+
                           Map<String, dynamic> updatedData = {
-                            'Name': controller.nameController.text,
+                            'Name': capitalizedName,
                             'Gender': controller.changedGender,
                             'BForm_challanId':
                                 controller.bForm_challanIdController.text,
                             'FatherName':
-                                controller.fatherNameController.text,
+                                capitalizedFatherName,
                             'FatherPhoneNo':
                                 controller.fatherPhoneNoController.text,
                             'FatherCNIC':
@@ -82,11 +86,7 @@ class EditStudent extends StatelessWidget {
                         },
                         child: Text(
                           'Save',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Font_Styles.cardLabel(context),
                         ),
                       ),
             ],
@@ -199,11 +199,7 @@ class EditStudent extends StatelessWidget {
                     child: Text(
                       'Edit Student',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize:
-                            33,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: Font_Styles.cardLabel(context),
                     ),
                   ),
                   Expanded(
@@ -279,19 +275,12 @@ class EditStudent extends StatelessWidget {
                                             )
                                           : Text(
                                               student.name.split(' ')[0],
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize:
-                                                    25, // nameFontSize is removed for simplification
-                                              ),
+                                              style: Font_Styles.labelHeadingLight(context),
                                             ),
                                     ),
                                     Text(
                                       student.studentRollNo,
-                                      style: TextStyle(
-                                        fontSize:
-                                            22, // rollNoFontSize is removed for simplification
-                                      ),
+                                      style: Font_Styles.labelHeadingLight(context),
                                     ),
                                   ],
                                 ),
@@ -535,6 +524,9 @@ class EditStudentController extends GetxController {
     fatherCNICValid = true;
 
     classesList = Database_Service.fetchAllClasses(school.schoolId.value);
+
+
+  
   }
 
   void toggleEditingName() {
@@ -558,3 +550,14 @@ class EditStudentController extends GetxController {
     update();
   }
 }
+
+
+  String capitalizeName(String name) {
+    List<String> parts = name.split(' ');
+    return parts.map((part) => _capitalize(part)).join(' ');
+  }
+
+  String _capitalize(String word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
+  }

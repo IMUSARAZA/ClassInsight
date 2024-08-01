@@ -142,7 +142,7 @@ class MakeAnnouncements extends StatelessWidget {
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                       ),
-                      style: const TextStyle(color: Colors.black),
+                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.04),
                     ),
                   ),
                 ),

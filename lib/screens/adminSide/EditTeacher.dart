@@ -252,10 +252,7 @@ class EditTeacher extends StatelessWidget {
                     child: Text(
                       'Edit Teacher',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: controller.headingFontSize,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: Font_Styles.dataTableTitle(context, controller.headingFontSize)
                     ),
                   ),
                 ),
@@ -296,12 +293,8 @@ class EditTeacher extends StatelessWidget {
                                       Expanded(
                                         child: Obx(() => Text(
                                               controller.name.value,
-                                              style: TextStyle(
-                                                fontSize:
-                                                    controller.headingFontSize -
-                                                        10,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                              style: Font_Styles.dataTableTitle(context, controller.headingFontSize -
+                                                        10),
                                               softWrap: true,
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
@@ -322,10 +315,7 @@ class EditTeacher extends StatelessWidget {
                                       const EdgeInsets.fromLTRB(0, 0, 30, 0),
                                   child: Text(
                                     controller.teacher!.empID,
-                                    style: TextStyle(
-                                      fontSize: controller.addStdFontSize,
-                                      fontWeight: FontWeight.normal,
-                                    ),
+                                    style: Font_Styles.dataTableTitle(context, controller.addStdFontSize),
                                   ),
                                 ),
                               ],
@@ -336,10 +326,7 @@ class EditTeacher extends StatelessWidget {
                                 30, 0, 60, screenHeight * 0.01),
                             child: Text(
                               'Classes Teacher: ${controller.teacher!.classTeacher}',
-                              style: TextStyle(
-                                fontSize: controller.addStdFontSize,
-                                fontWeight: FontWeight.normal,
-                              ),
+                              style: Font_Styles.dataTableTitle(context, controller.addStdFontSize),
                             ),
                           ),
                           Padding(
@@ -347,10 +334,7 @@ class EditTeacher extends StatelessWidget {
                                 30, 0, 60, screenHeight * 0.04),
                             child: Text(
                               'Classes & Subjects: ${controller.teacher!.subjects}',
-                              style: TextStyle(
-                                fontSize: controller.addStdFontSize,
-                                fontWeight: FontWeight.normal,
-                              ),
+                              style: Font_Styles.dataTableTitle(context, controller.addStdFontSize),
                             ),
                           ),
                           Padding(
@@ -467,31 +451,23 @@ class EditTeacher extends StatelessWidget {
                                         Icons.class_,
                                         color: Colors.black,
                                       ),
-                                      buttonText: const Text(
+                                      buttonText: Text(
                                         "Class to Assign",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
+                                        style: Font_Styles.labelHeadingRegular(context),
                                       ),
                                       checkColor: Colors.white,
-                                      cancelText: const Text(
+                                      cancelText: Text(
                                         "CANCEL",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
+                                        style: Font_Styles.labelHeadingRegular(context),
                                       ),
-                                      confirmText: const Text(
+                                      confirmText: Text(
                                         "OK",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
+                                        style: Font_Styles.labelHeadingRegular(context),
                                       ),
                                       initialValue: controller
                                           .selectedClasses,
                                       onConfirm: (results) {
+                                        controller.selectedClasses.clear();
                                         controller.selectedClasses
                                             .assignAll(results);
                                       },
@@ -538,25 +514,16 @@ class EditTeacher extends StatelessWidget {
                                                   ),
                                                   buttonText: Text(
                                                     "Select Subjects for $className",
-                                                    style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                    ),
+                                                    style: Font_Styles.labelHeadingRegular(context),
                                                   ),
                                                   selectedColor: Colors.black,
-                                                  cancelText: const Text(
+                                                  cancelText: Text(
                                                     "CANCEL",
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                    ),
+                                                    style: Font_Styles.labelHeadingRegular(context),
                                                   ),
-                                                  confirmText: const Text(
+                                                  confirmText: Text(
                                                     "OK",
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                    ),
+                                                    style: Font_Styles.labelHeadingRegular(context),
                                                   ),
                                                   checkColor: Colors.white,
                                                   initialValue: controller
@@ -564,6 +531,7 @@ class EditTeacher extends StatelessWidget {
                                                           className] ??
                                                       [],
                                                   onConfirm: (results) {
+                                                    controller.selectedSubjects.clear();
                                                     controller.selectedSubjects[
                                                             className] =
                                                         results
