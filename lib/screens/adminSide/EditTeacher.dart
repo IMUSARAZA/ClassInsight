@@ -1,7 +1,7 @@
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
@@ -41,22 +41,24 @@ class EditTeacherController extends GetxController {
   var nameValid = true.obs;
   var fatherNameValid = true.obs;
   var phoneNoValid = true.obs;
-  AdminHomeController school = Get.put(AdminHomeController());
   RxString schoolId = ''.obs;
   var selectedGender = ''.obs;
   var selectedClassTeacher = ''.obs;
   var existingClassTeacher = ''.obs;
-  Teacher? teacher;
+  late School school;
+  late Teacher teacher;
   var addStdFontSize = 16.0;
   var headingFontSize = 33.0;
   var isLoading = true.obs;
+  List arguments = Get.arguments;
 
   @override
   void onInit() {
     super.onInit();
-    teacher = Get.arguments;
-    schoolId.value = school.schoolId.value;
-    initializeData(teacher!);
+    teacher = arguments[0] as Teacher;
+    school = arguments[1] as School;
+    schoolId.value = school.schoolId;
+    initializeData(teacher);
     fetchClassesAndSubjects();
   }
 
@@ -219,7 +221,7 @@ class EditTeacher extends StatelessWidget {
 
                             Database_Service.updateTeacher(
                                 controller.schoolId.value,
-                                controller.teacher!.empID,
+                                controller.teacher.empID,
                                 capitalizedName,
                                 controller.selectedGender.value,
                                 controller.emailController.text,
@@ -314,7 +316,7 @@ class EditTeacher extends StatelessWidget {
                                   padding:
                                       const EdgeInsets.fromLTRB(0, 0, 30, 0),
                                   child: Text(
-                                    controller.teacher!.empID,
+                                    controller.teacher.empID,
                                     style: Font_Styles.dataTableTitle(context, controller.addStdFontSize),
                                   ),
                                 ),
@@ -325,7 +327,7 @@ class EditTeacher extends StatelessWidget {
                             padding: EdgeInsets.fromLTRB(
                                 30, 0, 60, screenHeight * 0.01),
                             child: Text(
-                              'Classes Teacher: ${controller.teacher!.classTeacher}',
+                              'Classes Teacher: ${controller.teacher.classTeacher}',
                               style: Font_Styles.dataTableTitle(context, controller.addStdFontSize),
                             ),
                           ),
@@ -333,7 +335,7 @@ class EditTeacher extends StatelessWidget {
                             padding: EdgeInsets.fromLTRB(
                                 30, 0, 60, screenHeight * 0.04),
                             child: Text(
-                              'Classes & Subjects: ${controller.teacher!.subjects}',
+                              'Classes & Subjects: ${controller.teacher.subjects}',
                               style: Font_Styles.dataTableTitle(context, controller.addStdFontSize),
                             ),
                           ),

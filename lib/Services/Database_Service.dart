@@ -10,7 +10,6 @@ class Database_Service extends GetxService {
   Future<void> saveStudent(
       String schoolID, String classSection, Student student) async {
     try {
-      // Reference to the Students collection
       CollectionReference studentsRef = FirebaseFirestore.instance
           .collection('Schools')
           .doc(schoolID)
@@ -20,15 +19,12 @@ class Database_Service extends GetxService {
       student.studentID = studentDoc.id;
       await studentDoc.update({
         'StudentID': student.studentID,
-      }); // Update studentID in Firestore document
+      }); 
 
-      // Fetch subjects for the selected class
       List<String> subjects = await fetchSubjects(schoolID, classSection);
 
-      // Fetch exam types for the selected class
       List<String> examTypes = await fetchExamStructure(schoolID, classSection);
 
-      // Initialize resultMap with subjects and exam types
       Map<String, Map<String, dynamic>> resultMap = {};
       for (String subject in subjects) {
         resultMap[subject] = {};
@@ -37,13 +33,12 @@ class Database_Service extends GetxService {
         }
       }
 
-      // Update the student document with resultMap
       await studentDoc.update({'resultMap': resultMap});
 
       print('Student saved successfully with ID: ${student.studentID}');
     } catch (e) {
       print('Error saving student: $e');
-      // Handle errors appropriately, e.g., show error message
+      
     }
   }
 
@@ -110,7 +105,6 @@ class Database_Service extends GetxService {
   Future<List<String>> fetchExamStructure(
       String schoolID, String className) async {
     try {
-      // Reference to the class collection
       QuerySnapshot classQuery = await FirebaseFirestore.instance
           .collection('Schools')
           .doc(schoolID)
@@ -119,14 +113,11 @@ class Database_Service extends GetxService {
           .get();
 
       if (classQuery.size > 0) {
-        // Assuming className is unique or you're interested in the first match
         DocumentSnapshot classDoc = classQuery.docs.first;
 
-        // Safely access and cast examType field
         List<dynamic>? examTypes = classDoc.get('examTypes');
 
         if (examTypes != null) {
-          // Convert dynamic list to List<String>
           List<String> examTypesList = examTypes.cast<String>();
           return examTypesList;
         } else {
@@ -135,7 +126,6 @@ class Database_Service extends GetxService {
           return [];
         }
       } else {
-        // No document found for the given className
         print('Class document not found for $className in school $schoolID.');
         return [];
       }
@@ -581,39 +571,30 @@ class Database_Service extends GetxService {
   static Future<String> fetchCounts(
       String schoolName, String collectionName) async {
     try {
-      // Access the Schools collection
       CollectionReference schoolsRef =
           FirebaseFirestore.instance.collection('Schools');
 
-      // Query to find the school document
       QuerySnapshot schoolSnapshot =
           await schoolsRef.where('SchoolName', isEqualTo: schoolName).get();
 
-      // Check if the school document exists
       if (schoolSnapshot.docs.isEmpty) {
         print('School with name $schoolName not found');
         return "0";
       }
 
-      // Get a reference to the school document
       DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
 
-      // Access the specified collection within the school document
       CollectionReference teachersRef = schoolDocRef.collection(collectionName);
 
-      // Check if the collection exists by querying its size
       QuerySnapshot teachersSnapshot = await teachersRef.limit(1).get();
 
-      // Return the count of documents in the collection if it exists
       if (teachersSnapshot.docs.isEmpty) {
         return "0";
       } else {
-        // Get the total count of documents in the collection
         QuerySnapshot fullSnapshot = await teachersRef.get();
         return fullSnapshot.size.toString();
       }
     } catch (e) {
-      // Print the error and return a fallback value
       print('Error fetching count from collection $collectionName: $e');
       return "0";
     }
@@ -1017,23 +998,18 @@ class Database_Service extends GetxService {
   static Future<void> updateAttendance(
       String schoolId, Map<String, String> studentStatusMap, String day) async {
     try {
-      // Create a new batch
       WriteBatch batch = FirebaseFirestore.instance.batch();
 
-      // Loop through the studentStatusMap to get studentId and their status
       studentStatusMap.forEach((studentId, status) {
-        // Reference to the specific student's document
         DocumentReference studentRef = FirebaseFirestore.instance
             .collection('Schools')
             .doc(schoolId)
             .collection('Students')
             .doc(studentId);
 
-        // Add the update operation to the batch
         batch.update(studentRef, {'attendance.$day': status});
       });
 
-      // Commit the batch
       await batch.commit();
 
       Get.back();
@@ -1134,7 +1110,6 @@ class Database_Service extends GetxService {
     List<String> uniqueSubjects = [];
 
     try {
-      // Query the teacher documents where 'EmployeeID' matches the given employeeId
       QuerySnapshot teacherSnapshot = await firestore
           .collection('Schools')
           .doc(schoolId)
@@ -1143,19 +1118,15 @@ class Database_Service extends GetxService {
           .get();
 
       if (teacherSnapshot.docs.isNotEmpty) {
-        // Assuming there is only one document with the given EmployeeID
         DocumentSnapshot teacherDoc = teacherSnapshot.docs.first;
 
-        // Cast data to Map<String, dynamic>
         Map<String, dynamic>? data = teacherDoc.data() as Map<String, dynamic>?;
 
         if (data != null) {
-          // Extract subjects map from the data
           Map<String, dynamic>? subjectsMap =
               data['Subjects'] as Map<String, dynamic>?;
 
           if (subjectsMap != null) {
-            // Extract unique subjects
             print(subjectsMap);
             Set<String> subjectsSet = {};
 
@@ -1166,7 +1137,7 @@ class Database_Service extends GetxService {
             });
 
             uniqueSubjects = subjectsSet.toList();
-            uniqueSubjects.sort(); // Optional: Sort subjects alphabetically
+            uniqueSubjects.sort(); 
           }
         }
       } else {
