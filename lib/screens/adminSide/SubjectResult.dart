@@ -14,7 +14,7 @@ class SubjectResultController extends GetxController {
   var studentsList = <Student>[].obs;
   var examsList = <String>[].obs;
 
-  var selectedClass = '2-A'.obs;
+  var selectedClass = ''.obs;
   var selectedSubject = ''.obs;
 
   Database_Service databaseService = Database_Service();

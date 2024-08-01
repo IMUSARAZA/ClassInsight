@@ -471,6 +471,7 @@ void _showFeeStatusPopup(BuildContext context, Student student) {
 
   showDialog(
     context: context,
+    barrierDismissible: false,
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text('Update Fee Status'),
@@ -542,7 +543,7 @@ void _showFeeStatusPopup(BuildContext context, Student student) {
           TextButton(
             child: Text('Cancel'),
             onPressed: () {
-              Navigator.of(context).pop();
+              Get.back();
             },
           ),
           TextButton(

@@ -16,7 +16,6 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     await GetStorage.init();
-    Get.put(AdminHomeController());
   } catch (e) {
   }
   runApp(const MyApp());

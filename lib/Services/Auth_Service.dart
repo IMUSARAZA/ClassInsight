@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 
@@ -19,10 +20,12 @@ class Auth_Service {
 static FirebaseAuth auth = FirebaseAuth.instance;
 
 static Future<void> loginAdmin(String email, String password, School school) async {
+  GetStorage storage = GetStorage();
 
   try {
       print("HEREEE" + school.schoolId);
       if (school.adminEmail == email) {
+        await storage.erase();
         print("HWEFBHEBH"+school.schoolId);
 
         Get.snackbar('Logging In', '',
@@ -36,9 +39,9 @@ static Future<void> loginAdmin(String email, String password, School school) asy
           email: email,
           password: password,
         );
-
         Get.offAllNamed('/AdminHome', arguments: school);
-        Get.snackbar('Logged in Successfully', "Welcome, Admin - ${school.name}");
+        Get.snackbar('Logged in Successfully', "Welcome, Admin - ${school.name}",duration: Duration(seconds: 1));
+        // print(userCredential);
 
         print("Logged IN");
       } else {

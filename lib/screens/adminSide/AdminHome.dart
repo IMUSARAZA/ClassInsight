@@ -364,7 +364,7 @@ class AdminHome extends StatelessWidget {
                               ShadowButton(
                                 text: "Manage Teachers",
                                 onTap: () {
-                                  Get.toNamed("/ManageTeachers", arguments: _controller.school.value);
+                                  Get.toNamed("/ManageTeachers");
                                 },
                               ),
                             ],
