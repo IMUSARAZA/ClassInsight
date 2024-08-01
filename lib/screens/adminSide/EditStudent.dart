@@ -16,79 +16,92 @@ class EditStudent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     final AdminHomeController school = Get.put(AdminHomeController());
 
+    var headingFontSize = 33.0;
+
+    if (screenWidth < 350) {
+      headingFontSize = 27.0;
+    }
+    if (screenWidth < 300) {
+      headingFontSize = 24.0;
+    }
+    if (screenWidth < 250) {
+      headingFontSize = 20.0;
+    }
+    if (screenWidth < 230) {
+      headingFontSize = 15.0;
+    }
+
     return GetBuilder<EditStudentController>(
-      init: EditStudentController(
-          student),
+      init: EditStudentController(student),
       builder: (controller) {
         return Scaffold(
           backgroundColor: AppColors.appLightBlue,
-
           appBar: AppBar(
             backgroundColor: AppColors.appLightBlue,
-            title: Text("Edit Student", style: Font_Styles.labelHeadingRegular(context),),
+            title: Text(
+              "Edit Student",
+              style: Font_Styles.labelHeadingRegular(context),
+            ),
             centerTitle: true,
             actions: [
               TextButton(
-                        onPressed: () async {
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return Center(
-                                child: Container(
-                                  color: Colors.white,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      valueColor:
-                                          AlwaysStoppedAnimation<Color>(
-                                        AppColors.appLightBlue,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-
-                          String capitalizedName = capitalizeName(controller.nameController.text);
-                          String capitalizedFatherName =capitalizeName(controller
-                                            .fatherNameController.text);
-
-                          Map<String, dynamic> updatedData = {
-                            'Name': capitalizedName,
-                            'Gender': controller.changedGender,
-                            'BForm_challanId':
-                                controller.bForm_challanIdController.text,
-                            'FatherName':
-                                capitalizedFatherName,
-                            'FatherPhoneNo':
-                                controller.fatherPhoneNoController.text,
-                            'FatherCNIC':
-                                controller.fatherCNICController.text,
-                            'StudentRollNo': student.studentRollNo,
-                            'ClassSection': controller.changedClass,
-                          };
-
-                          print("updated data: $updatedData");
-
-                          await Database_Service.updateStudent(
-                            school.schoolId.value,
-                            student.studentID,
-                            updatedData,
-                          ).whenComplete(() => Get.back(result: "student_added"));
-                          
-
-                          Get.back(result: "student_added");
-                          Get.snackbar("Edits Saved", "Refresh to see the changes");
-                          
-                        },
-                        child: Text(
-                          'Save',
-                          style: Font_Styles.cardLabel(context),
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return Center(
+                        child: Container(
+                          color: Colors.white,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.appLightBlue,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                      );
+                    },
+                  );
+
+                  String capitalizedName =
+                      capitalizeName(controller.nameController.text);
+                  String capitalizedFatherName =
+                      capitalizeName(controller.fatherNameController.text);
+
+                  Map<String, dynamic> updatedData = {
+                    'Name': capitalizedName,
+                    'Gender': controller.changedGender,
+                    'BForm_challanId':
+                        controller.bForm_challanIdController.text,
+                    'FatherName': capitalizedFatherName,
+                    'FatherPhoneNo': controller.fatherPhoneNoController.text,
+                    'FatherCNIC': controller.fatherCNICController.text,
+                    'StudentRollNo': student.studentRollNo,
+                    'ClassSection': controller.changedClass,
+                  };
+
+                  print("updated data: $updatedData");
+
+                  await Database_Service.updateStudent(
+                    school.schoolId.value,
+                    student.studentID,
+                    updatedData,
+                  ).whenComplete(() => Get.back(result: "student_added"));
+
+                  Get.back(result: "student_added");
+                  Get.snackbar("Edits Saved", "Refresh to see the changes");
+                },
+                child: Text(
+                  "Update",
+                  style: Font_Styles.labelHeadingLight(context),
+                ),
+              ),
             ],
           ),
           body: Container(
@@ -104,103 +117,15 @@ class EditStudent extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.appLightBlue,
                     ),
-                    // child: Row(
-                    //   mainAxisAlignment: MainAxisAlignment.end,
-                    //   children: [
-                    //     // Padding(
-                    //     //   padding: EdgeInsets.only(top: 20),
-                    //     //   child: IconButton(
-                    //     //     icon: const Icon(Icons.arrow_back),
-                    //     //     onPressed: () {
-                    //     //       Get.back();
-                    //     //       // Navigator.of(context).pop();
-                    //     //     },
-                    //     //   ),
-                    //     // ),
-                    //     Padding(
-                    //       padding: EdgeInsets.only(top: 20,),
-                    //       child: Text(
-                    //         'Edit Student',
-                    //         style: TextStyle(
-                    //           color: Colors.black,
-                    //           fontSize:
-                    //               16,
-                    //           fontWeight: FontWeight.w600,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //     Padding(
-                    //       padding: EdgeInsets.only(top: 20),
-                    //       child: TextButton(
-                    //         onPressed: () async {
-                    //           showDialog(
-                    //             context: context,
-                    //             barrierDismissible: false,
-                    //             builder: (BuildContext context) {
-                    //               return Center(
-                    //                 child: Container(
-                    //                   color: Colors.white,
-                    //                   child: Center(
-                    //                     child: CircularProgressIndicator(
-                    //                       valueColor:
-                    //                           AlwaysStoppedAnimation<Color>(
-                    //                         AppColors.appLightBlue,
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                 ),
-                    //               );
-                    //             },
-                    //           );
-
-                    //           Map<String, dynamic> updatedData = {
-                    //             'Name': controller.nameController.text,
-                    //             'Gender': controller.changedGender,
-                    //             'BForm_challanId':
-                    //                 controller.bForm_challanIdController.text,
-                    //             'FatherName':
-                    //                 controller.fatherNameController.text,
-                    //             'FatherPhoneNo':
-                    //                 controller.fatherPhoneNoController.text,
-                    //             'FatherCNIC':
-                    //                 controller.fatherCNICController.text,
-                    //             'StudentRollNo': student.studentRollNo,
-                    //             'ClassSection': controller.changedClass,
-                    //           };
-
-                    //           print("updated data: $updatedData");
-
-                    //           await Database_Service.updateStudent(
-                    //             school.schoolId.value,
-                    //             student.studentID,
-                    //             updatedData,
-                    //           );
-
-                              
-                    //           Get.back();
-                    //         },
-                    //         child: Text(
-                    //           'Save',
-                    //           style: TextStyle(
-                    //             color: Colors.black,
-                    //             fontSize: 16,
-                    //             fontWeight: FontWeight.w600,
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                   ),
                   Container(
                     height: MediaQuery.of(context).size.height * 0.08,
                     width: MediaQuery.of(context).size.width,
                     margin: const EdgeInsets.only(top: 50),
-                    child: Text(
-                      'Edit Student',
-                      textAlign: TextAlign.center,
-                      style: Font_Styles.cardLabel(context),
-                    ),
+                    child: Text('Edit Student',
+                        textAlign: TextAlign.center,
+                        style: Font_Styles.dataTableTitle(
+                            context, headingFontSize)),
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -275,12 +200,14 @@ class EditStudent extends StatelessWidget {
                                             )
                                           : Text(
                                               student.name.split(' ')[0],
-                                              style: Font_Styles.labelHeadingLight(context),
+                                              style: TextStyle(fontSize: headingFontSize/1.5, fontWeight: FontWeight.w400),
+                                                  
+                                                      
                                             ),
                                     ),
                                     Text(
                                       student.studentRollNo,
-                                      style: Font_Styles.labelHeadingLight(context),
+                                      style: TextStyle(fontSize: headingFontSize/1.5, fontWeight: FontWeight.w400),
                                     ),
                                   ],
                                 ),
@@ -422,6 +349,7 @@ class EditStudent extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              SizedBox(height: 5),
                               Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(30, 0, 30, 20),
@@ -433,6 +361,7 @@ class EditStudent extends StatelessWidget {
                                   isValid: controller.bForm_challanIdValid,
                                 ),
                               ),
+                              SizedBox(height: 5),
                               Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(30, 0, 30, 20),
@@ -443,6 +372,7 @@ class EditStudent extends StatelessWidget {
                                   isValid: controller.fatherNameValid,
                                 ),
                               ),
+                              SizedBox(height: 5),
                               Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(30, 0, 30, 20),
@@ -454,6 +384,7 @@ class EditStudent extends StatelessWidget {
                                   isValid: controller.fatherPhoneNoValid,
                                 ),
                               ),
+                              SizedBox(height: 5),
                               Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(30, 0, 30, 20),
@@ -524,9 +455,6 @@ class EditStudentController extends GetxController {
     fatherCNICValid = true;
 
     classesList = Database_Service.fetchAllClasses(school.schoolId.value);
-
-
-  
   }
 
   void toggleEditingName() {
@@ -551,13 +479,12 @@ class EditStudentController extends GetxController {
   }
 }
 
+String capitalizeName(String name) {
+  List<String> parts = name.split(' ');
+  return parts.map((part) => _capitalize(part)).join(' ');
+}
 
-  String capitalizeName(String name) {
-    List<String> parts = name.split(' ');
-    return parts.map((part) => _capitalize(part)).join(' ');
-  }
-
-  String _capitalize(String word) {
-    if (word.isEmpty) return word;
-    return word[0].toUpperCase() + word.substring(1).toLowerCase();
-  }
+String _capitalize(String word) {
+  if (word.isEmpty) return word;
+  return word[0].toUpperCase() + word.substring(1).toLowerCase();
+}

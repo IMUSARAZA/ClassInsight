@@ -4,41 +4,107 @@ import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:classinsight/models/StudentModel.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Database_Service extends GetxService {
-  Future<void> saveStudent(
-      String schoolID, String classSection, Student student) async {
+  // Future<void> saveStudent(
+  //     String schoolID, String classSection, Student student) async {
+  //   try {
+  //     CollectionReference studentsRef = FirebaseFirestore.instance
+  //         .collection('Schools')
+  //         .doc(schoolID)
+  //         .collection('Students');
+
+  //     DocumentReference studentDoc = await studentsRef.add(student.toMap());
+  //     student.studentID = studentDoc.id;
+  //     await studentDoc.update({
+  //       'StudentID': student.studentID,
+  //     });
+
+  //     List<String> subjects = await fetchSubjects(schoolID, classSection);
+
+  //     List<String> examTypes = await fetchExamStructure(schoolID, classSection);
+
+  //     Map<String, Map<String, dynamic>> resultMap = {};
+  //     for (String subject in subjects) {
+  //       resultMap[subject] = {};
+  //       for (String examType in examTypes) {
+  //         resultMap[subject]![examType] = '-';
+  //       }
+  //     }
+
+  //     await studentDoc.update({'resultMap': resultMap});
+
+  //     print('Student saved successfully with ID: ${student.studentID}');
+  //   } catch (e) {
+  //     print('Error saving student: $e');
+  //   }
+  // }
+  Future<void> saveStudent(BuildContext? context, String schoolID,
+      String classSection, Student student) async {
     try {
       CollectionReference studentsRef = FirebaseFirestore.instance
           .collection('Schools')
           .doc(schoolID)
           .collection('Students');
 
-      DocumentReference studentDoc = await studentsRef.add(student.toMap());
-      student.studentID = studentDoc.id;
-      await studentDoc.update({
-        'StudentID': student.studentID,
-      }); 
+      // Use the BForm_challanId as the document ID
+      String bFormChallanId = student.bFormChallanId;
+      DocumentReference studentDoc = studentsRef.doc(bFormChallanId);
 
-      List<String> subjects = await fetchSubjects(schoolID, classSection);
-
-      List<String> examTypes = await fetchExamStructure(schoolID, classSection);
-
-      Map<String, Map<String, dynamic>> resultMap = {};
-      for (String subject in subjects) {
-        resultMap[subject] = {};
-        for (String examType in examTypes) {
-          resultMap[subject]![examType] = '-';
+      // Use a transaction to ensure atomicity
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        // Check if the document already exists
+        DocumentSnapshot docSnapshot = await transaction.get(studentDoc);
+        if (docSnapshot.exists) {
+          // Instead of throwing an exception, handle it here
+          ScaffoldMessenger.of(context!).showSnackBar(SnackBar(
+              content: Text(
+                  'A student with the same B-Form already exists.')));
+          return; // Exit the transaction early
         }
-      }
 
-      await studentDoc.update({'resultMap': resultMap});
+        // Save student data with BForm_challanId as the document ID
+        transaction.set(studentDoc, student.toMap());
+
+        // Get the generated document ID and assign it to StudentID field
+        student.studentID = studentDoc.id;
+        transaction.update(studentDoc, {
+          'StudentID': student.studentID,
+        });
+
+        // Fetch subjects and exam types
+        List<String> subjects = await fetchSubjects(schoolID, classSection);
+        List<String> examTypes =
+            await fetchExamStructure(schoolID, classSection);
+
+        // Initialize resultMap
+        Map<String, Map<String, dynamic>> resultMap = {};
+        for (String subject in subjects) {
+          resultMap[subject] = {};
+          for (String examType in examTypes) {
+            resultMap[subject]![examType] = '-';
+          }
+        }
+
+        // Update the document with resultMap
+        transaction.update(studentDoc, {'resultMap': resultMap});
+      });
 
       print('Student saved successfully with ID: ${student.studentID}');
     } catch (e) {
       print('Error saving student: $e');
-      
+      if (e.toString().contains(
+          'A student with the same BForm_challanId already exists.')) {
+        // Handle the specific error for existing student
+        ScaffoldMessenger.of(context!).showSnackBar(SnackBar(
+            content: Text(
+                'A student with the same BForm_challanId already exists.')));
+      } else {
+        ScaffoldMessenger.of(context!)
+            .showSnackBar(SnackBar(content: Text('Error saving student: $e')));
+      }
     }
   }
 
@@ -1137,7 +1203,7 @@ class Database_Service extends GetxService {
             });
 
             uniqueSubjects = subjectsSet.toList();
-            uniqueSubjects.sort(); 
+            uniqueSubjects.sort();
           }
         }
       } else {

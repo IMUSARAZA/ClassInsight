@@ -12,33 +12,29 @@ import 'package:get/get.dart';
 class StudentController extends GetxController {
   var studentsList = <Student>[].obs;
   var classesList = <String>[].obs;
-  var selectedClass = ''.obs; 
-  var selectedNewClass = ''.obs; 
+  var selectedClass = ''.obs;
+  var selectedNewClass = ''.obs;
   var searchValid = true.obs;
 
   final AdminHomeController school = Get.put(AdminHomeController());
-
-
 
   @override
   void onInit() {
     super.onInit();
     refreshData();
-
   }
 
-void fetchStudents() async {
-  try {
-    if (selectedClass.isNotEmpty) {
-      var students = await Database_Service.getStudentsOfASpecificClass(
-          school.schoolId.value, selectedClass.value);
-      studentsList.value = students;
+  void fetchStudents() async {
+    try {
+      if (selectedClass.isNotEmpty) {
+        var students = await Database_Service.getStudentsOfASpecificClass(
+            school.schoolId.value, selectedClass.value);
+        studentsList.value = students;
+      }
+    } catch (e) {
+      print('Error fetching students: $e');
     }
-  } catch (e) {
-    print('Error fetching students: $e');
   }
-}
-
 
   void fetchClasses() async {
     var classes = await Database_Service.fetchAllClasses(school.schoolId.value);
@@ -51,17 +47,14 @@ void fetchStudents() async {
     fetchStudents();
   }
 
-  void refreshStudentList(){
+  void refreshStudentList() {
     fetchStudents();
   }
 
-
-  Future<void> refreshData() async{
+  Future<void> refreshData() async {
     fetchStudents();
     fetchClasses();
   }
-
-
 
   void searchStudent(String value) async {
     if (_containsDigits(value)) {
@@ -148,309 +141,350 @@ class ManageStudents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     studentController.refreshData();
-  
-  
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: Text(
-            'Students',
-            style: Font_Styles.labelHeadingLight(context),
-          ),
-          centerTitle: true,
-          actions: <Widget>[
-            Container(
-              width: 48.0,
-            ),
-            TextButton(
-              onPressed: () async {
-                studentController.selectedNewClass.value = await Get.toNamed("/AddStudent");
-      
-                if (studentController.selectedNewClass.value.isNotEmpty) {
-                  studentController.selectedClass.value = studentController.selectedNewClass.value;
-                  studentController.refreshStudentList();
-      
-                  print('Selected Class: ${studentController.selectedNewClass.value}');}
-              },
-              child: Text(
-                "Add Student",
-                style: Font_Styles.labelHeadingLight(context),
-              ),
-            ),
-          ],
-        ),
-        body: RefreshIndicator(
-          onRefresh: studentController.refreshData,
-          child: SingleChildScrollView(
-            child: Obx(()=>
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-                    child: Text(
-                      'Students',
-                      style: Font_Styles.mediumHeadingBold(context),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-                    child: Text(
-                      'Class',
-                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.04),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
-                    child: Obx(() {
-                      return DropdownButtonFormField<String>(
-                        value: studentController.selectedClass.value,
-                        decoration: InputDecoration(
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.black),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: AppColors.appLightBlue, width: 2.0),
-                          ),
-                        ),
-                        items: studentController.classesList.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          studentController.selectedClass.value = newValue!;
-                          studentController.refreshStudentList();
-                        },
-                      );
-                    }),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
-                    child: CustomTextField(
-                      controller: TextEditingController(),
-                      hintText: 'Search by name or roll no.',
-                      labelText: 'Search Student',
-                      isValid: studentController.searchValid.value,
-                      onChanged: (String value) {
-                        studentController.searchStudent(value);
-                      },
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-                  Obx(() {
-                    if (studentController.studentsList.isEmpty) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.appLightBlue,
-                        ),
-                      );
-                    } else {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          showCheckboxColumn: false,
-                          showBottomBorder: true,
-                          columns: <DataColumn>[
-                            DataColumn(
-                              label: Text(
-                                'Roll No.',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Student Name',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Gender',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Father Name',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Father Phone',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Father CNIC',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Fee Status',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Result',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Edit',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Delete',
-                                style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                              ),
-                            ),
-                          ],
-                          rows: studentController.studentsList
-                              .map(
-                                (student) => DataRow(
-                                  color: MaterialStateColor.resolveWith(
-                                      (states) => AppColors.appDarkBlue),
-                                  cells: [
-                                    DataCell(
-                                      Text(
-                                        student.studentRollNo,
-                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Text(
-                                        student.name,
-                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Text(
-                                        student.gender,
-                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Text(
-                                        student.fatherName,
-                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Text(
-                                        student.fatherPhoneNo,
-                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Text(
-                                        student.fatherCNIC,
-                                        style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      TextButton(
-                                          child: Text(student.feeStatus),
-                                          onPressed: () {
-                                            _showFeeStatusPopup(context, student);
-                                          }),
-                                    ),
-                                    DataCell(
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.text_snippet_outlined,
-                                          color: Colors.white,
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/StudentResult',
-                                            arguments: Student(
-                                                studentID: student.studentID,
-                                                name: student.name,
-                                                gender: student.gender,
-                                                bFormChallanId:
-                                                    student.bFormChallanId,
-                                                fatherName: student.fatherName,
-                                                fatherPhoneNo: student.fatherPhoneNo,
-                                                fatherCNIC: student.fatherCNIC,
-                                                studentRollNo: student.studentRollNo,
-                                                classSection: student.classSection,
-                                                feeStatus: student.feeStatus,
-                                                feeStartDate: student.feeStartDate,
-                                                feeEndDate: student.feeEndDate),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    DataCell(
-                                      IconButton(
-                                        icon: Icon(FontAwesomeIcons.edit),
-                                        onPressed: () async {
-                                          print(student);
-                                          var result = await Get.toNamed(
-                                            '/EditStudent',
-                                            arguments: Student(
-                                                studentID: student.studentID,
-                                                name: student.name,
-                                                gender: student.gender,
-                                                bFormChallanId:
-                                                    student.bFormChallanId,
-                                                fatherName: student.fatherName,
-                                                fatherPhoneNo: student.fatherPhoneNo,
-                                                fatherCNIC: student.fatherCNIC,
-                                                studentRollNo: student.studentRollNo,
-                                                classSection: student.classSection,
-                                                feeStatus: student.feeStatus,
-                                                feeStartDate: student.feeStartDate,
-                                                feeEndDate: student.feeEndDate),
-                                          );
 
-                                          if(result == 'student_added'){
-                                            studentController.refreshStudentList();
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                    DataCell(
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.delete,
-                                          color: Colors.red,
-                                        ),
-                                        onPressed: () {
-                                          studentController.deleteStudent(
-                                              context, student.studentID);
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                              .toList(),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Text(
+          'Students',
+          style: Font_Styles.labelHeadingLight(context),
+        ),
+        centerTitle: true,
+        actions: <Widget>[
+          Container(
+            width: 48.0,
+          ),
+          TextButton(
+            onPressed: () async {
+              studentController.selectedNewClass.value =
+                  await Get.toNamed("/AddStudent");
+
+              if (studentController.selectedNewClass.value.isNotEmpty) {
+                studentController.selectedClass.value =
+                    studentController.selectedNewClass.value;
+                studentController.refreshStudentList();
+
+                print(
+                    'Selected Class: ${studentController.selectedNewClass.value}');
+              }
+            },
+            child: Text(
+              "Add Student",
+              style: Font_Styles.labelHeadingLight(context),
+            ),
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: studentController.refreshData,
+        child: SingleChildScrollView(
+          child: Obx(
+            () => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+                  child: Text(
+                    'Students',
+                    style: Font_Styles.mediumHeadingBold(context),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+                  child: Text(
+                    'Class',
+                    style: Font_Styles.dataTableRows(
+                        context, MediaQuery.of(context).size.width * 0.04),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
+                  child: Obx(() {
+                    return DropdownButtonFormField<String>(
+                      value: studentController.selectedClass.value,
+                      decoration: InputDecoration(
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.black),
                         ),
-                      );
-                    }
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                              color: AppColors.appLightBlue, width: 2.0),
+                        ),
+                      ),
+                      items: studentController.classesList.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        studentController.selectedClass.value = newValue!;
+                        studentController.refreshStudentList();
+                      },
+                    );
                   }),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
+                  child: CustomTextField(
+                    controller: TextEditingController(),
+                    hintText: 'Search by name or roll no.',
+                    labelText: 'Search Student',
+                    isValid: studentController.searchValid.value,
+                    onChanged: (String value) {
+                      studentController.searchStudent(value);
+                    },
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                Obx(() {
+                  if (studentController.studentsList.isEmpty) {
+                    return Center(
+                      // child: CircularProgressIndicator(
+                      //   color: AppColors.appLightBlue,
+                      // ),
+                      child: Text('No student found in this section'),
+                    );
+                  } else {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        showCheckboxColumn: false,
+                        showBottomBorder: true,
+                        columns: <DataColumn>[
+                          DataColumn(
+                            label: Text(
+                              'Roll No.',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Student Name',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Gender',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Father Name',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Father Phone',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Father CNIC',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Fee Status',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Result',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Edit',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Delete',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.03),
+                            ),
+                          ),
+                        ],
+                        rows: studentController.studentsList
+                            .map(
+                              (student) => DataRow(
+                                color: MaterialStateColor.resolveWith(
+                                    (states) => AppColors.appDarkBlue),
+                                cells: [
+                                  DataCell(
+                                    Text(
+                                      student.studentRollNo,
+                                      style: Font_Styles.dataTableRows(
+                                          context,
+                                          MediaQuery.of(context).size.width *
+                                              0.03),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      student.name,
+                                      style: Font_Styles.dataTableRows(
+                                          context,
+                                          MediaQuery.of(context).size.width *
+                                              0.03),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      student.gender,
+                                      style: Font_Styles.dataTableRows(
+                                          context,
+                                          MediaQuery.of(context).size.width *
+                                              0.03),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      student.fatherName,
+                                      style: Font_Styles.dataTableRows(
+                                          context,
+                                          MediaQuery.of(context).size.width *
+                                              0.03),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      student.fatherPhoneNo,
+                                      style: Font_Styles.dataTableRows(
+                                          context,
+                                          MediaQuery.of(context).size.width *
+                                              0.03),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      student.fatherCNIC,
+                                      style: Font_Styles.dataTableRows(
+                                          context,
+                                          MediaQuery.of(context).size.width *
+                                              0.03),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    TextButton(
+                                        child: Text(student.feeStatus),
+                                        onPressed: () {
+                                          _showFeeStatusPopup(context, student);
+                                        }),
+                                  ),
+                                  DataCell(
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.text_snippet_outlined,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/StudentResult',
+                                          arguments: Student(
+                                              studentID: student.studentID,
+                                              name: student.name,
+                                              gender: student.gender,
+                                              bFormChallanId:
+                                                  student.bFormChallanId,
+                                              fatherName: student.fatherName,
+                                              fatherPhoneNo:
+                                                  student.fatherPhoneNo,
+                                              fatherCNIC: student.fatherCNIC,
+                                              studentRollNo:
+                                                  student.studentRollNo,
+                                              classSection:
+                                                  student.classSection,
+                                              feeStatus: student.feeStatus,
+                                              feeStartDate:
+                                                  student.feeStartDate,
+                                              feeEndDate: student.feeEndDate),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  DataCell(
+                                    IconButton(
+                                      icon: Icon(FontAwesomeIcons.edit),
+                                      onPressed: () async {
+                                        print(student);
+                                        var result = await Get.toNamed(
+                                          '/EditStudent',
+                                          arguments: Student(
+                                              studentID: student.studentID,
+                                              name: student.name,
+                                              gender: student.gender,
+                                              bFormChallanId:
+                                                  student.bFormChallanId,
+                                              fatherName: student.fatherName,
+                                              fatherPhoneNo:
+                                                  student.fatherPhoneNo,
+                                              fatherCNIC: student.fatherCNIC,
+                                              studentRollNo:
+                                                  student.studentRollNo,
+                                              classSection:
+                                                  student.classSection,
+                                              feeStatus: student.feeStatus,
+                                              feeStartDate:
+                                                  student.feeStartDate,
+                                              feeEndDate: student.feeEndDate),
+                                        );
+
+                                        if (result == 'student_added') {
+                                          studentController
+                                              .refreshStudentList();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  DataCell(
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () {
+                                        studentController.deleteStudent(
+                                            context, student.studentID);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    );
+                  }
+                }),
+              ],
             ),
           ),
         ),
-      
+      ),
     );
   }
 }
