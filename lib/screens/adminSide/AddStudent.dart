@@ -106,14 +106,6 @@ class AddStudentController extends GetxController {
                     valueColor: AlwaysStoppedAnimation<Color>(AppColors.appLightBlue),
                   ),
                 ),
-                SizedBox(height: 20),
-                Text(
-                  'Adding student...',
-                  style: GoogleFonts.poppins(
-                    color: AppColors.appLightBlue,
-                    fontSize: 18,
-                  ),
-                ),
               ],
             ),
           ),
@@ -139,6 +131,7 @@ class AddStudentController extends GetxController {
 
       Database_Service databaseService = Database_Service();
       await databaseService.saveStudent(
+        Get.context,
         school.schoolId.value,
         selectedClass.value,
         student,
@@ -329,7 +322,7 @@ class AddStudent extends StatelessWidget {
                               padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
                               child: CustomTextField(
                                 controller: controller.fatherPhoneNoController,
-                                hintText: "03xxxxxxxxx",
+                                hintText: "0321xxxxx12",
                                 labelText: "Father/Guardian's phone number",
                                 isValid: controller.fatherPhoneNoValid.value,
                               ),
@@ -338,7 +331,7 @@ class AddStudent extends StatelessWidget {
                               padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
                               child: CustomTextField(
                                 controller: controller.fatherCNICController,
-                                hintText: "35202xxxxxxxx",
+                                hintText: "35202xxxxxx78",
                                 labelText: "Father/Guardian's CNIC",
                                 isValid: controller.fatherCNICValid.value,
                               ),
