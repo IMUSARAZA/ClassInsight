@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
 
   }
 
-  String _getInitialLocation(User? user) {
+ String _getInitialLocation(User? user) {
     if (user != null) {
       if (user.email != null) {
         return '/AdminHome';
