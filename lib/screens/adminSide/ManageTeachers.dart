@@ -1,8 +1,8 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
 import 'dart:async';
 import 'package:classinsight/Services/Database_Service.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,15 +20,14 @@ class ManageTeachers extends StatefulWidget {
 class _ManageTeachersState extends State<ManageTeachers> {
   Future<List<Teacher>> teachers = Future<List<Teacher>>.value([]);
   TextEditingController searchTeacherController = TextEditingController();
-  AdminHomeController school = Get.put(AdminHomeController());
   bool teachersValid = true;
-  String schoolID = '';
+  late School school;
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    schoolID = school.schoolId.value;
+    school = Get.arguments as School;
     fetchTeachers();
   }
 
@@ -41,13 +40,13 @@ class _ManageTeachersState extends State<ManageTeachers> {
 
   Future<void> fetchTeachers() async {
     setState(() {
-      teachers = Database_Service.fetchTeachers(schoolID);
+      teachers = Database_Service.fetchTeachers(school.schoolId);
     });
   }
 
   void refreshTeachersList() {
     setState(() {
-      teachers = Database_Service.fetchTeachers(schoolID);
+      teachers = Database_Service.fetchTeachers(school.schoolId);
     });
   }
 
@@ -67,7 +66,6 @@ class _ManageTeachersState extends State<ManageTeachers> {
   void searchTeacher(String value, BuildContext context) {
     const duration = Duration(milliseconds: 700);
 
-    String schoolID = 'buwF2J4lkLCdIVrHfgkP';
 
 
     if (_debounce?.isActive ?? false) _debounce?.cancel();
@@ -78,7 +76,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
       {
        try {
         setState(() {
-          teachers = Database_Service.searchTeachersByEmployeeID(schoolID, value);
+          teachers = Database_Service.searchTeachersByEmployeeID(school.schoolId, value);
         });
       } catch (e) {
         print('Error searching for teacher: $e');
@@ -90,7 +88,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
 
       try {
         setState(() {
-          teachers = Database_Service.searchTeachersByName(schoolID, searchText);
+          teachers = Database_Service.searchTeachersByName(school.schoolId, searchText);
         });
       } catch (e) {
         print('Error searching for teacher: $e');
@@ -140,7 +138,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
           },
         );
 
-        await Database_Service.deleteTeacher(schoolID, empID);
+        await Database_Service.deleteTeacher(school.schoolId, empID);
 
         Navigator.of(context).pop();
 
@@ -209,7 +207,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Get.toNamed("/AddTeacher");
+                        Get.toNamed("/AddTeacher", arguments: school);
                       },
                       child: Text(
                         "Add Teacher",
@@ -418,7 +416,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                     GestureDetector(
                                       onTap: () {       
                                         Get.toNamed("/EditTeacher",
-                                            arguments: teacher);
+                                            arguments: [teacher, school]);  
                                       },
                                       child: const Icon(
                                         FontAwesomeIcons.penToSquare,

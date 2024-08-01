@@ -2,6 +2,7 @@
 import 'dart:math';
 
 import 'package:classinsight/Services/Auth_Service.dart';
+import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
@@ -34,6 +35,7 @@ class AddTeacherController extends GetxController {
   var addStdFontSize = 16.0;
   var headingFontSize = 33.0;
 
+  late School school;
   RxList<String> selectedClasses = <String>[].obs;
   RxList<ClassSubject> classesSubjects = <ClassSubject>[].obs;
   RxMap<String, List<String>> selectedSubjects = <String, List<String>>{}.obs;
@@ -41,14 +43,14 @@ class AddTeacherController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    school = Get.arguments as School;
     fetchClassesAndSubjects();
   }
 
-  String schoolId = 'buwF2J4lkLCdIVrHfgkP';
 
 void fetchClassesAndSubjects() async {
   try {
-    Map<String, List<String>> classesAndSubjectsMap = await Database_Service.fetchClassesAndSubjects(schoolId);
+    Map<String, List<String>> classesAndSubjectsMap = await Database_Service.fetchClassesAndSubjects(school.schoolId);
 
     List<ClassSubject> fetchedClassesSubjects = [];
 
@@ -468,7 +470,7 @@ class AddTeacher extends StatelessWidget {
                                             .fatherNameController.text);
 
                                     await Database_Service.saveTeacher(
-                                      controller.schoolId,
+                                      controller.school.schoolId,
                                       controller.empIDController.text,
                                       capitalizedName,
                                       controller.selectedGender.value,
@@ -486,7 +488,7 @@ class AddTeacher extends StatelessWidget {
 
                                     print('Generated password: $password');    
 
-                                    await Auth_Service.registerTeacher(controller.emailController.text, password, controller.schoolId); 
+                                    await Auth_Service.registerTeacher(controller.emailController.text, password, controller.school.schoolId); 
 
                                     await Auth_Service.sendPasswordEmail(controller.emailController.text, capitalizedName, password);    
 
