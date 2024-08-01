@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class AddTeacherController extends GetxController {
@@ -47,24 +48,24 @@ class AddTeacherController extends GetxController {
     fetchClassesAndSubjects();
   }
 
+  void fetchClassesAndSubjects() async {
+    try {
+      Map<String, List<String>> classesAndSubjectsMap =
+          await Database_Service.fetchClassesAndSubjects(school.schoolId);
 
-void fetchClassesAndSubjects() async {
-  try {
-    Map<String, List<String>> classesAndSubjectsMap = await Database_Service.fetchClassesAndSubjects(school.schoolId);
+      List<ClassSubject> fetchedClassesSubjects = [];
 
-    List<ClassSubject> fetchedClassesSubjects = [];
+      classesAndSubjectsMap.forEach((className, subjects) {
+        print('Fetched subjects for class $className');
+        fetchedClassesSubjects
+            .add(ClassSubject(className: className, subjects: subjects));
+      });
 
-    classesAndSubjectsMap.forEach((className, subjects) {
-      print('Fetched subjects for class $className');
-      fetchedClassesSubjects.add(ClassSubject(className: className, subjects: subjects));
-    });
-
-    classesSubjects.assignAll(fetchedClassesSubjects);
-  } catch (e) {
-    print('Error fetching classes and subjects: $e');
+      classesSubjects.assignAll(fetchedClassesSubjects);
+    } catch (e) {
+      print('Error fetching classes and subjects: $e');
+    }
   }
-}
-
 
   String capitalizeName(String name) {
     List<String> parts = name.split(' ');
@@ -255,7 +256,7 @@ class AddTeacher extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
                             child: CustomTextField(
                               controller: controller.cnicController,
-                              hintText: '352020xxxxxxxx91',
+                              hintText: '35202xxxxxx78',
                               labelText: 'CNIC No',
                               isValid: controller.cnicValid.value,
                             ),
@@ -264,7 +265,7 @@ class AddTeacher extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
                             child: CustomTextField(
                               controller: controller.phoneNoController,
-                              hintText: '0321xxxxxx12',
+                              hintText: '0321xxxxx12',
                               labelText: 'Phone Number',
                               isValid: controller.phoneNoValid.value,
                             ),
@@ -459,8 +460,34 @@ class AddTeacher extends StatelessWidget {
                                       'Error', 'Please fill all the fields');
                                 } else {
                                   try {
-                                    Get.snackbar(
-                                        'Saving', 'Adding a new teacher...');
+                                    Get.dialog(
+                                      Center(
+                                        child: Container(
+                                          color: Colors.white,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                width: 30,
+                                                height: 30,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                              Color>(
+                                                          AppColors
+                                                              .appLightBlue),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      barrierDismissible: false,
+                                    );
 
                                     String capitalizedName =
                                         controller.capitalizeName(
@@ -486,11 +513,17 @@ class AddTeacher extends StatelessWidget {
 
                                     String password = generateRandomPassword();
 
-                                    print('Generated password: $password');    
+                                    print('Generated password: $password');
 
-                                    await Auth_Service.registerTeacher(controller.emailController.text, password, controller.school.schoolId); 
+                                    await Auth_Service.registerTeacher(
+                                        controller.emailController.text,
+                                        password,
+                                        controller.school.schoolId);
 
-                                    await Auth_Service.sendPasswordEmail(controller.emailController.text, capitalizedName, password);    
+                                    await Auth_Service.sendPasswordEmail(
+                                        controller.emailController.text,
+                                        capitalizedName,
+                                        password);
 
                                     Get.back(result: 'updated');
                                     Navigator.pop(context);
@@ -518,6 +551,7 @@ class AddTeacher extends StatelessWidget {
     );
   }
 }
+
 String generateRandomPassword() {
   const int passwordLength = 8;
   const String upperCaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -529,11 +563,14 @@ String generateRandomPassword() {
 
   String password = '';
   password += upperCaseLetters[random.nextInt(upperCaseLetters.length)];
-  password += '${digits[random.nextInt(digits.length)]}${digits[random.nextInt(digits.length)]}${digits[random.nextInt(digits.length)]}';
+  password +=
+      '${digits[random.nextInt(digits.length)]}${digits[random.nextInt(digits.length)]}${digits[random.nextInt(digits.length)]}';
   password += specialChar;
 
   int remainingLength = passwordLength - password.length;
-  password += List.generate(remainingLength, (_) => lowerCaseLetters[random.nextInt(lowerCaseLetters.length)]).join('');
+  password += List.generate(remainingLength,
+          (_) => lowerCaseLetters[random.nextInt(lowerCaseLetters.length)])
+      .join('');
 
   password = String.fromCharCodes(password.runes.toList()..shuffle(random));
 

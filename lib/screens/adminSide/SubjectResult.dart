@@ -14,7 +14,7 @@ class SubjectResultController extends GetxController {
   var studentsList = <Student>[].obs;
   var examsList = <String>[].obs;
 
-  var selectedClass = '2-A'.obs;
+  var selectedClass = ''.obs;
   var selectedSubject = ''.obs;
 
   Database_Service databaseService = Database_Service();
@@ -30,10 +30,10 @@ class SubjectResultController extends GetxController {
     var schoolId = Get.find<AdminHomeController>().schoolId.value;
 
     classesList.value = await Database_Service.fetchAllClasses(schoolId);
-    subjectsList.value =
-        await Database_Service.fetchSubjects(schoolId, selectedClass.value);
     studentsList.value = await Database_Service.getStudentsOfASpecificClass(
         schoolId, selectedClass.value);
+    subjectsList.value =
+        await Database_Service.fetchSubjects(schoolId, selectedClass.value);
     examsList.value =
         await databaseService.fetchExamStructure(schoolId, selectedClass.value);
   }
@@ -47,13 +47,12 @@ class SubjectResultController extends GetxController {
 
   void updateData() async {
     var schoolId = Get.find<AdminHomeController>().schoolId.value;
-
-    subjectsList.value =
-        await Database_Service.fetchSubjects(schoolId, selectedClass.value);
     studentsList.value = await Database_Service.getStudentsOfASpecificClass(
         schoolId, selectedClass.value);
     examsList.value =
         await databaseService.fetchExamStructure(schoolId, selectedClass.value);
+    subjectsList.value =
+        await Database_Service.fetchSubjects(schoolId, selectedClass.value);
   }
 
   void updateStudentResults() async {
@@ -243,7 +242,8 @@ class SubjectResult extends StatelessWidget {
                                 child: Center(
                                   child: Text(
                                     'No exams found for this Class',
-                                    style: Font_Styles.labelHeadingLight(context),
+                                    style:
+                                        Font_Styles.labelHeadingLight(context),
                                   ),
                                 ),
                               );
@@ -255,20 +255,23 @@ class SubjectResult extends StatelessWidget {
                                     DataColumn(
                                       label: Text(
                                         'Roll No.',
-                                        style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
+                                        style: Font_Styles.dataTableTitle(
+                                            context, screenWidth * 0.04),
                                       ),
                                     ),
                                     DataColumn(
                                       label: Text(
                                         'Student Name',
-                                        style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
+                                        style: Font_Styles.dataTableTitle(
+                                            context, screenWidth * 0.04),
                                       ),
                                     ),
                                     for (var exam in examsList)
                                       DataColumn(
                                         label: Text(
                                           exam,
-                                          style: Font_Styles.dataTableTitle(context, screenWidth * 0.04),
+                                          style: Font_Styles.dataTableTitle(
+                                              context, screenWidth * 0.04),
                                         ),
                                       ),
                                   ],
