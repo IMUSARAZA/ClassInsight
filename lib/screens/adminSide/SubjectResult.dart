@@ -41,7 +41,7 @@ class SubjectResultController extends GetxController {
     try {
       DocumentSnapshot studentDoc = await FirebaseFirestore.instance
           .collection('Schools')
-          .doc(schoolId!)
+          .doc(schoolId)
           .collection('Students')
           .doc(studentID)
           .get();
@@ -78,7 +78,7 @@ class SubjectResultController extends GetxController {
     try {
       DocumentSnapshot studentDoc = await FirebaseFirestore.instance
           .collection('Schools')
-          .doc(schoolId!)
+          .doc(schoolId)
           .collection('Students')
           .doc(studentID)
           .get();
@@ -87,7 +87,6 @@ class SubjectResultController extends GetxController {
         Map<String, dynamic> resultMap = studentDoc['resultMap'];
         int totalSum = 0;
 
-        // Get the results for the selected subject
         var subjectResults = resultMap[selectedSubject.value] ?? {};
 
         for (var examType in examsList) {

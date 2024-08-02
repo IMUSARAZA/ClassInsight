@@ -1,5 +1,5 @@
-// ignore_for_file: must_be_immutable, use_build_context_synchronously
-import 'dart:async';
+// ignore_for_file: unused_local_variable
+
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
@@ -10,42 +10,57 @@ import 'package:get/get.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 
-class ManageTeachers extends StatefulWidget {
-  const ManageTeachers({super.key});
-
-  @override
-  State<ManageTeachers> createState() => _ManageTeachersState();
-}
-
-class _ManageTeachersState extends State<ManageTeachers> {
-  Future<List<Teacher>> teachers = Future<List<Teacher>>.value([]);
+class ManageTeachersController extends GetxController {
+  final RxList<Teacher> teachers = <Teacher>[].obs;
   TextEditingController searchTeacherController = TextEditingController();
   bool teachersValid = true;
   late School school;
+  RxBool isLoading = false.obs;
 
   @override
-  void initState() {
-    super.initState();
+  void onInit() {
+    super.onInit();
     school = Get.arguments as School;
     fetchTeachers();
   }
 
   @override
-  void dispose() {
+  void onClose() {
     searchTeacherController.dispose();
-    super.dispose();
+    super.onClose();
   }
 
-  Future<void> fetchTeachers() async {
-    setState(() {
-      teachers = Database_Service.fetchTeachers(school.schoolId);
-    });
+  void fetchTeachers() async {
+    isLoading.value = true;
+    try {
+      var fetchedTeachers = await Database_Service.fetchTeachers(school.schoolId);
+      teachers.assignAll(fetchedTeachers);
+    } catch (e) {
+      print('Error fetching teachers: $e');
+      Get.snackbar('Error', 'Failed to fetch teachers');
+    }
+    isLoading.value = false;
   }
 
-  void refreshTeachersList() {
-    setState(() {
-      teachers = Database_Service.fetchTeachers(school.schoolId);
-    });
+  void searchTeacher(BuildContext context, String value) {
+    if (_containsDigits(value)) {
+      try {
+        Database_Service.searchTeachersByEmployeeID(school.schoolId, value)
+            .then((results) => teachers.assignAll(results));
+      } catch (e) {
+        print('Error searching for teacher: $e');
+        Get.snackbar('Error', 'Failed to search for teacher');
+      }
+    } else {
+      String searchText = capitalize(value);
+      try {
+        Database_Service.searchTeachersByName(school.schoolId, searchText)
+            .then((results) => teachers.assignAll(results));
+      } catch (e) {
+        print('Error searching for teacher: $e');
+        Get.snackbar('Error', 'Failed to search for teacher');
+      }
+    }
   }
 
   String capitalize(String input) {
@@ -55,100 +70,67 @@ class _ManageTeachersState extends State<ManageTeachers> {
     }).join(' ');
   }
 
-
- bool _containsDigits(String value) {
+  bool _containsDigits(String value) {
     return value.contains(RegExp(r'\d'));
   }
 
-
-  void searchTeacher(String value, BuildContext context) {
-
-      if(_containsDigits(value))
-      {
-       try {
-        setState(() {
-          teachers = Database_Service.searchTeachersByEmployeeID(school.schoolId, value);
-        });
-      } catch (e) {
-        print('Error searching for teacher: $e');
-        Get.snackbar('Error', 'Failed to search for teacher');
-      }     
-      }
-      else{
-      String searchText = capitalize(value);
-
-      try {
-        setState(() {
-          teachers = Database_Service.searchTeachersByName(school.schoolId, searchText);
-        });
-      } catch (e) {
-        print('Error searching for teacher: $e');
-        Get.snackbar('Error', 'Failed to search for teacher');
-      }
-      }
- 
-  }
-
   void deleteTeacher(BuildContext context, String empID) async {
-
-    bool confirmDelete = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Are you sure?'),
-          content: const Text('This will delete this teacher permanently'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
+    bool confirmDelete = await Get.dialog(
+      AlertDialog(
+        title: const Text('Are you sure?'),
+        content: const Text('This will delete this teacher permanently'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Get.back(result: false);
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back(result: true);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
     );
 
     if (confirmDelete) {
       try {
-        showDialog(
-          context: context,
+        Get.dialog(
+          const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+            ),
+          ),
           barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-              ),
-            );
-          },
         );
 
         await Database_Service.deleteTeacher(school.schoolId, empID);
 
-        Navigator.of(context).pop();
+        Get.back(); // Close the loading dialog
 
-        refreshTeachersList();
+        fetchTeachers();
       } catch (e) {
         print('Error deleting teacher: $e');
-        Navigator.of(context).pop();
+        Get.back(); // Close the loading dialog
         Get.snackbar('Error', 'Failed to delete teacher');
       }
     }
   }
+}
 
-  double addStdFontSize = 16;
-  double headingFontSize = 33;
+class ManageTeachers extends StatelessWidget {
+  final ManageTeachersController controller = Get.put(ManageTeachersController());
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+
+    double addStdFontSize = 16;
+    double headingFontSize = 33;
 
     if (screenWidth < 350) {
       addStdFontSize = 14;
@@ -192,12 +174,12 @@ class _ManageTeachersState extends State<ManageTeachers> {
                     ),
                     TextButton(
                       onPressed: () async {
-                        await Get.toNamed("/AddTeacher", arguments: school);
-                        fetchTeachers();
+                        await Get.toNamed("/AddTeacher", arguments: controller.school);
+                        controller.fetchTeachers();
                       },
                       child: Text(
                         "Add Teacher",
-                        style: Font_Styles.labelHeadingLight(context,color: Colors.black),
+                        style: Font_Styles.labelHeadingLight(context, color: Colors.black),
                       ),
                     ),
                   ],
@@ -213,213 +195,190 @@ class _ManageTeachersState extends State<ManageTeachers> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(30, 10, 30, 20),
                 child: CustomTextField(
-                  controller: searchTeacherController,
+                  controller: controller.searchTeacherController,
                   hintText: 'Search by name & Employee ID',
                   labelText: 'Search Teacher',
-                  isValid: teachersValid,
+                  isValid: controller.teachersValid,
                   onChanged: (value) {
-                    searchTeacher(value, context);
+                    controller.searchTeacher(context, value);
                   },
                 ),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-              FutureBuilder<List<Teacher>>(
-                future: teachers,
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Teacher>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return Center(
+                    child: CircularProgressIndicator(
                         color: AppColors.appLightBlue,
                       ),
-                    );
-                  } else if (snapshot.hasError) {
-                    print('Snapshot error: ${snapshot.error}');
-                    return Center(
-                      child: Text(
-                        'Error: ${snapshot.error}',
-                        style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.04),
-                      ),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    print('No teachers found in the snapshot');
-                    return Center(
-                      child: Text(
-                        'No Teachers found',
-                        style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
-                      ),
-                    );
-                  } else {
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        showCheckboxColumn: false,
-                        showBottomBorder: true,
-                        columns: <DataColumn>[
-                          DataColumn(
-                            label: Text(
-                              'Employee ID',
+                    // child: Text(
+                    //   'No Teachers found',
+                    //   style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
+                    // ),
+                  );
+                } else {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      showCheckboxColumn: false,
+                      showBottomBorder: true,
+                      columns: <DataColumn>[
+                        DataColumn(
+                          label: Text(
+                            'Employee ID',
+                            style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Name',
+                            style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Gender',
+                            style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Email',
+                            style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Father Name',
+                            style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Classes',
+                            style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Container(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: Text(
+                              'Subjects',
                               style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
-                          DataColumn(
-                            label: Text(
-                              'Name',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
-                            ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Edit',
+                            style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                           ),
-                          DataColumn(
-                            label: Text(
-                              'Gender',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
-                            ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Delete',
+                            style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                           ),
-                          DataColumn(
-                                label: Text(
-                                  'Email',
-                                  style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
+                        ),
+                      ],
+                      rows: controller.teachers.map((Teacher teacher) {
+                        return DataRow(
+                          color: MaterialStateColor.resolveWith(
+                              (states) => AppColors.appDarkBlue),
+                          cells: [
+                            DataCell(
+                              Text(
+                                teacher.empID,
+                                style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                teacher.name,
+                                style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                teacher.gender,
+                                style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                teacher.email,
+                                style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                teacher.fatherName,
+                                style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                teacher.classes.join(', '),
+                                style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
+                              ),
+                            ),
+                            DataCell(
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width * 0.5,
+                                  child: SingleChildScrollView(
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: teacher.subjects.entries.map((entry) {
+                                          return Tooltip(
+                                            message: entry.value.join(', '),
+                                            child: Text(
+                                              '${entry.key}: ${entry.value.join(', ')}',
+                                              style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                          DataColumn(
-                            label: Text(
-                              'Father Name',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                             ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Classes',
-                              style: Font_Styles.dataTableTitle(context,MediaQuery.of(context).size.width * 0.035),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Container(
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              child: Text(
-                                'Subjects',
-                                style: Font_Styles.dataTableTitle(context,MediaQuery.of(context).size.width * 0.035),
+                            DataCell(
+                              GestureDetector(
+                                onTap: () async {
+                                  await Get.toNamed("/EditTeacher",
+                                      arguments: [teacher, controller.school]);
+                                  controller.fetchTeachers();
+                                },
+                                child: const Icon(
+                                  FontAwesomeIcons.penToSquare,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Edit',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Delete',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
-                            ),
-                          ),
-                        ],
-                        rows: snapshot.data!
-                            .map(
-                              (Teacher teacher) => DataRow(
-                                color: MaterialStateColor.resolveWith(
-                                    (states) => AppColors.appDarkBlue),
-                                cells: [
-                                  DataCell(
-                                    Text(
-                                      teacher.empID,
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      teacher.name,
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      teacher.gender,
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
-                                    ),
-                                  ),
-                                  DataCell(
-                                        Text(
-                                          teacher.email,
-                                          style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
-                                        ),
-                                      ),
-                                  DataCell(
-                                    Text(
-                                      teacher.fatherName,
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      teacher.classes.join(', '),
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.5,
-                                        child: SingleChildScrollView(
-                                          child: Padding(
-                                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: teacher.subjects.entries
-                                                  .map((entry) {
-                                                return Tooltip(
-                                                  message: entry.value.join(', '),
-                                                  child: Text(
-                                                    '${entry.key}: ${entry.value.join(', ')}',
-                                                    style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                );
-                                              }).toList(),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    GestureDetector(
-                                      onTap: () async {       
-                                        await Get.toNamed("/EditTeacher",
-                                            arguments: [teacher, school]);  
-                                        fetchTeachers();
-                                      },
-                                      child: const Icon(
-                                        FontAwesomeIcons.penToSquare,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    GestureDetector(
-                                      onTap: () {
-                                        deleteTeacher(context, teacher.empID);
-                                      },
-                                      child: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            DataCell(
+                              GestureDetector(
+                                onTap: () {
+                                  controller.deleteTeacher(context, teacher.empID);
+                                },
+                                child: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
                               ),
-                            )
-                            .toList(),
-                      ),
-                    );
-                  }
-                },
-              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  );
+                }
+              }),
             ],
           ),
         ),

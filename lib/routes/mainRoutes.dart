@@ -89,7 +89,7 @@ class MainRoutes {
     ),
     GetPage(
       name: "/ManageTeachers",
-      page: () => const ManageTeachers(),
+      page: () => ManageTeachers(),
     ),
     GetPage(
       name: "/AddTeacher",
