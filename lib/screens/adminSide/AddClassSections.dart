@@ -120,7 +120,7 @@ class AddClassSections extends StatelessWidget {
                       ),
                       Obx(() {
                         if (controller.addClass.value) {
-                          return TextButton(
+                          return controller.gradeName.text.isNotEmpty ? TextButton(
                             onPressed: () {
                               if (controller.validateFields()) {
                                 List<String> formData = controller.collectFormValues();
@@ -132,9 +132,9 @@ class AddClassSections extends StatelessWidget {
                             },
                             child: Text(
                               "Next",
-                              style: Font_Styles.labelHeadingLight(context),
+                              style: Font_Styles.labelHeadingLight(context,color: Colors.black),
                             ),
-                          );
+                          ):Container();
                         } else {
                           return TextButton(
                             onPressed: () {

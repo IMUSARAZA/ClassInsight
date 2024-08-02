@@ -192,12 +192,6 @@ class _ManageTeachersState extends State<ManageTeachers> {
                 width: screenWidth,
                 child: AppBar(
                   backgroundColor: Colors.white,
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Get.back();
-                    },
-                  ),
                   title: Text(
                     'Teachers',
                     style: Font_Styles.labelHeadingLight(context),
@@ -208,12 +202,13 @@ class _ManageTeachersState extends State<ManageTeachers> {
                       width: 48.0,
                     ),
                     TextButton(
-                      onPressed: () {
-                        Get.toNamed("/AddTeacher", arguments: school);
+                      onPressed: () async {
+                        await Get.toNamed("/AddTeacher", arguments: school);
+                        fetchTeachers();
                       },
                       child: Text(
                         "Add Teacher",
-                        style: Font_Styles.labelHeadingLight(context),
+                        style: Font_Styles.labelHeadingLight(context,color: Colors.black),
                       ),
                     ),
                   ],
@@ -275,37 +270,37 @@ class _ManageTeachersState extends State<ManageTeachers> {
                           DataColumn(
                             label: Text(
                               'Employee ID',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
+                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Name',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
+                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Gender',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
+                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                                 label: Text(
                                   'Email',
-                                  style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
+                                  style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                                 ),
                               ),
                           DataColumn(
                             label: Text(
                               'Father Name',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
+                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Classes',
-                              style: Font_Styles.dataTableTitle(context,MediaQuery.of(context).size.width * 0.03),
+                              style: Font_Styles.dataTableTitle(context,MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
@@ -313,20 +308,20 @@ class _ManageTeachersState extends State<ManageTeachers> {
                               width: MediaQuery.of(context).size.width * 0.5,
                               child: Text(
                                 'Subjects',
-                                style: Font_Styles.dataTableTitle(context,MediaQuery.of(context).size.width * 0.03),
+                                style: Font_Styles.dataTableTitle(context,MediaQuery.of(context).size.width * 0.035),
                               ),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Edit',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
+                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Delete',
-                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.03),
+                              style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                         ],
@@ -339,37 +334,37 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                   DataCell(
                                     Text(
                                       teacher.empID,
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
+                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
                                     ),
                                   ),
                                   DataCell(
                                     Text(
                                       teacher.name,
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
+                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
                                     ),
                                   ),
                                   DataCell(
                                     Text(
                                       teacher.gender,
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
+                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
                                     ),
                                   ),
                                   DataCell(
                                         Text(
                                           teacher.email,
-                                          style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
+                                          style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
                                         ),
                                       ),
                                   DataCell(
                                     Text(
                                       teacher.fatherName,
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
+                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
                                     ),
                                   ),
                                   DataCell(
                                     Text(
                                       teacher.classes.join(', '),
-                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
+                                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.035),
                                     ),
                                   ),
                                   DataCell(
@@ -405,9 +400,10 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                   ),
                                   DataCell(
                                     GestureDetector(
-                                      onTap: () {       
-                                        Get.toNamed("/EditTeacher",
+                                      onTap: () async {       
+                                        await Get.toNamed("/EditTeacher",
                                             arguments: [teacher, school]);  
+                                        fetchTeachers();
                                       },
                                       child: const Icon(
                                         FontAwesomeIcons.penToSquare,

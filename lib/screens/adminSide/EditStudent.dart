@@ -331,7 +331,7 @@ class EditStudent extends StatelessWidget {
                                                   return DropdownMenuItem<
                                                       String>(
                                                     value: value,
-                                                    child: Text(value),
+                                                    child: Text(value,style: Font_Styles.dataTableTitle(context,17),),
                                                   );
                                                 }).toList(),
                                                 onChanged: (String? newValue) {
