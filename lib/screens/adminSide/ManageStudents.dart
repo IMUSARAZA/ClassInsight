@@ -421,7 +421,8 @@ class ManageStudents extends StatelessWidget {
                                               feeStatus: student.feeStatus,
                                               feeStartDate:
                                                   student.feeStartDate,
-                                              feeEndDate: student.feeEndDate),
+                                              feeEndDate: student.feeEndDate
+                                              ),
                                         );
                                       },
                                     ),
@@ -617,7 +618,6 @@ class _UpdateFeeStatusDialogState extends State<UpdateFeeStatusDialog> {
         TextButton(
           child: Text('Update'),
           onPressed: () async {
-            // Only update the start date and end date if they are not empty
             String updatedStartDate = startDateController.text.isNotEmpty
                 ? startDateController.text
                 : originalStartDate;

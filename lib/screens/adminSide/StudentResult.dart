@@ -23,6 +23,7 @@ class StudentResultController extends GetxController {
     feeStartDate: '',
     feeEndDate: '',
     studentRollNo: '',
+    
   ).obs;
   var examsList = <String>[].obs;
   var subjectsList = <String>[].obs;

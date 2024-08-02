@@ -235,6 +235,7 @@ class EditTeacher extends StatelessWidget {
                             Get.snackbar('Teacher Updated',
                                 'The teacher has been updated successfully');
                             Navigator.of(context).pop();
+                            Navigator.of(context).pop();
                           }
                         },
                         child: Text(

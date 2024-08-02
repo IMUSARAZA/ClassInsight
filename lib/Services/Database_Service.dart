@@ -509,18 +509,9 @@ static Future<List<Teacher>> searchTeachersByName(
     DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
     CollectionReference teachersRef = schoolDocRef.collection('Teachers');
 
-    QuerySnapshot teachersSnapshot;
+    QuerySnapshot teachersSnapshot = await teachersRef.get();
 
-    if (searchText.isNotEmpty) {
-      teachersSnapshot = await teachersRef
-          .orderBy('Name')
-          .startAt([searchText]).endAt([searchText + '\uf8ff'])
-          .get();
-    } else {
-      teachersSnapshot = await teachersRef.get();
-    }
-
-    List<Teacher> teachers = teachersSnapshot.docs.map((doc) {
+    List<Teacher> allTeachers = teachersSnapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
       return Teacher(
         empID: data['EmployeeID'],
@@ -539,14 +530,19 @@ static Future<List<Teacher>> searchTeachersByName(
       );
     }).toList();
 
-    print('Teachers found: ${teachers.length}');
+    List<Teacher> filteredTeachers = allTeachers.where((teacher) {
+      return teacher.name.contains(searchText);
+    }).toList();
 
-    return teachers;
+    print('Teachers found: ${filteredTeachers.length}');
+
+    return filteredTeachers;
   } catch (e) {
     print('Error searching teachers: $e');
     return [];
   }
 }
+
 
   static Future<List<Teacher>> searchTeachersByEmployeeID(
       String schoolID, String employeeID) async {
@@ -743,27 +739,31 @@ static Future<List<Teacher>> searchTeachersByName(
   }
 
   static Future<List<Student>> searchStudentsByName(
-      String school, String classSection, String studentName) async {
-    List<Student> students = [];
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('Schools')
-          .doc(school)
-          .collection('Students')
-          .where('ClassSection', isEqualTo: classSection)
-          .where('Name', isGreaterThanOrEqualTo: studentName)
-          .where('Name', isLessThanOrEqualTo: studentName + '\uf8ff')
-          .get();
+    String school, String classSection, String studentName) async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Schools')
+        .doc(school)
+        .collection('Students')
+        .where('ClassSection', isEqualTo: classSection)
+        .get();
 
-      for (var doc in querySnapshot.docs) {
-        students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
-      }
-    } catch (e) {
-      print(
-          'Error searching students by name $studentName in class $classSection: $e');
-    }
-    return students;
+    List<Student> allStudents = querySnapshot.docs.map((doc) {
+      return Student.fromJson(doc.data() as Map<String, dynamic>);
+    }).toList();
+
+    List<Student> filteredStudents = allStudents.where((student) {
+      return student.name.toLowerCase().contains(studentName.toLowerCase());
+    }).toList();
+
+    return filteredStudents;
+  } catch (e) {
+    print(
+        'Error searching students by name $studentName in class $classSection: $e');
+    return [];
   }
+}
+
 
   static Future<Student?> getStudentByID(
       String school, String studentID) async {
@@ -881,7 +881,6 @@ static Future<List<Teacher>> searchTeachersByName(
         classNames.add(doc['className']);
       }
 
-      // Sort the class names lexicographically
       classNames.sort();
     } catch (e) {
       print('Error fetching classes: $e');

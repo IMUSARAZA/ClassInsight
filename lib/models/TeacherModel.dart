@@ -35,11 +35,9 @@ class Teacher {
     classes: List<String>.from(json['Classes'] ?? []),
     subjects: (json['Subjects'] as Map<String, dynamic>).map(
       (key, value) {
-        // Ensure correct type casting and conversion
         if (value is List) {
           return MapEntry(key, List<String>.from(value));
         } else {
-          // Handle cases where the value is not a List<String>
           return MapEntry(key, []);
         }
       },

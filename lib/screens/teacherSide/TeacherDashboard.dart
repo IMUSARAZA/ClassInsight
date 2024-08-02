@@ -135,7 +135,7 @@ class TeacherDashboard extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
                   "Hi, ${_controller.teacher.value!.name}",
-                  style: Font_Styles.largeHeadingBold(context),
+                  style: Font_Styles.mediumHeadingBold(context),
                 ),
               ),
               Padding(

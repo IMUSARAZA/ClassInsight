@@ -159,7 +159,7 @@ class ParentDashboard extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 child: Text(
                   "Hi, ${_controller.student.value!.name}",
-                  style: Font_Styles.largeHeadingBold(context),
+                  style: Font_Styles.mediumHeadingBold(context),
                 ),
               ),
               Padding(

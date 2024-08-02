@@ -32,9 +32,9 @@ class AddStudentController extends GetxController {
   var fatherCNICValid = true.obs;
   var studentRollNoValid = true.obs;
   var selectedClassValid = true.obs;
-
   var selectedGender = ''.obs;
   var selectedClass = ''.obs;
+  var searchName= '';
 
   Future<List<String>> fetchClasses() async {
     return await Database_Service.fetchAllClasses(school.schoolId.value);
@@ -113,6 +113,7 @@ class AddStudentController extends GetxController {
         ),
         barrierDismissible: false,
       );
+      
 
       final student = Student(
         name: capitalizedName,

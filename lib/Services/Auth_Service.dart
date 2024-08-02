@@ -158,6 +158,7 @@ static Future<void> loginTeacher(String email, String password, School school) a
           return MapEntry(key, List<String>.from(value));
         }),
         classTeacher: data['ClassTeacher'],
+        
       );
 
       print('Hi ${teacher.email}');

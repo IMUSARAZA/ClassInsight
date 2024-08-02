@@ -22,7 +22,6 @@ class _ManageTeachersState extends State<ManageTeachers> {
   TextEditingController searchTeacherController = TextEditingController();
   bool teachersValid = true;
   late School school;
-  Timer? _debounce;
 
   @override
   void initState() {
@@ -33,7 +32,6 @@ class _ManageTeachersState extends State<ManageTeachers> {
 
   @override
   void dispose() {
-    _debounce?.cancel();
     searchTeacherController.dispose();
     super.dispose();
   }
@@ -64,13 +62,6 @@ class _ManageTeachersState extends State<ManageTeachers> {
 
 
   void searchTeacher(String value, BuildContext context) {
-    const duration = Duration(milliseconds: 700);
-
-
-
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-
-    _debounce = Timer(duration, () async {
 
       if(_containsDigits(value))
       {
@@ -86,8 +77,6 @@ class _ManageTeachersState extends State<ManageTeachers> {
       else{
       String searchText = capitalize(value);
 
-      print('Searching for teacher: $searchText');
-
       try {
         setState(() {
           teachers = Database_Service.searchTeachersByName(school.schoolId, searchText);
@@ -97,7 +86,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
         Get.snackbar('Error', 'Failed to search for teacher');
       }
       }
-    });
+ 
   }
 
   void deleteTeacher(BuildContext context, String empID) async {

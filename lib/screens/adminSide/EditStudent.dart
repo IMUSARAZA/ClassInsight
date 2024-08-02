@@ -73,6 +73,8 @@ class EditStudent extends StatelessWidget {
                   String capitalizedFatherName =
                       capitalizeName(controller.fatherNameController.text);
 
+                  String searchName = formatNameForSearch(capitalizedName);    
+
                   Map<String, dynamic> updatedData = {
                     'Name': capitalizedName,
                     'Gender': controller.changedGender,
@@ -83,6 +85,7 @@ class EditStudent extends StatelessWidget {
                     'FatherCNIC': controller.fatherCNICController.text,
                     'StudentRollNo': student.studentRollNo,
                     'ClassSection': controller.changedClass,
+                    'searchName': searchName,
                   };
 
                   print("updated data: $updatedData");
@@ -458,7 +461,6 @@ class EditStudentController extends GetxController {
 
   void toggleEditingName() {
     isEditingName = !isEditingName;
-    // Update text controller with current value when entering edit mode
     if (isEditingName) {
       nameController.text = nameController.text;
     }
@@ -486,4 +488,11 @@ String capitalizeName(String name) {
 String _capitalize(String word) {
   if (word.isEmpty) return word;
   return word[0].toUpperCase() + word.substring(1).toLowerCase();
+}
+
+
+String formatNameForSearch(String name) {
+  String noSpaces = name.replaceAll(' ', '');
+  String lowerCaseName = noSpaces.toLowerCase();
+  return lowerCaseName;
 }
