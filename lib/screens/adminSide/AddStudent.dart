@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:classinsight/Widgets/CustomBlueButton.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/utils/AppColors.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AddStudentController extends GetxController {
   final nameController = TextEditingController();
@@ -48,25 +47,25 @@ class AddStudentController extends GetxController {
   }
 
   bool validateInputs() {
-    RegExp numeric13Digits = RegExp(r'^\d{13}$');
+    // RegExp numeric13Digits = RegExp(r'^\d{13}$');
     RegExp numeric11Digits = RegExp(r'^\d{11}$');
 
     nameValid.value = nameController.text.isNotEmpty;
     genderValid.value = selectedGender.value.isNotEmpty;
-    bFormChallanIdValid.value =
-        numeric13Digits.hasMatch(bFormChallanIdController.text);
+    // bFormChallanIdValid.value =
+    //     numeric13Digits.hasMatch(bFormChallanIdController.text);
     if (fatherPhoneNoController.text.isNotEmpty) {
       fatherPhoneNoValid.value =
           numeric11Digits.hasMatch(fatherPhoneNoController.text);
     } else {
       fatherPhoneNoValid.value = true;
     }
-    if (fatherCNICController.text.isNotEmpty) {
-      fatherCNICValid.value =
-          numeric13Digits.hasMatch(fatherCNICController.text);
-    } else {
-      fatherCNICValid.value = true;
-    }
+    // if (fatherCNICController.text.isNotEmpty) {
+    //   fatherCNICValid.value =
+    //       numeric13Digits.hasMatch(fatherCNICController.text);
+    // } else {
+    //   fatherCNICValid.value = true;
+    // }
     studentRollNoValid.value = studentRollNoController.text.isNotEmpty;
     selectedClassValid.value = selectedClass.value.isNotEmpty;
 
@@ -74,8 +73,8 @@ class AddStudentController extends GetxController {
         genderValid.value &&
         bFormChallanIdValid.value &&
         fatherNameValid.value &&
-        fatherPhoneNoValid.value &&
-        fatherCNICValid.value &&
+        // fatherPhoneNoValid.value &&
+        // fatherCNICValid.value &&
         studentRollNoValid.value &&
         selectedClassValid.value;
   }

@@ -15,7 +15,7 @@ class StudentController extends GetxController {
   var selectedClass = ''.obs;
   var selectedNewClass = ''.obs;
   var searchValid = true.obs;
-
+  RxBool isLoading = false.obs;
   final AdminHomeController school = Get.put(AdminHomeController());
 
   @override
@@ -25,6 +25,7 @@ class StudentController extends GetxController {
   }
 
 void fetchStudents() async {
+    isLoading.value = true;
   try {
     if (selectedClass.isNotEmpty) {
       var students = await Database_Service.getStudentsOfASpecificClass(
@@ -34,6 +35,7 @@ void fetchStudents() async {
   } catch (e) {
     print('Error fetching students: $e');
   }
+    isLoading.value = false;
 }
 
 
@@ -54,6 +56,7 @@ void fetchClasses() async {
 
 
   Future<void> refreshData() async {
+    isLoading.value = true;
     fetchClasses();
   }
 
@@ -248,12 +251,12 @@ class ManageStudents extends StatelessWidget {
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                 Obx(() {
-                  if (studentController.studentsList.isEmpty) {
+                  if (studentController.isLoading.value) {
                     return Center(
-                      // child: CircularProgressIndicator(
-                      //   color: AppColors.appLightBlue,
-                      // ),
-                      child: Text('No student found in this section'),
+                      child: CircularProgressIndicator(
+                        color: AppColors.appLightBlue,
+                      ),
+                      // child: Text('No student found in this section'),
                     );
                   } else {
                     return SingleChildScrollView(
