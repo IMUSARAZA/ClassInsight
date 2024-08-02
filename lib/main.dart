@@ -1,6 +1,5 @@
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/routes/mainRoutes.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     await GetStorage.init();
-    Get.put(AdminHomeController());
   } catch (e) {
   }
   runApp(const MyApp());
@@ -31,12 +29,16 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   User? user;
+  bool isTeacherLogged = false;
+  bool isParentLogged = false;
 
   @override
   void initState() {
     super.initState();
     user = FirebaseAuth.instance.currentUser;
-
+    final storage = GetStorage();
+    isTeacherLogged = storage.read('isTeacherLogged') ?? false;
+    isParentLogged = storage.read('isParentLogged') ?? false;
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null) {
         print('User is currently signed out!');
@@ -61,12 +63,15 @@ class _MyAppState extends State<MyApp> {
 
  String _getInitialLocation(User? user) {
     if (user != null) {
-      if (user.email != null) {
-        return '/AdminHome';
-      } else {
-        return '/';
+      if (isTeacherLogged) {
+        return '/TeacherDashboard';
+      } else{
+       return '/AdminHome';
       }
-    } else {
+    } else if (isParentLogged) {
+        return '/ParentDashboard';
+      } 
+    else {
       return '/onBoarding';
     }
   }

@@ -24,21 +24,30 @@ class Teacher {
   });
 
   factory Teacher.fromJson(Map<String, dynamic> json) {
-    return Teacher(
-      empID: json['EmployeeID'] ?? '',
-      name: json['Name'] ?? '',
-      gender: json['Gender'] ?? '',
-      email: json['Email'] ?? '',
-      cnic: json['CNIC'] ?? '',
-      phoneNo: json['PhoneNo'] ?? '',
-      fatherName: json['FatherName'] ?? '',
-      classes: List<String>.from(json['Classes'] ?? []),
-      subjects: (json['Subjects'] ?? {}).map<String, List<String>>(
-        (key, value) => MapEntry(key, List<String>.from(value)),
-      ),
-      classTeacher: json['ClassTeacher'] ?? '',
-    );
-  }
+  return Teacher(
+    empID: json['EmployeeID'] ?? '',
+    name: json['Name'] ?? '',
+    gender: json['Gender'] ?? '',
+    email: json['Email'] ?? '',
+    cnic: json['CNIC'] ?? '',
+    phoneNo: json['PhoneNo'] ?? '',
+    fatherName: json['FatherName'] ?? '',
+    classes: List<String>.from(json['Classes'] ?? []),
+    subjects: (json['Subjects'] as Map<String, dynamic>).map(
+      (key, value) {
+        // Ensure correct type casting and conversion
+        if (value is List) {
+          return MapEntry(key, List<String>.from(value));
+        } else {
+          // Handle cases where the value is not a List<String>
+          return MapEntry(key, []);
+        }
+      },
+    ),
+    classTeacher: json['ClassTeacher'] ?? '',
+  );
+}
+
 
   Map<String, dynamic> toJson() {
     return {

@@ -86,6 +86,8 @@ class _ManageTeachersState extends State<ManageTeachers> {
       else{
       String searchText = capitalize(value);
 
+      print('Searching for teacher: $searchText');
+
       try {
         setState(() {
           teachers = Database_Service.searchTeachersByName(school.schoolId, searchText);
@@ -252,11 +254,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                     return Center(
                       child: Text(
                         'Error: ${snapshot.error}',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: MediaQuery.of(context).size.width * 0.04,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Font_Styles.dataTableTitle(context, MediaQuery.of(context).size.width * 0.04),
                       ),
                     );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -393,14 +391,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                                                   message: entry.value.join(', '),
                                                   child: Text(
                                                     '${entry.key}: ${entry.value.join(', ')}',
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width *
-                                                              0.03,
-                                                    ),
+                                                    style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.03),
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                   ),

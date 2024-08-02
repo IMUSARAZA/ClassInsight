@@ -1,6 +1,5 @@
 // ignore_for_file: must_be_immutable
 import 'dart:math';
-
 import 'package:classinsight/Services/Auth_Service.dart';
 import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
@@ -11,7 +10,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class AddTeacherController extends GetxController {

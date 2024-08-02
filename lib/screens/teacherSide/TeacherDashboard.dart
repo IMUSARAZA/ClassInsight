@@ -5,31 +5,85 @@ import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class TeacherDashboardController extends GetxController {
   RxInt height = 120.obs;
-  late Teacher teacher;
-  final arguments = Get.arguments as List;
+  Rx<Teacher?> teacher = Rx<Teacher?>(null);
+  Rx<School?> school = Rx<School?>(null);
+  final GetStorage _storage = GetStorage();
 
   var classesList = <String>[].obs;
   var selectedClass = ''.obs;
-  late School school;
+  var arguments;
 
-  @override
+    @override
   void onInit() {
     super.onInit();
-    teacher = arguments[0] as Teacher;
-    school = arguments[1] as School;
+    try{
+     arguments = Get.arguments as List?;
+    }
+    catch(e){
+      print(e);
+      loadCachedData();
+
+    }
+    if (arguments != null && arguments.length >= 2) {
+      print('I am in if');
+      teacher.value = arguments[0] as Teacher?;
+      school.value = arguments[1] as School?;
+      
+      if (teacher.value != null && school.value != null) {
+        cacheData(school.value!, teacher.value!);
+      }
+    } else {
+      loadCachedData();
+    }
     fetchClasses();
   }
 
   void fetchClasses() {
-    classesList.value = teacher.classes;
-    if (classesList.isNotEmpty && selectedClass.isEmpty) {
-      selectedClass.value = classesList.first;
+    if (teacher.value != null) {
+      classesList.value = teacher.value!.classes;
+      if (classesList.isNotEmpty && selectedClass.isEmpty) {
+        selectedClass.value = classesList.first;
+      }
     }
   }
+
+  void loadCachedData() {
+    var cachedSchool = _storage.read('cachedSchool');
+    if (cachedSchool != null) {
+      school.value = School.fromJson(cachedSchool);
+    }
+    var cachedTeacher = _storage.read('cachedTeacher');
+    if (cachedTeacher != null) {
+      teacher.value = Teacher.fromJson(cachedTeacher);
+    }
+  }
+
+  void cacheData(School school, Teacher teacher) {
+    print('Caching data');
+    _storage.write('cachedSchool', school.toJson());
+    _storage.write('cachedTeacher', teacher.toJson());
+    _storage.write('isTeacherLogged', true);
+    print('Data cached');
+  }
+
+  void clearCachedData() {
+    _storage.remove('cachedSchool');
+    _storage.remove('cachedTeacher');
+    _storage.remove('isTeacherLogged');
+  }
+
+  void updateData(School school, Teacher teacher) {
+    this.school.value = school;
+    this.teacher.value = teacher;
+    cacheData(school, teacher);
+    fetchClasses();
+  }
 }
+
 
 class TeacherDashboard extends StatelessWidget {
   TeacherDashboard({super.key});
@@ -64,6 +118,7 @@ class TeacherDashboard extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
+              _controller.clearCachedData();
               Auth_Service.logout(context);
             },
             icon: Icon(Icons.logout_rounded, color: Colors.black),
@@ -79,7 +134,7 @@ class TeacherDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
-                  "Hi, ${_controller.teacher.name}",
+                  "Hi, ${_controller.teacher.value!.name}",
                   style: Font_Styles.largeHeadingBold(context),
                 ),
               ),
@@ -87,7 +142,7 @@ class TeacherDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
-                  _controller.teacher.email,
+                  _controller.teacher.value!.email,
                   style: Font_Styles.labelHeadingRegular(context),
                 ),
               ),
@@ -95,7 +150,7 @@ class TeacherDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Text(
-                  'Class Teacher: ${_controller.teacher.classTeacher}',
+                  'Class Teacher: ${_controller.teacher.value!.classTeacher}',
                   style: Font_Styles.labelHeadingLight(context),
                 ),
               ),
@@ -103,7 +158,7 @@ class TeacherDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Text(
-                  _controller.teacher.subjects.toString(),
+                  _controller.teacher.value!.subjects.toString(),
                   style: Font_Styles.labelHeadingLight(context),
                 ),
               ),
@@ -179,7 +234,7 @@ class TeacherDashboard extends StatelessWidget {
                             child: GestureDetector(
                               onTap: () {
                                 Get.toNamed("/MarkAttendance", arguments: [
-                                  _controller.school.schoolId,
+                                  _controller.school.value!.schoolId,
                                   _controller.selectedClass.value
                                 ]);
                               },
@@ -227,9 +282,9 @@ class TeacherDashboard extends StatelessWidget {
                             child: GestureDetector(
                               onTap: () {
                                 Get.toNamed('/DisplayMarks', arguments: [
-                                  _controller.school.schoolId,
+                                  _controller.school.value!.schoolId,
                                   _controller.selectedClass.value,
-                                  _controller.teacher
+                                  _controller.teacher.value
                                 ]);
                               },
                               child: Container(

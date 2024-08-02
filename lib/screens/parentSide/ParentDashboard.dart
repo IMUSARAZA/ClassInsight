@@ -7,32 +7,82 @@ import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ParentDashboardController extends GetxController {
   RxInt height = 120.obs;
-  late Student student;
+  Rx<Student?> student = Rx<Student?>(null);
+  Rx<School?> school = Rx<School?>(null);
   RxList<Announcement> mainAnnouncements = <Announcement>[].obs;
   RxList<Announcement> teacherComments = <Announcement>[].obs;
   var selectedClass = ''.obs;
   var feedetails = ''.obs;
-  late School school;
   RxBool isLoading = true.obs;
   Color feeColor = Colors.red;
+  final GetStorage _storage = GetStorage();
+  var arguments;
 
   @override
   void onInit() {
     super.onInit();
-    final arguments = Get.arguments as List;
-    student = arguments[0] as Student;
-    school = arguments[1] as School;
+    try{
+     arguments = Get.arguments as List?;
+    }
+    catch(e){
+      print(e);
+      loadCachedData();
+
+    }
+    if (arguments != null && arguments.length >= 2) {
+      print('I am in if');
+      student.value = arguments[0] as Student?;
+      school.value = arguments[1] as School?;
+      
+      if (student.value != null && school.value != null) {
+        cacheData(school.value!, student.value!);
+      }
+    } else {
+      loadCachedData();
+    }
     feeStatus();
     fetchAnnouncements();
   }
 
+  void loadCachedData() {
+    var cachedSchool = _storage.read('cachedSchool');
+    if (cachedSchool != null) {
+      school.value = School.fromJson(cachedSchool);
+    }
+    var cachedTeacher = _storage.read('cachedStudent');
+    if (cachedTeacher != null) {
+      student.value = Student.fromJson(cachedTeacher);
+    }
+  }
+
+  void cacheData(School school, Student teacher) {
+    print('Caching data');
+    _storage.write('cachedSchool', school.toJson());
+    _storage.write('cachedStudent', teacher.toJson());
+    _storage.write('isParentLogged', true);
+    print('Data cached');
+  }
+
+  void clearCachedData() {
+    _storage.remove('cachedSchool');
+    _storage.remove('cachedStudent');
+    _storage.remove('isParentLogged');
+  }
+
+  void updateData(School school, Student student) {
+    this.school.value = school;
+    this.student.value = student;
+    cacheData(school, student);
+  }
+
   void feeStatus(){
-    if(student.feeStatus == 'paid'){
-      feedetails.value = student.feeStatus+' '+'('+ student.feeStartDate +' '+ student.feeEndDate+')';
+    if(student.value!.feeStatus == 'paid'){
+      feedetails.value = student.value!.feeStatus+' '+'('+ student.value!.feeStartDate +' '+ student.value!.feeEndDate+')';
       feeColor = Colors.green;
     } else {
       feeColor = Colors.red;
@@ -43,19 +93,18 @@ class ParentDashboardController extends GetxController {
     isLoading.value = true;
 
     final adminAnnouncements =
-        await Database_Service.fetchAdminAnnouncements(school.schoolId);
+        await Database_Service.fetchAdminAnnouncements(school.value!.schoolId);
     if (adminAnnouncements != null) {
       mainAnnouncements.assignAll(adminAnnouncements);
     }
 
     final studentAnnouncements =
         await Database_Service.fetchStudentAnnouncements(
-            school.schoolId, student.studentID);
+            school.value!.schoolId, student.value!.studentID);
     if (studentAnnouncements != null) {
       teacherComments.assignAll(studentAnnouncements);
     }
 
-    print(teacherComments[0]);
     isLoading.value = false;
   }
 }
@@ -93,6 +142,7 @@ class ParentDashboard extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
+              _controller.clearCachedData();
               Auth_Service.logout(context);
             },
             icon: Icon(Icons.logout_rounded, color: Colors.black),
@@ -108,7 +158,7 @@ class ParentDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 child: Text(
-                  "Hi, ${_controller.student.name}",
+                  "Hi, ${_controller.student.value!.name}",
                   style: Font_Styles.largeHeadingBold(context),
                 ),
               ),
@@ -116,7 +166,7 @@ class ParentDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                 child: Text(
-                  'Father Name: ' + _controller.student.fatherName,
+                  'Father Name: ' + _controller.student.value!.fatherName,
                   style: Font_Styles.labelHeadingRegular(context),
                 ),
               ),
@@ -124,7 +174,7 @@ class ParentDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                 child: Text(
-                  'Roll No: ${_controller.student.studentRollNo}',
+                  'Roll No: ${_controller.student.value!.studentRollNo}',
                   style: Font_Styles.labelHeadingLight(context),
                 ),
               ),
@@ -132,7 +182,7 @@ class ParentDashboard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                 child: Text(
-                  'Class: ${_controller.student.classSection}',
+                  'Class: ${_controller.student.value!.classSection}',
                   style: Font_Styles.labelHeadingLight(context),
                 ),
               ),
@@ -297,8 +347,8 @@ class ParentDashboard extends StatelessWidget {
                             child: GestureDetector(
                               onTap: () {
                                 Get.toNamed("/ViewTimetable", arguments: [
-                                  _controller.school.schoolId,
-                                  _controller.student
+                                  _controller.school.value!.schoolId,
+                                  _controller.student.value
                                 ]);
                               },
                               child: Container(
@@ -348,7 +398,7 @@ class ParentDashboard extends StatelessWidget {
                               onTap: () {
                                 print(_controller.student);
                                 Get.toNamed("/ViewAttendance",
-                                    arguments: _controller.student);
+                                    arguments: _controller.student.value);
                               },
                               child: Container(
                                 height: screenHeight * 0.16,
@@ -396,13 +446,13 @@ class ParentDashboard extends StatelessWidget {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                print(_controller.student.studentID);
-                                print(_controller.school.schoolId);
+                                print(_controller.student.value!.studentID);
+                                print(_controller.school.value!.schoolId);
                                 Get.toNamed(
                                   '/Result',
                                   arguments: {
-                                    'student': _controller.student,
-                                    'schoolId': _controller.school
+                                    'student': _controller.student.value,
+                                    'schoolId': _controller.school.value!
                                         .schoolId, // Make sure `schoolId` is accessible here
                                   },
                                 );

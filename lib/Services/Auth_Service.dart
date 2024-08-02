@@ -162,6 +162,8 @@ static Future<void> loginTeacher(String email, String password, School school) a
 
       print('Hi ${teacher.email}');
 
+      
+
       Get.snackbar('Success', 'Login successful');
 
       Get.offAllNamed('/TeacherDashboard', arguments: [teacher,school]);

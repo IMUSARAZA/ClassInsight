@@ -1,5 +1,4 @@
 import 'package:classinsight/firebase_options.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
