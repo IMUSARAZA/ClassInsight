@@ -119,21 +119,8 @@ class Database_Service extends GetxService {
 
       if (studentDoc.exists) {
         Map<String, dynamic> resultMap = studentDoc['resultMap'];
-        return resultMap.map((subject, exams) {
-          Map<String, String> processedExams =
-              Map<String, String>.from(exams).map((examType, marks) {
-            String obtainedMarks = '-';
-            if (marks is String) {
-              RegExp regex = RegExp(r'^(\d+)/\d+$');
-              Match? match = regex.firstMatch(marks);
-              if (match != null) {
-                obtainedMarks = match.group(1) ?? '-';
-              }
-            }
-            return MapEntry(examType, obtainedMarks);
-          });
-          return MapEntry(subject, processedExams);
-        });
+        return resultMap.map(
+            (key, value) => MapEntry(key, Map<String, String>.from(value)));
       } else {
         return {};
       }
@@ -142,6 +129,42 @@ class Database_Service extends GetxService {
       return {};
     }
   }
+
+  // Future<Map<String, Map<String, String>>> fetchStudentResultMap(
+  //     String schoolID, String studentID) async {
+  //   try {
+  //     DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+  //         .collection('Schools')
+  //         .doc(schoolID)
+  //         .collection('Students')
+  //         .doc(studentID)
+  //         .get();
+
+  //     if (studentDoc.exists) {
+  //       Map<String, dynamic> resultMap = studentDoc['resultMap'];
+  //       return resultMap.map((subject, exams) {
+  //         Map<String, String> processedExams =
+  //             Map<String, String>.from(exams).map((examType, marks) {
+  //           String obtainedMarks = '-';
+  //           if (marks is String) {
+  //             RegExp regex = RegExp(r'^(\d+)/\d+$');
+  //             Match? match = regex.firstMatch(marks);
+  //             if (match != null) {
+  //               obtainedMarks = match.group(1) ?? '-';
+  //             }
+  //           }
+  //           return MapEntry(examType, obtainedMarks);
+  //         });
+  //         return MapEntry(subject, processedExams);
+  //       });
+  //     } else {
+  //       return {};
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching resultMap: $e');
+  //     return {};
+  //   }
+  // }
 
   Future<void> updateOrAddMarks(String schoolID, String studentID,
       String subject, String examType, String obtainedMarks) async {
