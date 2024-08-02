@@ -158,7 +158,8 @@ class AddClassSections extends StatelessWidget {
                 Center(
                   child: Container(
                     height: 0.05 * screenHeight,
-                    margin: const EdgeInsets.only(bottom: 10.0),
+                    width: screenWidth * 0.6,
+                    margin: const EdgeInsets.only(bottom: 20.0),
                     child: Obx(
                       () => Container(
                         width: screenWidth * 0.6,

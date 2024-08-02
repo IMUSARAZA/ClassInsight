@@ -53,6 +53,7 @@ class ViewTimetable extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: controller.refreshData,
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text("Manage Timetable", style: Font_Styles.labelHeadingLight(context)),
           backgroundColor: Colors.white,

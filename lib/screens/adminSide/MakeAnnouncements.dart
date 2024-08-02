@@ -72,39 +72,42 @@ class MakeAnnouncements extends StatelessWidget {
                           // Save the changes to the database
 
                           // Navigate back or show a success message
-                          if(controller.announcementController.text.isEmpty){
+                          if (controller.announcementController.text.isEmpty) {
                             Get.snackbar(
                               'Empty Announcement',
                               'Please write an announcement before sending it.',
                             );
                             return;
-                          }else{
-                          showDialog(
-                                      context: context,
-                                      barrierDismissible: false,
-                                      builder: (BuildContext context) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    AppColors.appLightBlue),
-                                          ),
-                                        );
-                                      },
-                                    );
+                          } else {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppColors.appLightBlue),
+                                  ),
+                                );
+                              },
+                            );
 
-                          Get.snackbar(
-                            'Announcement Sent',
-                            'The announement has been successfully sent to all the school.',
-                          );
+                            Get.snackbar(
+                              'Announcement Sent',
+                              'The announement has been successfully sent to all the school.',
+                            );
 
-                          Database_Service.createAnnouncement(controller.school.schoolId.value, '', controller.announcementController.text, 'Admin', true);
+                            Database_Service.createAnnouncement(
+                                controller.school.schoolId.value,
+                                '',
+                                controller.announcementController.text,
+                                'Admin',
+                                true);
 
-                          controller.announcementController.clear();
+                            controller.announcementController.clear();
 
-                          Navigator.of(context).pop();
-
-                        }
+                            Navigator.of(context).pop();
+                          }
                         },
                         child: Text(
                           "Send",
@@ -114,9 +117,8 @@ class MakeAnnouncements extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 Padding(
-                  padding: EdgeInsets.fromLTRB(0, screenHeight * 0.18, 0, 0),
+                  padding: EdgeInsets.fromLTRB(20, screenHeight * 0.18, 20, 0),
                   child: Center(
                     child: Text(
                       "Make Announcement",
@@ -124,29 +126,40 @@ class MakeAnnouncements extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 Center(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(screenWidth * 0.05,
-                      screenHeight * 0.05, screenWidth * 0.05, 0),
-                  child: Container(
-                    height: screenHeight * 0.3,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: TextField(
-                      controller: controller.announcementController,
-                      decoration: const InputDecoration(
-                        hintText: 'Type your announcement here......', 
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(screenWidth * 0.05,
+                        screenHeight * 0.05, screenWidth * 0.05, 0),
+                    child: Container(
+                      height: screenHeight * 0.3,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey),
                       ),
-                      style: Font_Styles.dataTableRows(context, MediaQuery.of(context).size.width * 0.04),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              Colors.white, // Set the background color to white
+                          borderRadius:
+                              BorderRadius.circular(10), // Rounded corners
+                        ),
+                        child: TextField(
+                          controller: controller.announcementController,
+                          decoration: InputDecoration(
+                            hintText: 'Type your announcement here......',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none, // No visible border
+                            ),
+                            contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                          ),
+                          style: Font_Styles.dataTableRows(context,
+                              MediaQuery.of(context).size.width * 0.04),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
               ],
             ),
           ),

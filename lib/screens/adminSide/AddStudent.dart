@@ -11,9 +11,6 @@ import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
-
-
 class AddStudentController extends GetxController {
   final nameController = TextEditingController();
   final bFormChallanIdController = TextEditingController();
@@ -34,7 +31,7 @@ class AddStudentController extends GetxController {
   var selectedClassValid = true.obs;
   var selectedGender = ''.obs;
   var selectedClass = ''.obs;
-  var searchName= '';
+  var searchName = '';
 
   Future<List<String>> fetchClasses() async {
     return await Database_Service.fetchAllClasses(school.schoolId.value);
@@ -50,14 +47,14 @@ class AddStudentController extends GetxController {
     return word[0].toUpperCase() + word.substring(1).toLowerCase();
   }
 
-
   bool validateInputs() {
     RegExp numeric13Digits = RegExp(r'^\d{13}$');
     RegExp numeric11Digits = RegExp(r'^\d{11}$');
 
     nameValid.value = nameController.text.isNotEmpty;
     genderValid.value = selectedGender.value.isNotEmpty;
-    bFormChallanIdValid.value = numeric13Digits.hasMatch(bFormChallanIdController.text);
+    bFormChallanIdValid.value =
+        numeric13Digits.hasMatch(bFormChallanIdController.text);
     if (fatherPhoneNoController.text.isNotEmpty) {
       fatherPhoneNoValid.value =
           numeric11Digits.hasMatch(fatherPhoneNoController.text);
@@ -83,11 +80,9 @@ class AddStudentController extends GetxController {
         selectedClassValid.value;
   }
 
-
   Future<void> addStudent() async {
-
     String capitalizedName = capitalizeName(nameController.text);
-    
+
     String capitalizedFatherName = capitalizeName(fatherNameController.text);
 
     if (validateInputs()) {
@@ -104,7 +99,8 @@ class AddStudentController extends GetxController {
                   width: 30,
                   height: 30,
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.appLightBlue),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.appLightBlue),
                   ),
                 ),
               ],
@@ -113,7 +109,6 @@ class AddStudentController extends GetxController {
         ),
         barrierDismissible: false,
       );
-      
 
       final student = Student(
         name: capitalizedName,
@@ -123,7 +118,7 @@ class AddStudentController extends GetxController {
         fatherPhoneNo: fatherPhoneNoController.text,
         fatherCNIC: fatherCNICController.text,
         studentRollNo: studentRollNoController.text,
-        studentID: '', 
+        studentID: '',
         classSection: selectedClass.value,
         feeStatus: '-',
         feeStartDate: '-',
@@ -138,14 +133,12 @@ class AddStudentController extends GetxController {
         selectedClass.value,
         student,
       );
-      
-      
-      Get.back(); 
-      Get.back(result: selectedClass.value); 
+
+      Get.back();
+      Get.back(result: selectedClass.value);
     }
   }
 }
-
 
 class AddStudent extends StatelessWidget {
   const AddStudent({Key? key}) : super(key: key);
@@ -154,7 +147,6 @@ class AddStudent extends StatelessWidget {
   Widget build(BuildContext context) {
     final AddStudentController controller = Get.put(AddStudentController());
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-
 
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
@@ -196,16 +188,10 @@ class AddStudent extends StatelessWidget {
                     child: AppBar(
                       backgroundColor: AppColors.appLightBlue,
                       elevation: 0,
-                      leading: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {
-                          Get.back();
-                        },
-                      ),
                       title: Center(
                         child: Text(
                           'Add Student',
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(
                             color: Colors.black,
                             fontSize: addStdFontSize,
                             fontWeight: FontWeight.w600,
@@ -214,7 +200,7 @@ class AddStudent extends StatelessWidget {
                       ),
                       actions: <Widget>[
                         Container(
-                          width: 48.0, // Adjust as needed
+                          width: 48.0,
                         ),
                       ],
                     ),
@@ -226,7 +212,7 @@ class AddStudent extends StatelessWidget {
                     child: Text(
                       'Add New Student',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
                         fontSize: headingFontSize,
                         fontWeight: FontWeight.w700,
                       ),

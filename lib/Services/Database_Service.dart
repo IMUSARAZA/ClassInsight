@@ -60,8 +60,7 @@ class Database_Service extends GetxService {
         if (docSnapshot.exists) {
           // Instead of throwing an exception, handle it here
           ScaffoldMessenger.of(context!).showSnackBar(SnackBar(
-              content: Text(
-                  'A student with the same B-Form already exists.')));
+              content: Text('A student with the same B-Form already exists.')));
           return; // Exit the transaction early
         }
 
@@ -120,8 +119,21 @@ class Database_Service extends GetxService {
 
       if (studentDoc.exists) {
         Map<String, dynamic> resultMap = studentDoc['resultMap'];
-        return resultMap.map(
-            (key, value) => MapEntry(key, Map<String, String>.from(value)));
+        return resultMap.map((subject, exams) {
+          Map<String, String> processedExams =
+              Map<String, String>.from(exams).map((examType, marks) {
+            String obtainedMarks = '-';
+            if (marks is String) {
+              RegExp regex = RegExp(r'^(\d+)/\d+$');
+              Match? match = regex.firstMatch(marks);
+              if (match != null) {
+                obtainedMarks = match.group(1) ?? '-';
+              }
+            }
+            return MapEntry(examType, obtainedMarks);
+          });
+          return MapEntry(subject, processedExams);
+        });
       } else {
         return {};
       }
@@ -492,57 +504,56 @@ class Database_Service extends GetxService {
     }
   }
 
-static Future<List<Teacher>> searchTeachersByName(
-    String schoolID, String searchText) async {
-  try {
-    CollectionReference schoolsRef =
-        FirebaseFirestore.instance.collection('Schools');
+  static Future<List<Teacher>> searchTeachersByName(
+      String schoolID, String searchText) async {
+    try {
+      CollectionReference schoolsRef =
+          FirebaseFirestore.instance.collection('Schools');
 
-    QuerySnapshot schoolSnapshot =
-        await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
+      QuerySnapshot schoolSnapshot =
+          await schoolsRef.where('SchoolID', isEqualTo: schoolID).get();
 
-    if (schoolSnapshot.docs.isEmpty) {
-      print('School with ID $schoolID not found');
+      if (schoolSnapshot.docs.isEmpty) {
+        print('School with ID $schoolID not found');
+        return [];
+      }
+
+      DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
+      CollectionReference teachersRef = schoolDocRef.collection('Teachers');
+
+      QuerySnapshot teachersSnapshot = await teachersRef.get();
+
+      List<Teacher> allTeachers = teachersSnapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return Teacher(
+          empID: data['EmployeeID'],
+          name: data['Name'],
+          gender: data['Gender'],
+          email: data['Email'],
+          cnic: data['CNIC'],
+          phoneNo: data['PhoneNo'],
+          fatherName: data['FatherName'],
+          classes: List<String>.from(data['Classes'] ?? []),
+          subjects:
+              (data['Subjects'] as Map<String, dynamic>).map((key, value) {
+            return MapEntry(key, List<String>.from(value));
+          }),
+          classTeacher: data['ClassTeacher'],
+        );
+      }).toList();
+
+      List<Teacher> filteredTeachers = allTeachers.where((teacher) {
+        return teacher.name.contains(searchText);
+      }).toList();
+
+      print('Teachers found: ${filteredTeachers.length}');
+
+      return filteredTeachers;
+    } catch (e) {
+      print('Error searching teachers: $e');
       return [];
     }
-
-    DocumentReference schoolDocRef = schoolSnapshot.docs.first.reference;
-    CollectionReference teachersRef = schoolDocRef.collection('Teachers');
-
-    QuerySnapshot teachersSnapshot = await teachersRef.get();
-
-    List<Teacher> allTeachers = teachersSnapshot.docs.map((doc) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      return Teacher(
-        empID: data['EmployeeID'],
-        name: data['Name'],
-        gender: data['Gender'],
-        email: data['Email'],
-        cnic: data['CNIC'],
-        phoneNo: data['PhoneNo'],
-        fatherName: data['FatherName'],
-        classes: List<String>.from(data['Classes'] ?? []),
-        subjects:
-            (data['Subjects'] as Map<String, dynamic>).map((key, value) {
-          return MapEntry(key, List<String>.from(value));
-        }),
-        classTeacher: data['ClassTeacher'],
-      );
-    }).toList();
-
-    List<Teacher> filteredTeachers = allTeachers.where((teacher) {
-      return teacher.name.contains(searchText);
-    }).toList();
-
-    print('Teachers found: ${filteredTeachers.length}');
-
-    return filteredTeachers;
-  } catch (e) {
-    print('Error searching teachers: $e');
-    return [];
   }
-}
-
 
   static Future<List<Teacher>> searchTeachersByEmployeeID(
       String schoolID, String employeeID) async {
@@ -739,31 +750,30 @@ static Future<List<Teacher>> searchTeachersByName(
   }
 
   static Future<List<Student>> searchStudentsByName(
-    String school, String classSection, String studentName) async {
-  try {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Schools')
-        .doc(school)
-        .collection('Students')
-        .where('ClassSection', isEqualTo: classSection)
-        .get();
+      String school, String classSection, String studentName) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(school)
+          .collection('Students')
+          .where('ClassSection', isEqualTo: classSection)
+          .get();
 
-    List<Student> allStudents = querySnapshot.docs.map((doc) {
-      return Student.fromJson(doc.data() as Map<String, dynamic>);
-    }).toList();
+      List<Student> allStudents = querySnapshot.docs.map((doc) {
+        return Student.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
 
-    List<Student> filteredStudents = allStudents.where((student) {
-      return student.name.toLowerCase().contains(studentName.toLowerCase());
-    }).toList();
+      List<Student> filteredStudents = allStudents.where((student) {
+        return student.name.toLowerCase().contains(studentName.toLowerCase());
+      }).toList();
 
-    return filteredStudents;
-  } catch (e) {
-    print(
-        'Error searching students by name $studentName in class $classSection: $e');
-    return [];
+      return filteredStudents;
+    } catch (e) {
+      print(
+          'Error searching students by name $studentName in class $classSection: $e');
+      return [];
+    }
   }
-}
-
 
   static Future<Student?> getStudentByID(
       String school, String studentID) async {
@@ -1170,7 +1180,7 @@ static Future<List<Teacher>> searchTeachersByName(
   }
 
   Future<List<String>> fetchUniqueSubjects(
-      String schoolId, String employeeId) async {
+      String schoolId, String employeeId, String className) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     List<String> uniqueSubjects = [];
 
@@ -1191,18 +1201,14 @@ static Future<List<Teacher>> searchTeachersByName(
           Map<String, dynamic>? subjectsMap =
               data['Subjects'] as Map<String, dynamic>?;
 
-          if (subjectsMap != null) {
-            print(subjectsMap);
-            Set<String> subjectsSet = {};
-
-            subjectsMap.forEach((className, subjects) {
-              List<dynamic> subjectsList = subjects as List<dynamic>;
-              subjectsSet
-                  .addAll(subjectsList.map((subject) => subject.toString()));
-            });
-
-            uniqueSubjects = subjectsSet.toList();
+          if (subjectsMap != null && subjectsMap.containsKey(className)) {
+            List<dynamic> subjectsList =
+                subjectsMap[className] as List<dynamic>;
+            uniqueSubjects =
+                subjectsList.map((subject) => subject.toString()).toList();
             uniqueSubjects.sort();
+          } else {
+            print('No subjects found for the class $className.');
           }
         }
       } else {

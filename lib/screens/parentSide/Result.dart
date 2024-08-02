@@ -1,4 +1,5 @@
 import 'package:classinsight/firebase_options.dart';
+import 'package:classinsight/utils/fontStyles.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
@@ -93,6 +94,11 @@ class Result extends StatelessWidget {
     controller.setStudent(student);
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Text("Result", style: Font_Styles.labelHeadingRegular(context)),
+        centerTitle: true,
+      ),
       backgroundColor: Colors.white,
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -126,34 +132,6 @@ class Result extends StatelessWidget {
               child: Center(
                 child: Column(
                   children: [
-                    Container(
-                      height: screenHeight * 0.10,
-                      width: screenWidth,
-                      child: AppBar(
-                        elevation: 0,
-                        leading: IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: () {
-                            Get.back();
-                          },
-                        ),
-                        title: Center(
-                          child: Text(
-                            'Result',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: resultFontSize,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        actions: <Widget>[
-                          Container(
-                            width: 48.0, // Adjust as needed
-                          ),
-                        ],
-                      ),
-                    ),
                     Container(
                       height: 0.05 * screenHeight,
                       width: screenWidth,

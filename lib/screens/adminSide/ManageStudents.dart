@@ -137,12 +137,14 @@ class StudentController extends GetxController {
 
 class ManageStudents extends StatelessWidget {
   final StudentController studentController = Get.put(StudentController());
+  
 
   @override
   Widget build(BuildContext context) {
     studentController.refreshData();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(

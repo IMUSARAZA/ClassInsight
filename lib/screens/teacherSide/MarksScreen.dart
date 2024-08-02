@@ -66,8 +66,8 @@ class MarksScreenController extends GetxController {
     print(schoolId);
     print(teacher.empID);
 
-    var subjectsList =
-        await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
+    var subjectsList = await databaseService.fetchUniqueSubjects(
+        schoolId!, teacher.empID, className);
 
     Set<String> uniqueSubjects = {};
 
@@ -81,8 +81,8 @@ class MarksScreenController extends GetxController {
 
   void fetchInitialData() async {
     if (schoolId != null) {
-      subjectsListTeachers.value =
-          await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
+      subjectsListTeachers.value = await databaseService.fetchUniqueSubjects(
+          schoolId!, teacher.empID, className);
       studentsList.value = await Database_Service.getStudentsOfASpecificClass(
           schoolId!, className);
       marksTypeList.value =
@@ -105,8 +105,8 @@ class MarksScreenController extends GetxController {
   }
 
   void updateData() async {
-    subjectsListTeachers.value =
-        await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
+    subjectsListTeachers.value = await databaseService.fetchUniqueSubjects(
+        schoolId!, teacher.empID, className);
     studentsList.value = await Database_Service.getStudentsOfASpecificClass(
         schoolId!, className);
     marksTypeList.value =
@@ -207,11 +207,8 @@ class MarksScreen extends StatelessWidget {
                                     ?.text ??
                                 '';
 
-                            // If obtainedMarks is empty, set it to '-'
-                            if (obtainedMarks.isEmpty) {
-                              obtainedMarks = '-';
-                            } else {
-                              // Validate if obtainedMarks is a number and within range
+                            // Validate if obtainedMarks is a number and within range
+                            if (obtainedMarks.isNotEmpty) {
                               if (!RegExp(r'^[0-9]+$')
                                   .hasMatch(obtainedMarks)) {
                                 obtainedMarks =
@@ -227,11 +224,18 @@ class MarksScreen extends StatelessWidget {
                                 allValid =
                                     false; // Mark as invalid if obtainedMarks is out of range
                               }
+                            } else {
+                              obtainedMarks =
+                                  '-'; // Set to '-' if obtainedMarks is empty
                             }
 
                             // Print the values (for debugging or logging purposes)
                             print(
                                 'Roll No.: $studentRollNo, Name: $studentName, Obtained Marks: $obtainedMarks, Total Marks: $totalMarks, Subject: $subject, Exam Type: $examType');
+
+                            // Format the marks
+                            String formattedMarks =
+                                '$obtainedMarks/$totalMarks';
 
                             // Update or add marks to the database
                             Database_Service database_service =
@@ -241,7 +245,7 @@ class MarksScreen extends StatelessWidget {
                               student.studentID,
                               subject,
                               examType,
-                              obtainedMarks,
+                              formattedMarks,
                             );
                           }
 

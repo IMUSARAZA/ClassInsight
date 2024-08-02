@@ -4,6 +4,7 @@ import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/screens/teacherSide/MarksScreen.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,6 +37,7 @@ class DisplayMarksController extends GetxController {
   var studentsList = <Student>[].obs;
   var examsList = <String>[].obs;
   var subjectsListTeachers = <String>[].obs;
+  var obtainedMarks;
 
   var selectedSubject = ''.obs;
   late String className;
@@ -69,8 +71,8 @@ class DisplayMarksController extends GetxController {
     print(teacher.empID);
 
     // Use the fetchUniqueSubjects method to get the subjects taught by the teacher
-    var subjectsList =
-        await databaseService.fetchUniqueSubjects(schoolId!, teacher.empID);
+    var subjectsList = await databaseService.fetchUniqueSubjects(
+        schoolId!, teacher.empID, className);
 
     Set<String> uniqueSubjects = {};
 
@@ -91,6 +93,82 @@ class DisplayMarksController extends GetxController {
           await databaseService.fetchExamStructure(schoolId!, className);
     } else {
       print('Error: schoolId is null');
+    }
+  }
+
+  Future<String> fetchTotalObtainedMarks(String studentID) async {
+    try {
+      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolId!)
+          .collection('Students')
+          .doc(studentID)
+          .get();
+
+      if (studentDoc.exists) {
+        Map<String, dynamic> resultMap = studentDoc['resultMap'];
+        int totalSum = 0;
+
+        // Get the results for the selected subject
+        var subjectResults = resultMap[selectedSubject.value] ?? {};
+
+        for (var examType in examsList) {
+          var marks = subjectResults[examType] ?? '-';
+          if (marks is String) {
+            RegExp regex = RegExp(r'(\d+)/(\d+)');
+            Match? match = regex.firstMatch(marks);
+            if (match != null) {
+              int obtainedMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
+              totalSum += obtainedMarks;
+            }
+          }
+        }
+
+        return totalSum.toString();
+      } else {
+        return '0';
+      }
+    } catch (e) {
+      print('Error fetching resultMap: $e');
+      return '0';
+    }
+  }
+
+  Future<String> fetchStudentTotalMarksSum(String studentID) async {
+    try {
+      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolId!)
+          .collection('Students')
+          .doc(studentID)
+          .get();
+
+      if (studentDoc.exists) {
+        Map<String, dynamic> resultMap = studentDoc['resultMap'];
+        int totalSum = 0;
+
+        // Get the results for the selected subject
+        var subjectResults = resultMap[selectedSubject.value] ?? {};
+
+        for (var examType in examsList) {
+          var marks = subjectResults[examType] ?? '-';
+          if (marks is String) {
+            RegExp regex = RegExp(r'\d+/(\d+)');
+            Match? match = regex.firstMatch(marks);
+            if (match != null) {
+              int totalMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
+              totalSum += totalMarks;
+            }
+          }
+        }
+
+        return totalSum.toString();
+      } else {
+        return '0';
+      }
+    } catch (e) {
+      print('Error fetching resultMap: $e');
+      return '0';
     }
   }
 
@@ -274,11 +352,29 @@ class DisplayMarks extends StatelessWidget {
                                     ),
                                   ),
                                 ),
+                              DataColumn(
+                                label: Text(
+                                  'Obtained Marks',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Total Marks',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                             ],
                             rows: students.map((student) {
                               return DataRow(
-                                color: MaterialStateColor.resolveWith((states) => AppColors.appOrange),
-                                
+                                color: MaterialStateColor.resolveWith(
+                                    (states) => AppColors.appOrange),
                                 cells: [
                                   DataCell(Text(student.studentRollNo)),
                                   DataCell(Text(student.name)),
@@ -301,6 +397,44 @@ class DisplayMarks extends StatelessWidget {
                                         },
                                       ),
                                     ),
+                                  DataCell(
+                                    FutureBuilder<String>(
+                                      future:
+                                          controller.fetchTotalObtainedMarks(
+                                              student.studentID),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Text('');
+                                        } else if (snapshot.hasError) {
+                                          return Text('Error');
+                                        } else {
+                                          final totalMarksSum =
+                                              snapshot.data ?? '0';
+                                          return Text(totalMarksSum);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  DataCell(
+                                    FutureBuilder<String>(
+                                      future:
+                                          controller.fetchStudentTotalMarksSum(
+                                              student.studentID),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Text('');
+                                        } else if (snapshot.hasError) {
+                                          return Text('Error');
+                                        } else {
+                                          final totalMarksSum =
+                                              snapshot.data ?? '0';
+                                          return Text(totalMarksSum);
+                                        }
+                                      },
+                                    ),
+                                  ),
                                 ],
                               );
                             }).toList(),
