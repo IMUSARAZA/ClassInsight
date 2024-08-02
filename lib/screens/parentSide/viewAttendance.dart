@@ -43,8 +43,11 @@ class ViewAttendController extends GetxController {
 
   Color getColorBasedOnPercentage(double percentage) {
     if (percentage < 50) {
+      return Colors.red;
+    } else if(percentage<70 && percentage >=50) {
       return AppColors.appOrange;
-    } else {
+    }
+    else{
       return AppColors.appDarkBlue;
     }
   }
@@ -165,7 +168,9 @@ class ViewAttendance extends StatelessWidget {
                       child: Obx(() {
                         return ConstrainedBox(
                           constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                          child: DataTable(
+                          child: 
+                          controller.attendance.entries.isNotEmpty ?
+                          DataTable(
                             columnSpacing: screenWidth * 0.1,
                             sortAscending: false,
                             sortColumnIndex: 1,
@@ -183,7 +188,7 @@ class ViewAttendance extends StatelessWidget {
                                 ],
                               );
                             }).toList(),
-                          ),
+                          ): Center(child: Text('No attedance for ${controller.selectedMonth}')),
                         );
                       }),
                     ),

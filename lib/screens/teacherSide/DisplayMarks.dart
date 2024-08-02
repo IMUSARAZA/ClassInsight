@@ -211,12 +211,6 @@ class DisplayMarks extends StatelessWidget {
                   width: screenWidth,
                   child: AppBar(
                     backgroundColor: Colors.white,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        Get.back();
-                      },
-                    ),
                     title: Text(
                       'Marks',
                       style: Font_Styles.labelHeadingLight(context),
@@ -237,7 +231,7 @@ class DisplayMarks extends StatelessWidget {
                         },
                         child: Text(
                           "Edit",
-                          style: Font_Styles.labelHeadingLight(context),
+                          style: Font_Styles.labelHeadingLight(context,color: Colors.black),
                         ),
                       ),
                     ],

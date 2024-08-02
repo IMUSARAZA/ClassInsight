@@ -145,12 +145,6 @@ class MarksScreen extends StatelessWidget {
                   width: screenWidth,
                   child: AppBar(
                     backgroundColor: Colors.white,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        Get.back();
-                      },
-                    ),
                     title: Text(
                       'Marks',
                       style: Font_Styles.labelHeadingLight(context),
@@ -168,7 +162,6 @@ class MarksScreen extends StatelessWidget {
                             Get.snackbar(
                               'Error',
                               'School ID is missing.',
-                              snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.red,
                               colorText: Colors.white,
                             );
@@ -186,7 +179,6 @@ class MarksScreen extends StatelessWidget {
                             Get.snackbar(
                               'Error',
                               'Total Marks must be a valid number.',
-                              snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.red,
                               colorText: Colors.white,
                             );
@@ -254,7 +246,6 @@ class MarksScreen extends StatelessWidget {
                             Get.snackbar(
                               'Success',
                               'Marks have been updated successfully.',
-                              snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.green,
                               colorText: Colors.white,
                             );
@@ -262,7 +253,6 @@ class MarksScreen extends StatelessWidget {
                             Get.snackbar(
                               'Error',
                               'Please enter valid marks for all students.',
-                              snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.red,
                               colorText: Colors.white,
                             );

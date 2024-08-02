@@ -15,6 +15,7 @@ class AttendanceController extends GetxController {
   final arguments = Get.arguments as List;
   RxString schoolId = ''.obs;
   RxString selectedClass = ''.obs;
+  RxString teacherName = ''.obs;
 
   
 
@@ -24,6 +25,7 @@ class AttendanceController extends GetxController {
     datepicker.text = "${DateTime.now().toLocal()}".split(' ')[0]; // Initialize with current date
     schoolId.value = arguments[0] as String;
     selectedClass.value = arguments[1] as String;
+    teacherName.value = arguments[2] as String;
     fetchStudents();
   }
 
@@ -93,12 +95,28 @@ class MarkAttendance extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              // if (controller.selectedHeaderValue.value.isEmpty) {
-              //   Get.snackbar("Attendance unmarked", 'Kindly mark the attendance for submission');
-              // } else {
-              //   await Database_Service.updateAttendance(controller.schoolId.value, controller.getStudentStatusMap(), controller.datepicker.text);
-              // }
-                await Database_Service.updateAttendance(controller.schoolId.value, controller.getStudentStatusMap(), controller.datepicker.text);
+              showDialog(
+                context: context, 
+              builder: (context)
+              {
+                return AlertDialog(
+                  title: Text("Attendance"),
+                  content: Text('Are you sure you want to submit the attendance for ${controller.selectedClass}?'),
+                  actions: [
+                    TextButton(
+                      onPressed: (){
+                        Get.back();
+                      }, 
+                    child: Text('No')),
+                    TextButton(
+                      onPressed: () async{
+                      await Database_Service.updateAttendance(controller.schoolId.value, controller.getStudentStatusMap(), controller.datepicker.text);
+                      }, 
+                    child: Text('Yes')),
+                  ],
+                );
+              });
+
             },
             child: Text('Submit', style: Font_Styles.labelHeadingRegular(context, color: Colors.black)),
           ),
@@ -286,7 +304,12 @@ class MarkAttendance extends StatelessWidget {
                                             String remarks = controller.remarkscontroller.text;
                                             if (remarks.isNotEmpty) {
                                               print('Remarks for ${student.name}: $remarks');
-                                              await Database_Service.createAnnouncement(controller.schoolId.value, student.studentID, remarks, 'Teacher', false);
+                                              await Database_Service.createAnnouncement(
+                                                controller.schoolId.value, 
+                                                student.studentID, 
+                                                remarks,
+                                                controller.teacherName.value, 
+                                                false);
 
                                               Get.back();
                                             } else {

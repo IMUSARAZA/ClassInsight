@@ -251,6 +251,7 @@ class _ManageTeachersState extends State<ManageTeachers> {
                     );
                   } else {
                     return SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
                       scrollDirection: Axis.horizontal,
                       child: DataTable(
                         showCheckboxColumn: false,

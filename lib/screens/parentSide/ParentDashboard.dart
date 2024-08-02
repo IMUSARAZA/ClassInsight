@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:classinsight/Services/Auth_Service.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/AnnouncementsModel.dart';
@@ -5,6 +7,7 @@ import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/StudentModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -22,25 +25,26 @@ class ParentDashboardController extends GetxController {
   Color feeColor = Colors.red;
   final GetStorage _storage = GetStorage();
   var arguments;
+  late StreamSubscription studentSubscription;
+  late StreamSubscription schoolSubscription;
 
   @override
   void onInit() {
     super.onInit();
-    try{
-     arguments = Get.arguments as List?;
-    }
-    catch(e){
+    try {
+      arguments = Get.arguments as List?;
+    } catch (e) {
       print(e);
       loadCachedData();
-
     }
     if (arguments != null && arguments.length >= 2) {
       print('I am in if');
       student.value = arguments[0] as Student?;
       school.value = arguments[1] as School?;
-      
+
       if (student.value != null && school.value != null) {
         cacheData(school.value!, student.value!);
+        addListeners();
       }
     } else {
       loadCachedData();
@@ -49,21 +53,29 @@ class ParentDashboardController extends GetxController {
     fetchAnnouncements();
   }
 
+  @override
+  void onClose() {
+    super.onClose();
+    studentSubscription.cancel();
+    schoolSubscription.cancel();
+  }
+
   void loadCachedData() {
     var cachedSchool = _storage.read('cachedSchool');
     if (cachedSchool != null) {
       school.value = School.fromJson(cachedSchool);
+      addListeners();
     }
-    var cachedTeacher = _storage.read('cachedStudent');
-    if (cachedTeacher != null) {
-      student.value = Student.fromJson(cachedTeacher);
+    var cachedStudent = _storage.read('cachedStudent');
+    if (cachedStudent != null) {
+      student.value = Student.fromJson(cachedStudent);
     }
   }
 
-  void cacheData(School school, Student teacher) {
+  void cacheData(School school, Student student) {
     print('Caching data');
     _storage.write('cachedSchool', school.toJson());
-    _storage.write('cachedStudent', teacher.toJson());
+    _storage.write('cachedStudent', student.toJson());
     _storage.write('isParentLogged', true);
     print('Data cached');
   }
@@ -80,9 +92,15 @@ class ParentDashboardController extends GetxController {
     cacheData(school, student);
   }
 
-  void feeStatus(){
-    if(student.value!.feeStatus == 'paid'){
-      feedetails.value = student.value!.feeStatus+' '+'('+ student.value!.feeStartDate +' '+ student.value!.feeEndDate+')';
+  void feeStatus() {
+    if (student.value!.feeStatus == 'paid') {
+      feedetails.value = student.value!.feeStatus +
+          ' ' +
+          '(' +
+          student.value!.feeStartDate +
+          ' ' +
+          student.value!.feeEndDate +
+          ')';
       feeColor = Colors.green;
     } else {
       feeColor = Colors.red;
@@ -92,22 +110,47 @@ class ParentDashboardController extends GetxController {
   void fetchAnnouncements() async {
     isLoading.value = true;
 
-    final adminAnnouncements =
-        await Database_Service.fetchAdminAnnouncements(school.value!.schoolId);
+    final adminAnnouncements = await Database_Service.fetchAdminAnnouncements(
+        school.value!.schoolId);
     if (adminAnnouncements != null) {
       mainAnnouncements.assignAll(adminAnnouncements);
     }
 
-    final studentAnnouncements =
-        await Database_Service.fetchStudentAnnouncements(
-            school.value!.schoolId, student.value!.studentID);
+    final studentAnnouncements = await Database_Service.fetchStudentAnnouncements(
+        school.value!.schoolId, student.value!.studentID);
     if (studentAnnouncements != null) {
       teacherComments.assignAll(studentAnnouncements);
     }
 
     isLoading.value = false;
   }
+
+  void addListeners() {
+    studentSubscription = FirebaseFirestore.instance
+        .collection('Schools')
+        .doc(school.value!.schoolId)
+        .collection('Students')
+        .doc(student.value!.studentID)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        student.value = Student.fromJson(snapshot.data()!);
+        feeStatus();
+      }
+    });
+
+    schoolSubscription = FirebaseFirestore.instance
+        .collection('Schools')
+        .doc(school.value!.schoolId)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        school.value = School.fromJson(snapshot.data()!);
+      }
+    });
+  }
 }
+
 
 class ParentDashboard extends StatelessWidget {
   ParentDashboard({super.key});
@@ -133,6 +176,7 @@ class ParentDashboard extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: Text(
           "Dashboard",
           style: Font_Styles.labelHeadingLight(context),
@@ -198,6 +242,7 @@ class ParentDashboard extends StatelessWidget {
                     ),
                 ),
               ),
+              SizedBox(height: screenHeight*0.02,),
               Expanded(
                 child: Container(
                   width: screenWidth,
@@ -284,8 +329,8 @@ class ParentDashboard extends StatelessWidget {
                                                   title: Text(announcement
                                                           .announcementDescription ??
                                                       ''),
-                                                  subtitle: Text(announcement
-                                                          .announcementBy ??
+                                                  subtitle: Text('-' + announcement
+                                                          .announcementBy! ??
                                                       ''),
                                                 );
                                               },
@@ -327,8 +372,8 @@ class ParentDashboard extends StatelessWidget {
                                                   title: Text(comment
                                                           .announcementDescription ??
                                                       ''),
-                                                  subtitle: Text(
-                                                      comment.announcementBy ??
+                                                  subtitle: Text('-' + 
+                                                      comment.announcementBy! ??
                                                           ''),
                                                 );
                                               },

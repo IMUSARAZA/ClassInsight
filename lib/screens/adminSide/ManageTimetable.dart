@@ -105,6 +105,7 @@ class ManageTimetable extends StatelessWidget {
           child: Icon(Icons.delete_rounded, color: AppColors.appOrange),
         ),
         body: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

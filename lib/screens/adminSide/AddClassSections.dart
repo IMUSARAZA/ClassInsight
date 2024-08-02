@@ -11,6 +11,7 @@ import 'package:classinsight/utils/AppColors.dart';
 class AddClassSectionsController extends GetxController {
   RxnInt selectedSections = RxnInt();
   RxBool textShow = false.obs;
+  var textFieldValue = ''.obs;
   RxList<bool> isValidList = <bool>[].obs;
   TextEditingController gradeName = TextEditingController();
   RxList<TextEditingController> sectionControllers = <TextEditingController>[].obs;
@@ -88,6 +89,10 @@ class AddClassSections extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
+      controller.gradeName.addListener(() {
+      controller.textFieldValue.value = controller.gradeName.text;
+    });
+
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
       body: SingleChildScrollView(
@@ -120,7 +125,7 @@ class AddClassSections extends StatelessWidget {
                       ),
                       Obx(() {
                         if (controller.addClass.value) {
-                          return controller.gradeName.text.isNotEmpty ? TextButton(
+                          return controller.textFieldValue.isNotEmpty ? TextButton(
                             onPressed: () {
                               if (controller.validateFields()) {
                                 List<String> formData = controller.collectFormValues();

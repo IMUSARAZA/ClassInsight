@@ -3,6 +3,7 @@ import 'package:classinsight/models/SchoolModel.dart';
 import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -17,17 +18,16 @@ class TeacherDashboardController extends GetxController {
   var selectedClass = ''.obs;
   var arguments;
 
-    @override
+  @override
   void onInit() {
     super.onInit();
-    try{
-     arguments = Get.arguments as List?;
-    }
-    catch(e){
+    try {
+      arguments = Get.arguments as List?;
+    } catch (e) {
       print(e);
       loadCachedData();
-
     }
+
     if (arguments != null && arguments.length >= 2) {
       print('I am in if');
       teacher.value = arguments[0] as Teacher?;
@@ -39,7 +39,11 @@ class TeacherDashboardController extends GetxController {
     } else {
       loadCachedData();
     }
+
     fetchClasses();
+
+    // Set up real-time listeners
+    setupRealTimeListeners();
   }
 
   void fetchClasses() {
@@ -82,6 +86,37 @@ class TeacherDashboardController extends GetxController {
     cacheData(school, teacher);
     fetchClasses();
   }
+
+  void setupRealTimeListeners() {
+    if (teacher.value != null && school.value != null) {
+      // Set up listener for teacher document
+      FirebaseFirestore.instance
+          .collection('Teachers')
+          .doc()
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.exists) {
+          Teacher updatedTeacher = Teacher.fromJson(snapshot.data()!);
+          teacher.value = updatedTeacher;
+          cacheData(school.value!, updatedTeacher); // Update cached data
+          fetchClasses();
+        }
+      });
+
+      // Set up listener for school document
+      FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(school.value!.schoolId)
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.exists) {
+          School updatedSchool = School.fromJson(snapshot.data()!);
+          school.value = updatedSchool;
+          cacheData(updatedSchool, teacher.value!); // Update cached data
+        }
+      });
+    }
+  }
 }
 
 
@@ -109,6 +144,7 @@ class TeacherDashboard extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: Text(
           "Dashboard",
           style: Font_Styles.labelHeadingLight(context),
@@ -230,12 +266,16 @@ class TeacherDashboard extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: screenHeight * 0.01),
+                          
+                          Obx(() =>
+                          _controller.selectedClass.value == _controller.teacher.value!.classTeacher ?
                           Center(
                             child: GestureDetector(
                               onTap: () {
                                 Get.toNamed("/MarkAttendance", arguments: [
                                   _controller.school.value!.schoolId,
-                                  _controller.selectedClass.value
+                                  _controller.selectedClass.value,
+                                  _controller.teacher.value!.name
                                 ]);
                               },
                               child: Container(
@@ -276,7 +316,7 @@ class TeacherDashboard extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          ),
+                          ):Container()),
                           SizedBox(height: screenHeight * 0.03),
                           Center(
                             child: GestureDetector(

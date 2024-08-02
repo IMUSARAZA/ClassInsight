@@ -67,7 +67,8 @@ class MakeAnnouncements extends StatelessWidget {
                       Container(
                         width: 48.0,
                       ),
-                      TextButton(
+                      //  controller.announcementController.text.isNotEmpty? 
+                       TextButton(
                         onPressed: () {
                           // Save the changes to the database
 
@@ -111,9 +112,10 @@ class MakeAnnouncements extends StatelessWidget {
                         },
                         child: Text(
                           "Send",
-                          style: Font_Styles.labelHeadingLight(context),
+                          style: Font_Styles.labelHeadingLight(context,color: Colors.black),
                         ),
-                      ),
+                      )
+                      // : Container()
                     ],
                   ),
                 ),
@@ -131,7 +133,7 @@ class MakeAnnouncements extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(screenWidth * 0.05,
                         screenHeight * 0.05, screenWidth * 0.05, 0),
                     child: Container(
-                      height: screenHeight * 0.3,
+                      // height: screenHeight * 0.3,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Colors.grey),
@@ -144,6 +146,9 @@ class MakeAnnouncements extends StatelessWidget {
                               BorderRadius.circular(10), // Rounded corners
                         ),
                         child: TextField(
+                          maxLength: 100,
+                          maxLines: null,
+                          minLines: 1,
                           controller: controller.announcementController,
                           decoration: InputDecoration(
                             hintText: 'Type your announcement here......',
@@ -151,10 +156,10 @@ class MakeAnnouncements extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide.none, // No visible border
                             ),
-                            contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            // contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                           ),
                           style: Font_Styles.dataTableRows(context,
-                              MediaQuery.of(context).size.width * 0.04),
+                              MediaQuery.of(context).size.width * 0.05),
                         ),
                       ),
                     ),

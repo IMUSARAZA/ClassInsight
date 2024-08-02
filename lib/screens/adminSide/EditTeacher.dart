@@ -234,13 +234,13 @@ class EditTeacher extends StatelessWidget {
 
                             Get.snackbar('Teacher Updated',
                                 'The teacher has been updated successfully');
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pop();
+                            Get.back();
+                            Get.back();
                           }
                         },
                         child: Text(
                           "Update",
-                          style: Font_Styles.labelHeadingLight(context),
+                          style: Font_Styles.labelHeadingLight(context,color: Colors.black),
                         ),
                       ),
                     ],
@@ -460,11 +460,11 @@ class EditTeacher extends StatelessWidget {
                                       ),
                                       checkColor: Colors.white,
                                       cancelText: Text(
-                                        "CANCEL",
+                                        "Cancel",
                                         style: Font_Styles.labelHeadingRegular(context),
                                       ),
                                       confirmText: Text(
-                                        "OK",
+                                        "Ok",
                                         style: Font_Styles.labelHeadingRegular(context),
                                       ),
                                       initialValue: controller
@@ -521,11 +521,11 @@ class EditTeacher extends StatelessWidget {
                                                   ),
                                                   selectedColor: Colors.black,
                                                   cancelText: Text(
-                                                    "CANCEL",
+                                                    "Cancel",
                                                     style: Font_Styles.labelHeadingRegular(context),
                                                   ),
                                                   confirmText: Text(
-                                                    "OK",
+                                                    "Ok",
                                                     style: Font_Styles.labelHeadingRegular(context),
                                                   ),
                                                   checkColor: Colors.white,

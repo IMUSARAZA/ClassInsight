@@ -24,50 +24,52 @@ class StudentController extends GetxController {
     refreshData();
   }
 
-  void fetchStudents() async {
-    try {
-      if (selectedClass.isNotEmpty) {
-        var students = await Database_Service.getStudentsOfASpecificClass(
-            school.schoolId.value, selectedClass.value);
-        studentsList.value = students;
-      }
-    } catch (e) {
-      print('Error fetching students: $e');
+void fetchStudents() async {
+  try {
+    if (selectedClass.isNotEmpty) {
+      var students = await Database_Service.getStudentsOfASpecificClass(
+          school.schoolId.value, selectedClass.value);
+      studentsList.value = students;
     }
+  } catch (e) {
+    print('Error fetching students: $e');
   }
+}
 
-  void fetchClasses() async {
+
+void fetchClasses() async {
+  try {
     var classes = await Database_Service.fetchAllClasses(school.schoolId.value);
     classesList.value = classes;
 
     if (classes.isNotEmpty && selectedClass.isEmpty) {
       selectedClass.value = classes.first;
     }
-
+  } catch (e) {
+    print('Error fetching classes: $e');
+  } finally {
     fetchStudents();
   }
+}
 
-  void refreshStudentList() {
-    fetchStudents();
-  }
 
   Future<void> refreshData() async {
-    fetchStudents();
     fetchClasses();
   }
 
-  void searchStudent(String value) async {
-    if (_containsDigits(value)) {
-      var students = await Database_Service.searchStudentsByRollNo(
-          school.schoolId.value, selectedClass.value, value);
-      studentsList.value = students;
-    } else {
-      var searchText = capitalize(value);
-      var students = await Database_Service.searchStudentsByName(
-          school.schoolId.value, selectedClass.value, searchText);
-      studentsList.value = students;
-    }
+void searchStudent(String value) async {
+  if (_containsDigits(value)) {
+    var students = await Database_Service.searchStudentsByRollNo(
+        school.schoolId.value, selectedClass.value, value);
+    studentsList.value = students;
+  } else {
+    var searchText = capitalize(value);
+    var students = await Database_Service.searchStudentsByName(
+        school.schoolId.value, selectedClass.value, searchText);
+    studentsList.value = students;
   }
+}
+
 
   bool _containsDigits(String value) {
     return value.contains(RegExp(r'\d'));
@@ -80,68 +82,69 @@ class StudentController extends GetxController {
     }).join(' ');
   }
 
-  void deleteStudent(BuildContext context, String studentID) async {
-    bool confirmDelete = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Are you sure?'),
-          content: Text('This will delete this student permanently'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Get.back();
-              },
-              child: Text('Cancel'),
+ void deleteStudent(BuildContext context, String studentID) async {
+  bool confirmDelete = await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Are you sure?'),
+        content: Text('This will delete this student permanently'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            child: Text('Delete'),
+          ),
+        ],
+      );
+    },
+  );
+
+  if (confirmDelete) {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
             ),
-            TextButton(
-              onPressed: () {
-                Get.back();
-              },
-              child: Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
+          );
+        },
+      );
 
-    if (confirmDelete) {
-      try {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-              ),
-            );
-          },
-        );
+      await Database_Service.deleteStudent(school.schoolId.value, studentID);
 
-        await Database_Service.deleteStudent(school.schoolId.value, studentID);
+      Get.back();
 
-        Get.back();
-
-        refreshStudentList();
-      } catch (e) {
-        print('Error deleting student: $e');
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete student')),
-        );
-      }
+      fetchStudents();
+    } catch (e) {
+      print('Error deleting student: $e');
+      Get.back();  // Ensure dialog is dismissed
+      Get.snackbar('Delete failed','Failed to delete student');
+      
     }
   }
 }
 
+}
+
+// ignore: must_be_immutable
 class ManageStudents extends StatelessWidget {
   final StudentController studentController = Get.put(StudentController());
+  TextEditingController searchController = TextEditingController();
   
 
   @override
   Widget build(BuildContext context) {
-    studentController.refreshData();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -164,7 +167,7 @@ class ManageStudents extends StatelessWidget {
               if (studentController.selectedNewClass.value.isNotEmpty) {
                 studentController.selectedClass.value =
                     studentController.selectedNewClass.value;
-                studentController.refreshStudentList();
+                studentController.refreshData();
 
                 print(
                     'Selected Class: ${studentController.selectedNewClass.value}');
@@ -180,6 +183,7 @@ class ManageStudents extends StatelessWidget {
       body: RefreshIndicator(
         onRefresh: studentController.refreshData,
         child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Obx(
             () => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,7 +229,7 @@ class ManageStudents extends StatelessWidget {
                       }).toList(),
                       onChanged: (String? newValue) {
                         studentController.selectedClass.value = newValue!;
-                        studentController.refreshStudentList();
+                        studentController.refreshData();
                       },
                     );
                   }),
@@ -233,11 +237,11 @@ class ManageStudents extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.fromLTRB(30, 0, 30, 20),
                   child: CustomTextField(
-                    controller: TextEditingController(),
+                    controller: searchController,
                     hintText: 'Search by name or roll no.',
                     labelText: 'Search Student',
                     isValid: studentController.searchValid.value,
-                    onChanged: (String value) {
+                    onChanged: (String value) async {
                       studentController.searchStudent(value);
                     },
                   ),
@@ -458,7 +462,7 @@ class ManageStudents extends StatelessWidget {
 
                                         if (result == 'student_added') {
                                           studentController
-                                              .refreshStudentList();
+                                              .refreshData();
                                         }
                                       },
                                     ),
@@ -493,6 +497,7 @@ class ManageStudents extends StatelessWidget {
 }
 
 
+
 void _showFeeStatusPopup(BuildContext context, Student student) {
   showDialog(
     context: context,
@@ -502,7 +507,6 @@ void _showFeeStatusPopup(BuildContext context, Student student) {
     },
   );
 }
-
 class UpdateFeeStatusDialog extends StatefulWidget {
   final Student student;
 
@@ -641,9 +645,9 @@ class _UpdateFeeStatusDialogState extends State<UpdateFeeStatusDialog> {
                   updatedEndDate);
 
               final studentController = Get.find<StudentController>();
-              studentController.refreshStudentList();
+              studentController.refreshData();
 
-              Navigator.of(context).pop();
+              Get.back();
             } catch (e) {
               print('Error updating fee status: $e');
               Get.snackbar("Failed updating", "Error updating fee status");
