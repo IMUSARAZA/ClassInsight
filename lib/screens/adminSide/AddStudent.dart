@@ -57,7 +57,7 @@ class AddStudentController extends GetxController {
 
     nameValid.value = nameController.text.isNotEmpty;
     genderValid.value = selectedGender.value.isNotEmpty;
-    bFormChallanIdValid.value = bFormChallanIdController.text.isNotEmpty;
+    bFormChallanIdValid.value = numeric13Digits.hasMatch(bFormChallanIdController.text);
     if (fatherPhoneNoController.text.isNotEmpty) {
       fatherPhoneNoValid.value =
           numeric11Digits.hasMatch(fatherPhoneNoController.text);
@@ -82,6 +82,7 @@ class AddStudentController extends GetxController {
         studentRollNoValid.value &&
         selectedClassValid.value;
   }
+
 
   Future<void> addStudent() async {
 
@@ -151,6 +152,8 @@ class AddStudent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AddStudentController controller = Get.put(AddStudentController());
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
 
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
@@ -247,6 +250,7 @@ class AddStudent extends StatelessWidget {
                         ],
                       ),
                       child: SingleChildScrollView(
+                        padding: EdgeInsets.only(bottom: keyboardHeight),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [

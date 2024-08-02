@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -49,7 +50,13 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(
+       theme: ThemeData(
+        brightness: Brightness.light,
+        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+        pageTransitionsTheme: PageTransitionsTheme(builders: {
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        }),
         useMaterial3: true,
       ),
       initialRoute: _getInitialLocation(user),

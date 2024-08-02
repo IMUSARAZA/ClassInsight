@@ -67,6 +67,28 @@ class AddTeacherController extends GetxController {
     }
   }
 
+  bool validatePhoneNo(String phoneNo) {
+    final RegExp phoneNoRegex = RegExp(r'^\d{11}$');
+    return phoneNoRegex.hasMatch(phoneNo);
+  }
+
+  bool validateCnic(String cnic) {
+    final RegExp cnicRegex = RegExp(r'^\d{13}$');
+    return cnicRegex.hasMatch(cnic);
+  }
+
+  bool validateForm() {
+    empIDValid.value = empIDController.text.isNotEmpty;
+    nameValid.value = nameController.text.isNotEmpty;
+    emailValid.value = emailController.text.isNotEmpty && GetUtils.isEmail(emailController.text);
+    cnicValid.value = validateCnic(cnicController.text);
+    phoneNoValid.value = validatePhoneNo(phoneNoController.text);
+    fatherNameValid.value = fatherNameController.text.isNotEmpty;
+    genderValid.value = selectedGender.value.isNotEmpty;
+
+    return empIDValid.value && nameValid.value && emailValid.value && cnicValid.value && phoneNoValid.value && fatherNameValid.value && genderValid.value;
+  }
+
   String capitalizeName(String name) {
     List<String> parts = name.split(' ');
     return parts.map((part) => _capitalize(part)).join(' ');
@@ -77,6 +99,7 @@ class AddTeacherController extends GetxController {
     return word[0].toUpperCase() + word.substring(1).toLowerCase();
   }
 }
+
 
 class ClassSubject {
   String className;
@@ -94,6 +117,7 @@ class AddTeacher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
@@ -179,6 +203,7 @@ class AddTeacher extends StatelessWidget {
                       ],
                     ),
                     child: SingleChildScrollView(
+                      padding: EdgeInsets.only(bottom: keyboardHeight),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -247,7 +272,7 @@ class AddTeacher extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
                             child: CustomTextField(
                               controller: controller.emailController,
-                              hintText: 'jhondoe@....com',
+                              hintText: 'johndoe@....com',
                               labelText: 'Email',
                               isValid: controller.emailValid.value,
                             ),
@@ -446,18 +471,8 @@ class AddTeacher extends StatelessWidget {
                             child: CustomBlueButton(
                               buttonText: 'Add',
                               onPressed: () async {
-                                if (controller.selectedClasses.isEmpty ||
-                                    controller.selectedSubjects.isEmpty ||
-                                    controller.empIDController.text.isEmpty ||
-                                    controller.nameController.text.isEmpty ||
-                                    controller.selectedGender.value.isEmpty ||
-                                    controller.emailController.text.isEmpty ||
-                                    controller.phoneNoController.text.isEmpty ||
-                                    controller.cnicController.text.isEmpty ||
-                                    controller
-                                        .fatherNameController.text.isEmpty) {
-                                  Get.snackbar(
-                                      'Error', 'Please fill all the fields');
+                                if (!controller.validateForm()) {
+                                  Get.snackbar('Error', 'Please fill all the fields correctly');
                                 } else {
                                   try {
                                     Get.dialog(
@@ -467,19 +482,13 @@ class AddTeacher extends StatelessWidget {
                                           width: double.infinity,
                                           height: double.infinity,
                                           child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               SizedBox(
                                                 width: 30,
                                                 height: 30,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                              Color>(
-                                                          AppColors
-                                                              .appLightBlue),
+                                                child: CircularProgressIndicator(
+                                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.appLightBlue),
                                                 ),
                                               ),
                                             ],
@@ -489,12 +498,8 @@ class AddTeacher extends StatelessWidget {
                                       barrierDismissible: false,
                                     );
 
-                                    String capitalizedName =
-                                        controller.capitalizeName(
-                                            controller.nameController.text);
-                                    String capitalizedFatherName =
-                                        controller.capitalizeName(controller
-                                            .fatherNameController.text);
+                                    String capitalizedName = controller.capitalizeName(controller.nameController.text);
+                                    String capitalizedFatherName = controller.capitalizeName(controller.fatherNameController.text);
 
                                     await Database_Service.saveTeacher(
                                       controller.school.schoolId,
@@ -508,36 +513,26 @@ class AddTeacher extends StatelessWidget {
                                       controller.selectedClasses.toList(),
                                       controller.selectedSubjects.toJson(),
                                       controller.selectedClassTeacher.value,
-                                    ).then(
-                                        (value) => Get.back(result: 'updated'));
+                                    ).then((value) => Get.back(result: 'updated'));
 
                                     String password = generateRandomPassword();
-
                                     print('Generated password: $password');
 
-                                    await Auth_Service.registerTeacher(
-                                        controller.emailController.text,
-                                        password,
-                                        controller.school.schoolId);
-
-                                    await Auth_Service.sendPasswordEmail(
-                                        controller.emailController.text,
-                                        capitalizedName,
-                                        password);
+                                    await Auth_Service.registerTeacher(controller.emailController.text, password, controller.school.schoolId);
+                                    await Auth_Service.sendPasswordEmail(controller.emailController.text, capitalizedName, password);
 
                                     Get.back(result: 'updated');
                                     Navigator.pop(context);
-                                    Get.snackbar('Saved',
-                                        'New teacher added successfully');
+                                    Get.snackbar('Saved', 'New teacher added successfully');
                                   } catch (e) {
-                                    Get.snackbar('Error',
-                                        'Failed to add new teacher: $e');
+                                    Get.snackbar('Error', 'Failed to add new teacher: $e');
                                   }
                                 }
                               },
                               text: 'Add',
                             ),
-                          ),
+                          )
+
                         ],
                       ),
                     ),

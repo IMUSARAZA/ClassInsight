@@ -90,7 +90,7 @@ class ManageTimetable extends StatelessWidget {
                 padding: EdgeInsets.all(4.0),
                 child: Text(
                   'Add',
-                  style: Font_Styles.labelHeadingLight(context),
+                  style: Font_Styles.labelHeadingLight(context,color: Colors.black),
                 ),
               ),
             )
@@ -107,6 +107,13 @@ class ManageTimetable extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+               Padding(
+                  padding: EdgeInsets.fromLTRB(30, 10, 10, 5),
+                  child: Text(
+                    'Timetable',
+                    style: Font_Styles.mediumHeadingBold(context),
+                  ),
+                ),
               Padding(
                 padding: EdgeInsets.fromLTRB(30, 20, 30, 5),
                 child: Obx(() {

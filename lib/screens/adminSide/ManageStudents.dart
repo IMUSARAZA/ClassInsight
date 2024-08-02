@@ -96,7 +96,7 @@ class StudentController extends GetxController {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(true);
+                Get.back();
               },
               child: Text('Delete'),
             ),
@@ -121,7 +121,7 @@ class StudentController extends GetxController {
 
         await Database_Service.deleteStudent(school.schoolId.value, studentID);
 
-        Navigator.of(context).pop();
+        Get.back();
 
         refreshStudentList();
       } catch (e) {
@@ -170,7 +170,7 @@ class ManageStudents extends StatelessWidget {
             },
             child: Text(
               "Add Student",
-              style: Font_Styles.labelHeadingLight(context),
+              style: Font_Styles.labelHeadingLight(context,color: Colors.black),
             ),
           ),
         ],
@@ -260,70 +260,70 @@ class ManageStudents extends StatelessWidget {
                             label: Text(
                               'Roll No.',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Student Name',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Gender',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Father Name',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Father Phone',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Father CNIC',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Fee Status',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Result',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Edit',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Delete',
                               style: Font_Styles.dataTableTitle(context,
-                                  MediaQuery.of(context).size.width * 0.03),
+                                  MediaQuery.of(context).size.width * 0.035),
                             ),
                           ),
                         ],
@@ -339,7 +339,7 @@ class ManageStudents extends StatelessWidget {
                                       style: Font_Styles.dataTableRows(
                                           context,
                                           MediaQuery.of(context).size.width *
-                                              0.03),
+                                              0.035),
                                     ),
                                   ),
                                   DataCell(
@@ -348,7 +348,7 @@ class ManageStudents extends StatelessWidget {
                                       style: Font_Styles.dataTableRows(
                                           context,
                                           MediaQuery.of(context).size.width *
-                                              0.03),
+                                              0.035),
                                     ),
                                   ),
                                   DataCell(
@@ -357,7 +357,7 @@ class ManageStudents extends StatelessWidget {
                                       style: Font_Styles.dataTableRows(
                                           context,
                                           MediaQuery.of(context).size.width *
-                                              0.03),
+                                              0.035),
                                     ),
                                   ),
                                   DataCell(
@@ -366,7 +366,7 @@ class ManageStudents extends StatelessWidget {
                                       style: Font_Styles.dataTableRows(
                                           context,
                                           MediaQuery.of(context).size.width *
-                                              0.03),
+                                              0.035),
                                     ),
                                   ),
                                   DataCell(
@@ -375,7 +375,7 @@ class ManageStudents extends StatelessWidget {
                                       style: Font_Styles.dataTableRows(
                                           context,
                                           MediaQuery.of(context).size.width *
-                                              0.03),
+                                              0.035),
                                     ),
                                   ),
                                   DataCell(
@@ -384,7 +384,7 @@ class ManageStudents extends StatelessWidget {
                                       style: Font_Styles.dataTableRows(
                                           context,
                                           MediaQuery.of(context).size.width *
-                                              0.03),
+                                              0.035),
                                     ),
                                   ),
                                   DataCell(
@@ -428,7 +428,7 @@ class ManageStudents extends StatelessWidget {
                                   ),
                                   DataCell(
                                     IconButton(
-                                      icon: Icon(FontAwesomeIcons.edit),
+                                      icon: Icon(FontAwesomeIcons.penToSquare),
                                       onPressed: () async {
                                         print(student);
                                         var result = await Get.toNamed(
@@ -489,135 +489,169 @@ class ManageStudents extends StatelessWidget {
   }
 }
 
+
 void _showFeeStatusPopup(BuildContext context, Student student) {
-  TextEditingController startDateController = TextEditingController();
-  TextEditingController endDateController = TextEditingController();
-  final AdminHomeController school = Get.put(AdminHomeController());
-
-  // Initialize with existing values
-  String feeStatus = student.feeStatus;
-  String originalStartDate = student.feeStartDate;
-  String originalEndDate = student.feeEndDate;
-
-  // Set controllers with existing values
-  startDateController.text = originalStartDate;
-  endDateController.text = originalEndDate;
-
   showDialog(
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Update Fee Status'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(bottom: 20),
-              child: TextField(
-                controller: startDateController,
-                decoration: InputDecoration(labelText: 'Start Date'),
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null) {
-                    startDateController.text =
-                        pickedDate.toLocal().toString().split(' ')[0];
-                  }
-                },
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(bottom: 30),
-              child: TextField(
-                controller: endDateController,
-                decoration: InputDecoration(labelText: 'End Date'),
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null) {
-                    endDateController.text =
-                        pickedDate.toLocal().toString().split(' ')[0];
-                  }
-                },
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(bottom: 20),
-              child: DropdownButtonFormField<String>(
-                value: ['paid', 'unpaid'].contains(student.feeStatus)
-                    ? student.feeStatus
-                    : null,
-                items: ['paid', 'unpaid'].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  feeStatus = newValue!;
-                },
-                decoration: InputDecoration(
-                  labelText: 'Fee Status',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            )
-          ],
-        ),
-        actions: [
-          TextButton(
-            child: Text('Cancel'),
-            onPressed: () {
-              Get.back();
-            },
-          ),
-          TextButton(
-            child: Text('Update'),
-            onPressed: () async {
-              // Only update the start date and end date if they are not empty
-              String updatedStartDate = startDateController.text.isNotEmpty
-                  ? startDateController.text
-                  : originalStartDate;
-              String updatedEndDate = endDateController.text.isNotEmpty
-                  ? endDateController.text
-                  : originalEndDate;
-
-              student.feeStatus = feeStatus;
-              student.feeStartDate = updatedStartDate;
-              student.feeEndDate = updatedEndDate;
-
-              try {
-                await Database_Service.updateFeeStatus(
-                    school.schoolId.value,
-                    student.studentID,
-                    feeStatus,
-                    updatedStartDate,
-                    updatedEndDate);
-
-                final studentController = Get.find<StudentController>();
-                studentController.refreshStudentList();
-
-                Navigator.of(context).pop();
-              } catch (e) {
-                print('Error updating fee status: $e');
-               Get.snackbar("Failed updating", "Error updating fee status");
-              }
-            },
-          ),
-        ],
-      );
+      return UpdateFeeStatusDialog(student: student);
     },
-  ).whenComplete(() {
+  );
+}
+
+class UpdateFeeStatusDialog extends StatefulWidget {
+  final Student student;
+
+  UpdateFeeStatusDialog({required this.student});
+
+  @override
+  _UpdateFeeStatusDialogState createState() => _UpdateFeeStatusDialogState();
+}
+
+class _UpdateFeeStatusDialogState extends State<UpdateFeeStatusDialog> {
+  late TextEditingController startDateController;
+  late TextEditingController endDateController;
+  late String feeStatus;
+  late String originalStartDate;
+  late String originalEndDate;
+
+  @override
+  void initState() {
+    super.initState();
+    final AdminHomeController school = Get.put(AdminHomeController());
+
+    // Initialize with existing values
+    feeStatus = widget.student.feeStatus;
+    originalStartDate = widget.student.feeStartDate;
+    originalEndDate = widget.student.feeEndDate;
+
+    // Set controllers with existing values
+    startDateController = TextEditingController(text: originalStartDate);
+    endDateController = TextEditingController(text: originalEndDate);
+  }
+
+  @override
+  void dispose() {
     startDateController.dispose();
     endDateController.dispose();
-  });
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Update Fee Status'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: TextField(
+              readOnly: true,
+              controller: startDateController,
+              decoration: InputDecoration(labelText: 'Start Date'),
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2101),
+                );
+                if (pickedDate != null) {
+                  startDateController.text =
+                      pickedDate.toLocal().toString().split(' ')[0];
+                }
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 30),
+            child: TextField(
+              readOnly: true,
+              controller: endDateController,
+              decoration: InputDecoration(labelText: 'End Date'),
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2101),
+                );
+                if (pickedDate != null) {
+                  endDateController.text =
+                      pickedDate.toLocal().toString().split(' ')[0];
+                }
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.01),
+            child: DropdownButtonFormField<String>(
+              value: ['paid', 'unpaid'].contains(widget.student.feeStatus)
+                  ? widget.student.feeStatus
+                  : null,
+              items: ['paid', 'unpaid'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  feeStatus = newValue!;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Fee Status',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          )
+        ],
+      ),
+      actions: [
+        TextButton(
+          child: Text('Cancel'),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+        TextButton(
+          child: Text('Update'),
+          onPressed: () async {
+            // Only update the start date and end date if they are not empty
+            String updatedStartDate = startDateController.text.isNotEmpty
+                ? startDateController.text
+                : originalStartDate;
+            String updatedEndDate = endDateController.text.isNotEmpty
+                ? endDateController.text
+                : originalEndDate;
+
+            widget.student.feeStatus = feeStatus;
+            widget.student.feeStartDate = updatedStartDate;
+            widget.student.feeEndDate = updatedEndDate;
+
+            try {
+              final AdminHomeController school = Get.find<AdminHomeController>();
+              await Database_Service.updateFeeStatus(
+                  school.schoolId.value,
+                  widget.student.studentID,
+                  feeStatus,
+                  updatedStartDate,
+                  updatedEndDate);
+
+              final studentController = Get.find<StudentController>();
+              studentController.refreshStudentList();
+
+              Navigator.of(context).pop();
+            } catch (e) {
+              print('Error updating fee status: $e');
+              Get.snackbar("Failed updating", "Error updating fee status");
+            }
+          },
+        ),
+      ],
+    );
+  }
 }
