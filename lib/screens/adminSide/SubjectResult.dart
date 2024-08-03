@@ -30,13 +30,17 @@ class SubjectResultController extends GetxController {
 
   void fetchInitialData() async {
     classesList.value = await Database_Service.fetchAllClasses(schoolId);
-    studentsList.value = await Database_Service.getStudentsOfASpecificClass(
-        schoolId, selectedClass.value);
+    selectedClass.value = classesList.first;
     subjectsList.value =
         await Database_Service.fetchSubjects(schoolId, selectedClass.value);
+    selectedSubject.value = subjectsList.first;
+    studentsList.value = await Database_Service.getStudentsOfASpecificClass(
+        schoolId, selectedClass.value);
     examsList.value =
         await databaseService.fetchExamStructure(schoolId, selectedClass.value);
   }
+
+  
   Future<String> fetchTotalObtainedMarks(String studentID) async {
     try {
       DocumentSnapshot studentDoc = await FirebaseFirestore.instance
@@ -142,9 +146,7 @@ class SubjectResult extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return Scaffold(
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: Container(
@@ -289,172 +291,176 @@ class SubjectResult extends StatelessWidget {
                   ),
                   Expanded(
                     child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Column(
-                        children: [
-                          Obx(() {
-                            var subjectsList = controller.subjectsList;
-                            if (subjectsList.isEmpty) {
-                              return Padding(
-                                padding: EdgeInsets.fromLTRB(30, 20, 0, 0),
-                                child: Text(
-                                  'No subjects found...',
-                                  style: Font_Styles.labelHeadingLight(context),
-                                ),
-                              );
-                            } else {
-                              return Container(); // Placeholder to maintain layout structure
-                            }
-                          }),
-                          Obx(() {
-                            var examsList = controller.examsList;
-                            if (examsList.isEmpty) {
-                              return Container(
-                                width: screenWidth,
-                                height: 20,
-                                padding: EdgeInsets.only(left: 30),
-                                child: Center(
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Column(
+                          children: [
+                            Obx(() {
+                              var subjectsList = controller.subjectsList;
+                              if (subjectsList.isEmpty) {
+                                return Padding(
+                                  padding: EdgeInsets.fromLTRB(30, 20, 0, 0),
                                   child: Text(
-                                    'No exams found for this Class',
-                                    style:
-                                        Font_Styles.labelHeadingLight(context),
+                                    'No subjects found...',
+                                    style: Font_Styles.labelHeadingLight(context),
                                   ),
-                                ),
-                              );
-                            } else {
-                              return Obx(() {
-                                var students = controller.studentsList;
-                                return DataTable(
-                                  columns: [
-                                    DataColumn(
-                                      label: Text(
-                                        'Roll No.',
-                                        style: Font_Styles.dataTableTitle(
-                                            context, screenWidth * 0.04),
-                                      ),
+                                );
+                              } else {
+                                return Container(); // Placeholder to maintain layout structure
+                              }
+                            }),
+                            Obx(() {
+                              var examsList = controller.examsList;
+                              if (examsList.isEmpty) {
+                                return Container(
+                                  width: screenWidth,
+                                  height: 20,
+                                  padding: EdgeInsets.only(left: 30),
+                                  child: Center(
+                                    child: Text(
+                                      'No exams found for this Class',
+                                      style:
+                                          Font_Styles.labelHeadingLight(context),
                                     ),
-                                    DataColumn(
-                                      label: Text(
-                                        'Student Name',
-                                        style: Font_Styles.dataTableTitle(
-                                            context, screenWidth * 0.04),
-                                      ),
-                                    ),
-                                    for (var exam in examsList)
+                                  ),
+                                );
+                              } else {
+                                return Obx(() {
+                                  var students = controller.studentsList;
+                                  return DataTable(
+                                    columns: [
                                       DataColumn(
                                         label: Text(
-                                          exam,
+                                          'Roll No.',
                                           style: Font_Styles.dataTableTitle(
                                               context, screenWidth * 0.04),
                                         ),
                                       ),
-                                    DataColumn(
-                                      label: Text(
-                                        'Obtained Marks',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                                      DataColumn(
+                                        label: Text(
+                                          'Student Name',
+                                          style: Font_Styles.dataTableTitle(
+                                              context, screenWidth * 0.04),
                                         ),
                                       ),
-                                    ),
-                                    DataColumn(
-                                      label: Text(
-                                        'Total Marks',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                                      for (var exam in examsList)
+                                        DataColumn(
+                                          label: Text(
+                                            exam,
+                                            style: Font_Styles.dataTableTitle(
+                                                context, screenWidth * 0.04),
+                                          ),
+                                        ),
+                                      DataColumn(
+                                        label: Text(
+                                          'Obtained Marks',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                  rows: students.map((student) {
-                                    return DataRow(
-                                      color: MaterialStateProperty.resolveWith<
-                                          Color?>(
-                                        (Set<MaterialState> states) {
-                                          return AppColors
-                                              .appOrange; // Set the desired color here
+                                      DataColumn(
+                                        label: Text(
+                                          'Total Marks',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    rows: students.map((student) {
+                                      return DataRow(
+                                        color: MaterialStateProperty.resolveWith<
+                                            Color?>(
+                                          (Set<MaterialState> states) {
+                                            return AppColors
+                                                .appOrange; // Set the desired color here
+                                          },
+                                        ),
+                                        cells: [
+                                          DataCell(Text(student.studentRollNo)),
+                                          DataCell(Text(student.name)),
+                                          for (var exam in examsList)
+                                            DataCell(Obx(() {
+                                              return FutureBuilder<String>(
+                                                future: controller
+                                                    .fetchStudentResults(
+                                                        student.studentID)
+                                                    .then((resultMap) {
+                                                  return resultMap[exam] ?? '-';
+                                                }),
+                                                builder:
+                                                    (context, resultSnapshot) {
+                                                  if (resultSnapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: 30),
+                                                      child: Text('Loading...'),
+                                                    );
+                                                  } else if (resultSnapshot
+                                                      .hasError) {
+                                                    return Text('Error');
+                                                  } else {
+                                                    return Text(
+                                                        resultSnapshot.data ??
+                                                            '-');
+                                                  }
+                                                },
+                                              );
+                                            })),
+                                            DataCell(
+                                      FutureBuilder<String>(
+                                        future:
+                                            controller.fetchTotalObtainedMarks(
+                                                student.studentID),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Text('');
+                                          } else if (snapshot.hasError) {
+                                            return Text('Error');
+                                          } else {
+                                            final totalMarksSum =
+                                                snapshot.data ?? '0';
+                                            return Text(totalMarksSum);
+                                          }
                                         },
                                       ),
-                                      cells: [
-                                        DataCell(Text(student.studentRollNo)),
-                                        DataCell(Text(student.name)),
-                                        for (var exam in examsList)
-                                          DataCell(Obx(() {
-                                            return FutureBuilder<String>(
-                                              future: controller
-                                                  .fetchStudentResults(
-                                                      student.studentID)
-                                                  .then((resultMap) {
-                                                return resultMap[exam] ?? '-';
-                                              }),
-                                              builder:
-                                                  (context, resultSnapshot) {
-                                                if (resultSnapshot
-                                                        .connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return Padding(
-                                                    padding: EdgeInsets.only(
-                                                        left: 30),
-                                                    child: Text('Loading...'),
-                                                  );
-                                                } else if (resultSnapshot
-                                                    .hasError) {
-                                                  return Text('Error');
-                                                } else {
-                                                  return Text(
-                                                      resultSnapshot.data ??
-                                                          '-');
-                                                }
-                                              },
-                                            );
-                                          })),
-                                          DataCell(
-                                    FutureBuilder<String>(
-                                      future:
-                                          controller.fetchTotalObtainedMarks(
-                                              student.studentID),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Text('');
-                                        } else if (snapshot.hasError) {
-                                          return Text('Error');
-                                        } else {
-                                          final totalMarksSum =
-                                              snapshot.data ?? '0';
-                                          return Text(totalMarksSum);
-                                        }
-                                      },
                                     ),
-                                  ),
-                                  DataCell(
-                                    FutureBuilder<String>(
-                                      future:
-                                          controller.fetchStudentTotalMarksSum(
-                                              student.studentID),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Text('');
-                                        } else if (snapshot.hasError) {
-                                          return Text('Error');
-                                        } else {
-                                          final totalMarksSum =
-                                              snapshot.data ?? '0';
-                                          return Text(totalMarksSum);
-                                        }
-                                      },
+                                    DataCell(
+                                      FutureBuilder<String>(
+                                        future:
+                                            controller.fetchStudentTotalMarksSum(
+                                                student.studentID),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Text('');
+                                          } else if (snapshot.hasError) {
+                                            return Text('Error');
+                                          } else {
+                                            final totalMarksSum =
+                                                snapshot.data ?? '0';
+                                            return Text(totalMarksSum);
+                                          }
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                      ],
-                                    );
-                                  }).toList(),
-                                );
-                              });
-                            }
-                          }),
-                        ],
+                                        ],
+                                      );
+                                    }).toList(),
+                                  );
+                                });
+                              }
+                            }),
+                          ],
+                        ),
                       ),
                     ),
                   )
@@ -463,7 +469,6 @@ class SubjectResult extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }

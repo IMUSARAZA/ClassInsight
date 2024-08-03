@@ -53,7 +53,7 @@ class ParentLoginScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Enter your Challan ID",
+                    "Enter your Challan ID/B-form number",
                     style: GoogleFonts.poppins(
                       fontSize: screenWidth * 0.06,
                       fontWeight: FontWeight.bold,
@@ -88,8 +88,8 @@ class ParentLoginScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(color: Colors.black),
                       ),
-                      hintText: "Challan form number",
-                      labelText: "Challan form number",
+                      hintText: "Challan/Bform number",
+                      labelText: "Challan/Bform",
                       labelStyle: TextStyle(color: Colors.black),
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 15.0,

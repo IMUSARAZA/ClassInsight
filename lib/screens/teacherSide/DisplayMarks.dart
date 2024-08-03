@@ -110,7 +110,7 @@ class DisplayMarksController extends GetxController {
         int totalSum = 0;
 
         // Get the results for the selected subject
-        var subjectResults = resultMap[selectedSubject.value] ?? {};
+        var subjectResults = resultMap?[selectedSubject.value] ?? {};
 
         for (var examType in examsList) {
           var marks = subjectResults[examType] ?? '-';
@@ -211,12 +211,6 @@ class DisplayMarks extends StatelessWidget {
                   width: screenWidth,
                   child: AppBar(
                     backgroundColor: Colors.white,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        Get.back();
-                      },
-                    ),
                     title: Text(
                       'Marks',
                       style: Font_Styles.labelHeadingLight(context),
@@ -237,7 +231,8 @@ class DisplayMarks extends StatelessWidget {
                         },
                         child: Text(
                           "Edit",
-                          style: Font_Styles.labelHeadingLight(context),
+                          style: Font_Styles.labelHeadingLight(context,
+                              color: Colors.black),
                         ),
                       ),
                     ],
@@ -319,70 +314,93 @@ class DisplayMarks extends StatelessWidget {
                       );
                     } else {
                       return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Obx(() {
-                          var students = controller.studentsList;
-                          return DataTable(
-                            columns: [
-                              DataColumn(
-                                label: Text(
-                                  'Roll No.',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Student Name',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              for (var exam in examsList)
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Obx(() {
+                            var students = controller.studentsList;
+                            return DataTable(
+                              columns: [
                                 DataColumn(
                                   label: Text(
-                                    exam,
+                                    'Roll No.',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                              DataColumn(
-                                label: Text(
-                                  'Obtained Marks',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                DataColumn(
+                                  label: Text(
+                                    'Student Name',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Total Marks',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                for (var exam in examsList)
+                                  DataColumn(
+                                    label: Text(
+                                      exam,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                DataColumn(
+                                  label: Text(
+                                    'Obtained Marks',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                            rows: students.map((student) {
-                              return DataRow(
-                                color: MaterialStateColor.resolveWith(
-                                    (states) => AppColors.appOrange),
-                                cells: [
-                                  DataCell(Text(student.studentRollNo)),
-                                  DataCell(Text(student.name)),
-                                  for (var exam in examsList)
+                                DataColumn(
+                                  label: Text(
+                                    'Total Marks',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              rows: students.map((student) {
+                                return DataRow(
+                                  color: MaterialStateColor.resolveWith(
+                                      (states) => AppColors.appOrange),
+                                  cells: [
+                                    DataCell(Text(student.studentRollNo)),
+                                    DataCell(Text(student.name)),
+                                    for (var exam in examsList)
+                                      DataCell(
+                                        FutureBuilder<Map<String, String>>(
+                                          future:
+                                              controller.fetchStudentResults(
+                                                  student.studentID),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return Text('');
+                                            } else if (snapshot.hasError) {
+                                              return Text('Error');
+                                            } else {
+                                              final marks =
+                                                  snapshot.data?[exam] ?? '-';
+                                              return Text(marks);
+                                            }
+                                          },
+                                        ),
+                                      ),
                                     DataCell(
-                                      FutureBuilder<Map<String, String>>(
-                                        future: controller.fetchStudentResults(
-                                            student.studentID),
+                                          FutureBuilder<String>(
+                                        future:
+                                            controller.fetchTotalObtainedMarks(
+                                                student.studentID),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState ==
                                               ConnectionState.waiting) {
@@ -390,56 +408,38 @@ class DisplayMarks extends StatelessWidget {
                                           } else if (snapshot.hasError) {
                                             return Text('Error');
                                           } else {
-                                            final marks =
-                                                snapshot.data?[exam] ?? '-';
-                                            return Text(marks);
+                                            final totalMarksSum =
+                                                snapshot.data ?? '0';
+                                            return Text(totalMarksSum);
                                           }
                                         },
                                       ),
                                     ),
-                                  DataCell(
-                                    FutureBuilder<String>(
-                                      future:
-                                          controller.fetchTotalObtainedMarks(
-                                              student.studentID),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Text('');
-                                        } else if (snapshot.hasError) {
-                                          return Text('Error');
-                                        } else {
-                                          final totalMarksSum =
-                                              snapshot.data ?? '0';
-                                          return Text(totalMarksSum);
-                                        }
-                                      },
+                                    DataCell(
+                                      FutureBuilder<String>(
+                                        future: controller
+                                            .fetchStudentTotalMarksSum(
+                                                student.studentID),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Text('');
+                                          } else if (snapshot.hasError) {
+                                            return Text('Error');
+                                          } else {
+                                            final totalMarksSum =
+                                                snapshot.data ?? '0';
+                                            return Text(totalMarksSum);
+                                          }
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  DataCell(
-                                    FutureBuilder<String>(
-                                      future:
-                                          controller.fetchStudentTotalMarksSum(
-                                              student.studentID),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Text('');
-                                        } else if (snapshot.hasError) {
-                                          return Text('Error');
-                                        } else {
-                                          final totalMarksSum =
-                                              snapshot.data ?? '0';
-                                          return Text(totalMarksSum);
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }).toList(),
-                          );
-                        }),
+                                  ],
+                                );
+                              }).toList(),
+                            );
+                          }),
+                        ),
                       );
                     }
                   }),

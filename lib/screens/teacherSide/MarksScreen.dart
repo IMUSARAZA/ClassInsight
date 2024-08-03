@@ -145,12 +145,6 @@ class MarksScreen extends StatelessWidget {
                   width: screenWidth,
                   child: AppBar(
                     backgroundColor: Colors.white,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        Get.back();
-                      },
-                    ),
                     title: Text(
                       'Marks',
                       style: Font_Styles.labelHeadingLight(context),
@@ -168,7 +162,6 @@ class MarksScreen extends StatelessWidget {
                             Get.snackbar(
                               'Error',
                               'School ID is missing.',
-                              snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.red,
                               colorText: Colors.white,
                             );
@@ -186,7 +179,6 @@ class MarksScreen extends StatelessWidget {
                             Get.snackbar(
                               'Error',
                               'Total Marks must be a valid number.',
-                              snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.red,
                               colorText: Colors.white,
                             );
@@ -254,7 +246,6 @@ class MarksScreen extends StatelessWidget {
                             Get.snackbar(
                               'Success',
                               'Marks have been updated successfully.',
-                              snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.green,
                               colorText: Colors.white,
                             );
@@ -262,7 +253,6 @@ class MarksScreen extends StatelessWidget {
                             Get.snackbar(
                               'Error',
                               'Please enter valid marks for all students.',
-                              snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.red,
                               colorText: Colors.white,
                             );
@@ -421,129 +411,134 @@ class MarksScreen extends StatelessWidget {
                       );
                     } else {
                       return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Obx(() {
-                          var students = controller.studentsList;
-                          var totalMarks = controller.getTotalMarks();
-                          return DataTable(
-                            columns: [
-                              DataColumn(
-                                label: Text(
-                                  'Roll No.',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Obx(() {
+                            var students = controller.studentsList;
+                            var totalMarks = controller.getTotalMarks();
+                            return DataTable(
+                              columns: [
+                                DataColumn(
+                                  label: Text(
+                                    'Roll No.',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Student Name',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                DataColumn(
+                                  label: Text(
+                                    'Student Name',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Obtained Marks',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                DataColumn(
+                                  label: Text(
+                                    'Obtained Marks',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Total Marks',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                DataColumn(
+                                  label: Text(
+                                    'Total Marks',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                            rows: students.map((student) {
-                              return DataRow(
-                                color:
-                                    MaterialStateProperty.resolveWith<Color?>(
-                                  (Set<MaterialState> states) {
-                                    return AppColors.appOrange;
-                                  },
-                                ),
-                                cells: [
-                                  DataCell(Text(student.studentRollNo)),
-                                  DataCell(Text(student.name)),
-                                  DataCell(
-                                    Obx(() {
-                                      // Get the instance of MarksScreenController
-                                      final marksController =
-                                          Get.find<MarksScreenController>();
+                              ],
+                              rows: students.map((student) {
+                                return DataRow(
+                                  color:
+                                      MaterialStateProperty.resolveWith<Color?>(
+                                    (Set<MaterialState> states) {
+                                      return AppColors.appOrange;
+                                    },
+                                  ),
+                                  cells: [
+                                    DataCell(Text(student.studentRollNo)),
+                                    DataCell(Text(student.name)),
+                                    DataCell(
+                                      Obx(() {
+                                        // Get the instance of MarksScreenController
+                                        final marksController =
+                                            Get.find<MarksScreenController>();
 
-                                      // Get the TextEditingController for the current student
-                                      TextEditingController controller =
-                                          marksController
-                                                      .obtainedMarksControllers[
-                                                  student.studentID] ??
-                                              TextEditingController();
+                                        // Get the TextEditingController for the current student
+                                        TextEditingController controller =
+                                            marksController
+                                                        .obtainedMarksControllers[
+                                                    student.studentID] ??
+                                                TextEditingController();
 
-                                      return TextFormField(
-                                        controller: controller,
-                                        decoration: InputDecoration(
-                                          hintText: 'Enter',
-                                          hintStyle: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255,
-                                                162,
-                                                159,
-                                                159), // Light gray hint text
+                                        return TextFormField(
+                                          controller: controller,
+                                          decoration: InputDecoration(
+                                            hintText: 'Enter',
+                                            hintStyle: TextStyle(
+                                              color: const Color.fromARGB(
+                                                  255,
+                                                  162,
+                                                  159,
+                                                  159), // Light gray hint text
+                                              fontWeight: FontWeight
+                                                  .normal, // Ensure hint text is not bold
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical:
+                                                  4, // Adjust padding if needed
+                                            ),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide
+                                                  .none, // Remove the bottom border
+                                            ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide
+                                                  .none, // Remove the bottom border when focused
+                                            ),
+                                            errorBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide
+                                                  .none, // Remove the bottom border on error
+                                            ),
+                                            focusedErrorBorder:
+                                                UnderlineInputBorder(
+                                              borderSide: BorderSide
+                                                  .none, // Remove the bottom border on error focus
+                                            ),
+                                          ),
+                                          style: TextStyle(
+                                            color: Colors
+                                                .black, // Style input text
                                             fontWeight: FontWeight
-                                                .normal, // Ensure hint text is not bold
+                                                .normal, // Ensure input text is not bold
                                           ),
-                                          contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical:
-                                                4, // Adjust padding if needed
-                                          ),
-                                          enabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide
-                                                .none, // Remove the bottom border
-                                          ),
-                                          focusedBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide
-                                                .none, // Remove the bottom border when focused
-                                          ),
-                                          errorBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide
-                                                .none, // Remove the bottom border on error
-                                          ),
-                                          focusedErrorBorder:
-                                              UnderlineInputBorder(
-                                            borderSide: BorderSide
-                                                .none, // Remove the bottom border on error focus
-                                          ),
-                                        ),
-                                        style: TextStyle(
-                                          color:
-                                              Colors.black, // Style input text
-                                          fontWeight: FontWeight
-                                              .normal, // Ensure input text is not bold
-                                        ),
-                                        onChanged: (value) {
-                                          // Optional: Handle obtained marks input if needed
-                                        },
-                                      );
-                                    }),
-                                  ),
-                                  DataCell(
-                                    Text(totalMarks),
-                                  ),
-                                ],
-                              );
-                            }).toList(),
-                          );
-                        }),
+                                          onChanged: (value) {
+                                            // Optional: Handle obtained marks input if needed
+                                          },
+                                        );
+                                      }),
+                                    ),
+                                    DataCell(
+                                      Text(totalMarks),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            );
+                          }),
+                        ),
                       );
                     }
                   }),

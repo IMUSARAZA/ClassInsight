@@ -219,6 +219,7 @@ class ManageTeachers extends StatelessWidget {
                 } else {
                   return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
+                    physics: BouncingScrollPhysics(),
                     child: DataTable(
                       showCheckboxColumn: false,
                       showBottomBorder: true,
