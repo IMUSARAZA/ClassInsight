@@ -288,6 +288,13 @@ class ManageStudents extends StatelessWidget {
                           ),
                           DataColumn(
                             label: Text(
+                              'B-Form/Challan ID',
+                              style: Font_Styles.dataTableTitle(context,
+                                  MediaQuery.of(context).size.width * 0.035),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
                               'Father Name',
                               style: Font_Styles.dataTableTitle(context,
                                   MediaQuery.of(context).size.width * 0.035),
@@ -363,6 +370,15 @@ class ManageStudents extends StatelessWidget {
                                   DataCell(
                                     Text(
                                       student.gender,
+                                      style: Font_Styles.dataTableRows(
+                                          context,
+                                          MediaQuery.of(context).size.width *
+                                              0.035),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      student.bFormChallanId,
                                       style: Font_Styles.dataTableRows(
                                           context,
                                           MediaQuery.of(context).size.width *
