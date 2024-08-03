@@ -109,8 +109,7 @@ class DisplayMarksController extends GetxController {
         Map<String, dynamic> resultMap = studentDoc['resultMap'];
         int totalSum = 0;
 
-        // Get the results for the selected subject
-        var subjectResults = resultMap?[selectedSubject.value] ?? {};
+        var subjectResults = resultMap[selectedSubject.value] ?? {};
 
         for (var examType in examsList) {
           var marks = subjectResults[examType] ?? '-';

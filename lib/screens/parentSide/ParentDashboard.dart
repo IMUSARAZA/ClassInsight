@@ -330,8 +330,8 @@ class ParentDashboard extends StatelessWidget {
                                                           .announcementDescription ??
                                                       ''),
                                                   subtitle: Text('-' + announcement
-                                                          .announcementBy! ??
-                                                      ''),
+                                                          .announcementBy!
+                                                  ),
                                                 );
                                               },
                                             );
@@ -373,8 +373,7 @@ class ParentDashboard extends StatelessWidget {
                                                           .announcementDescription ??
                                                       ''),
                                                   subtitle: Text('-' + 
-                                                      comment.announcementBy! ??
-                                                          ''),
+                                                      comment.announcementBy!),
                                                 );
                                               },
                                             );

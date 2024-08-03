@@ -42,7 +42,6 @@ class TeacherDashboardController extends GetxController {
 
     fetchClasses();
 
-    // Set up real-time listeners
     setupRealTimeListeners();
   }
 
@@ -89,7 +88,6 @@ class TeacherDashboardController extends GetxController {
 
   void setupRealTimeListeners() {
     if (teacher.value != null && school.value != null) {
-      // Set up listener for teacher document
       FirebaseFirestore.instance
           .collection('Teachers')
           .doc()
@@ -98,12 +96,11 @@ class TeacherDashboardController extends GetxController {
         if (snapshot.exists) {
           Teacher updatedTeacher = Teacher.fromJson(snapshot.data()!);
           teacher.value = updatedTeacher;
-          cacheData(school.value!, updatedTeacher); // Update cached data
+          cacheData(school.value!, updatedTeacher); 
           fetchClasses();
         }
       });
 
-      // Set up listener for school document
       FirebaseFirestore.instance
           .collection('Schools')
           .doc(school.value!.schoolId)
@@ -112,7 +109,7 @@ class TeacherDashboardController extends GetxController {
         if (snapshot.exists) {
           School updatedSchool = School.fromJson(snapshot.data()!);
           school.value = updatedSchool;
-          cacheData(updatedSchool, teacher.value!); // Update cached data
+          cacheData(updatedSchool, teacher.value!); 
         }
       });
     }
@@ -228,7 +225,7 @@ class TeacherDashboard extends StatelessWidget {
                               'Class',
                               style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 15, // Adjust as needed
+                                fontSize: 15,
                               ),
                             ),
                           ),

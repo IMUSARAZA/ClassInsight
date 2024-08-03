@@ -62,21 +62,21 @@ class EditTeacherController extends GetxController {
     fetchClassesAndSubjects();
   }
 
+  void fetchClassesAndSubjects() async {
+    isLoading.value = true;
 
-void fetchClassesAndSubjects() async {
-  isLoading.value = true;
-  
-  Map<String, List<String>> classesAndSubjectsMap = await Database_Service.fetchClassesAndSubjects(schoolId.value);
-  List<ClassSubject> fetchedClassesSubjects = [];
+    Map<String, List<String>> classesAndSubjectsMap =
+        await Database_Service.fetchClassesAndSubjects(schoolId.value);
+    List<ClassSubject> fetchedClassesSubjects = [];
 
-  classesAndSubjectsMap.forEach((className, subjects) {
-    fetchedClassesSubjects.add(ClassSubject(className: className, subjects: subjects));
-  });
+    classesAndSubjectsMap.forEach((className, subjects) {
+      fetchedClassesSubjects
+          .add(ClassSubject(className: className, subjects: subjects));
+    });
 
-  classesSubjects.assignAll(fetchedClassesSubjects);
-  isLoading.value = false;
-}
-
+    classesSubjects.assignAll(fetchedClassesSubjects);
+    isLoading.value = false;
+  }
 
   void initializeData(Teacher teacher) {
     name.value = teacher.name;
@@ -103,7 +103,6 @@ void fetchClassesAndSubjects() async {
     if (word.isEmpty) return word;
     return word[0].toUpperCase() + word.substring(1).toLowerCase();
   }
-
 
   void showEditNameDialog(BuildContext context) {
     showDialog(
@@ -200,24 +199,24 @@ class EditTeacher extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          if (
-                            controller.selectedGender.value.isEmpty ||
-                            controller.phoneNoController.text.isEmpty ||
-                            controller.emailController.text.isEmpty ||
-                            controller.cnicController.text.isEmpty ||
-                            controller.fatherNameController.text.isEmpty ||
-                            controller.selectedClasses.isEmpty ||
-                            controller.selectedSubjects.isEmpty
-                              ) {
+                          if (controller.selectedGender.value.isEmpty ||
+                              controller.phoneNoController.text.isEmpty ||
+                              controller.emailController.text.isEmpty ||
+                              controller.cnicController.text.isEmpty ||
+                              controller.fatherNameController.text.isEmpty ||
+                              controller.selectedClasses.isEmpty ||
+                              controller.selectedSubjects.isEmpty) {
                             Get.snackbar('No Changes Made',
                                 'Please make some changes to update the teacher');
-                          } 
+                          } else if (controller.selectedSubjects.values
+                              .every((subjects) => subjects.isNotEmpty)) {
+                            print(controller.selectedClassTeacher.value);
 
-                          else {
-                        print(controller.selectedClassTeacher.value);
-
-                          String capitalizedName = controller.capitalizeName(controller.name.value);
-                          String capitalizedFatherName = controller.capitalizeName(controller.fatherNameController.text);
+                            String capitalizedName = controller
+                                .capitalizeName(controller.name.value);
+                            String capitalizedFatherName =
+                                controller.capitalizeName(
+                                    controller.fatherNameController.text);
 
                             Database_Service.updateTeacher(
                                 controller.schoolId.value,
@@ -234,13 +233,18 @@ class EditTeacher extends StatelessWidget {
 
                             Get.snackbar('Teacher Updated',
                                 'The teacher has been updated successfully');
-                            Get.back();
-                            Get.back();
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                            
+                          } else {
+                            Get.snackbar('No Subjects Selected',
+                                'Please select subjects for all the classes');
                           }
                         },
                         child: Text(
                           "Update",
-                          style: Font_Styles.labelHeadingLight(context,color: Colors.black),
+                          style: Font_Styles.labelHeadingLight(context,
+                              color: Colors.black),
                         ),
                       ),
                     ],
@@ -252,11 +256,10 @@ class EditTeacher extends StatelessWidget {
                     height: 0.05 * screenHeight,
                     width: screenWidth,
                     margin: const EdgeInsets.only(bottom: 10.0),
-                    child: Text(
-                      'Edit Teacher',
-                      textAlign: TextAlign.center,
-                      style: Font_Styles.dataTableTitle(context, controller.headingFontSize)
-                    ),
+                    child: Text('Edit Teacher',
+                        textAlign: TextAlign.center,
+                        style: Font_Styles.dataTableTitle(
+                            context, controller.headingFontSize)),
                   ),
                 ),
                 Expanded(
@@ -296,8 +299,10 @@ class EditTeacher extends StatelessWidget {
                                       Expanded(
                                         child: Obx(() => Text(
                                               controller.name.value,
-                                              style: Font_Styles.dataTableTitle(context, controller.headingFontSize -
-                                                        10),
+                                              style: Font_Styles.dataTableTitle(
+                                                  context,
+                                                  controller.headingFontSize -
+                                                      10),
                                               softWrap: true,
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
@@ -318,7 +323,8 @@ class EditTeacher extends StatelessWidget {
                                       const EdgeInsets.fromLTRB(0, 0, 30, 0),
                                   child: Text(
                                     controller.teacher.empID,
-                                    style: Font_Styles.dataTableTitle(context, controller.addStdFontSize),
+                                    style: Font_Styles.dataTableTitle(
+                                        context, controller.addStdFontSize),
                                   ),
                                 ),
                               ],
@@ -329,15 +335,19 @@ class EditTeacher extends StatelessWidget {
                                 30, 0, 60, screenHeight * 0.01),
                             child: Text(
                               'Classes Teacher: ${controller.teacher.classTeacher}',
-                              style: Font_Styles.dataTableTitle(context, controller.addStdFontSize),
+                              style: Font_Styles.dataTableTitle(
+                                  context, controller.addStdFontSize),
                             ),
                           ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(
                                 30, 0, 60, screenHeight * 0.04),
-                            child: Text(
-                              'Classes & Subjects: ${controller.teacher.subjects}',
-                              style: Font_Styles.dataTableTitle(context, controller.addStdFontSize),
+                            child: Obx(
+                              () => Text(
+                                'Classes & Subjects: ${controller.selectedSubjects}',
+                                style: Font_Styles.dataTableTitle(
+                                    context, controller.addStdFontSize),
+                              ),
                             ),
                           ),
                           Padding(
@@ -431,50 +441,71 @@ class EditTeacher extends StatelessWidget {
                                 return Column(
                                   children: [
                                     MultiSelectDialogField(
-                                      backgroundColor: AppColors.appLightBlue,
-                                      items: controller.classesSubjects
-                                          .map((classSubject) =>
-                                              MultiSelectItem(
-                                                  classSubject.className,
-                                                  classSubject.className))
-                                          .toList(),
-                                      title: const Text("Available Classes"),
-                                      selectedColor: Colors.black,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(10),
+                                        backgroundColor: AppColors.appLightBlue,
+                                        items: controller.classesSubjects
+                                            .map((classSubject) =>
+                                                MultiSelectItem(
+                                                    classSubject.className,
+                                                    classSubject.className))
+                                            .toList(),
+                                        title: const Text("Available Classes"),
+                                        selectedColor: Colors.black,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: const BorderRadius.all(
+                                            Radius.circular(10),
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.black,
+                                            width: 1,
+                                          ),
                                         ),
-                                        border: Border.all(
+                                        buttonIcon: const Icon(
+                                          Icons.class_,
                                           color: Colors.black,
-                                          width: 1,
                                         ),
-                                      ),
-                                      buttonIcon: const Icon(
-                                        Icons.class_,
-                                        color: Colors.black,
-                                      ),
-                                      buttonText: Text(
-                                        "Class to Assign",
-                                        style: Font_Styles.labelHeadingRegular(context),
-                                      ),
-                                      checkColor: Colors.white,
-                                      cancelText: Text(
-                                        "Cancel",
-                                        style: Font_Styles.labelHeadingRegular(context),
-                                      ),
-                                      confirmText: Text(
-                                        "Ok",
-                                        style: Font_Styles.labelHeadingRegular(context),
-                                      ),
-                                      initialValue: controller
-                                          .selectedClasses,
-                                      onConfirm: (results) {
-                                        controller.selectedClasses.clear();
-                                        controller.selectedClasses
-                                            .assignAll(results);
-                                      },
-                                    ),
+                                        buttonText: Text(
+                                          "Class to Assign",
+                                          style:
+                                              Font_Styles.labelHeadingRegular(
+                                                  context),
+                                        ),
+                                        checkColor: Colors.white,
+                                        cancelText: Text(
+                                          "Cancel",
+                                          style:
+                                              Font_Styles.labelHeadingRegular(
+                                                  context),
+                                        ),
+                                        confirmText: Text(
+                                          "Ok",
+                                          style:
+                                              Font_Styles.labelHeadingRegular(
+                                                  context),
+                                        ),
+                                        initialValue:
+                                            controller.selectedClasses,
+                                        onConfirm: (results) {
+                                          controller.selectedClasses.clear();
+                                          controller.selectedClasses
+                                              .assignAll(results);
+
+                                          RxMap<String, List<String>>
+                                              updatedSubjects =
+                                              <String, List<String>>{}.obs;
+
+                                          for (var selectedClass in results) {
+                                            if (controller.selectedSubjects
+                                                .containsKey(selectedClass)) {
+                                              updatedSubjects[selectedClass] =
+                                                  controller.selectedSubjects[
+                                                      selectedClass]!;
+                                            }
+                                          }
+
+                                          controller.selectedSubjects.value =
+                                              updatedSubjects;
+                                        }),
                                     Obx(() => Column(
                                           children: [
                                             for (var className
@@ -517,16 +548,22 @@ class EditTeacher extends StatelessWidget {
                                                   ),
                                                   buttonText: Text(
                                                     "Select Subjects for $className",
-                                                    style: Font_Styles.labelHeadingRegular(context),
+                                                    style: Font_Styles
+                                                        .labelHeadingRegular(
+                                                            context),
                                                   ),
                                                   selectedColor: Colors.black,
                                                   cancelText: Text(
                                                     "Cancel",
-                                                    style: Font_Styles.labelHeadingRegular(context),
+                                                    style: Font_Styles
+                                                        .labelHeadingRegular(
+                                                            context),
                                                   ),
                                                   confirmText: Text(
                                                     "Ok",
-                                                    style: Font_Styles.labelHeadingRegular(context),
+                                                    style: Font_Styles
+                                                        .labelHeadingRegular(
+                                                            context),
                                                   ),
                                                   checkColor: Colors.white,
                                                   initialValue: controller
@@ -534,13 +571,21 @@ class EditTeacher extends StatelessWidget {
                                                           className] ??
                                                       [],
                                                   onConfirm: (results) {
-                                                    controller.selectedSubjects.clear();
+                                                    print(results);
+
+                                                    print(controller
+                                                        .selectedSubjects);
+                                                    controller.selectedSubjects
+                                                        .remove(className);
+
                                                     controller.selectedSubjects[
                                                             className] =
                                                         results
                                                             .map((e) =>
                                                                 e.toString())
                                                             .toList();
+                                                    print(controller
+                                                        .selectedSubjects);
                                                   },
                                                 ),
                                               ),
@@ -590,8 +635,9 @@ class EditTeacher extends StatelessWidget {
                                       : null,
                                   items: items,
                                   onChanged: (newValue) {
-          controller.selectedClassTeacher.value = newValue ?? '';
-        },
+                                    controller.selectedClassTeacher.value =
+                                        newValue ?? '';
+                                  },
                                   decoration: InputDecoration(
                                     labelText: "Class Teacher",
                                     border: OutlineInputBorder(
