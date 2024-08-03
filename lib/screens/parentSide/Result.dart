@@ -1,5 +1,6 @@
 import 'package:classinsight/firebase_options.dart';
 import 'package:classinsight/utils/fontStyles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/models/StudentModel.dart';
@@ -7,7 +8,6 @@ import 'package:classinsight/utils/AppColors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-// Controller for managing student results
 class ResultController extends GetxController {
   var student = Student(
     name: '',
@@ -57,6 +57,82 @@ class ResultController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<String> fetchTotalObtainedMarks(
+      String studentID, String subject) async {
+    try {
+      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolId)
+          .collection('Students')
+          .doc(studentID)
+          .get();
+
+      if (studentDoc.exists) {
+        Map<String, dynamic> resultMap = studentDoc['resultMap'];
+        int totalSum = 0;
+
+        var subjectResults = resultMap[subject] ?? {};
+
+        for (var examType in examsList) {
+          var marks = subjectResults[examType] ?? '-';
+          if (marks is String) {
+            RegExp regex = RegExp(r'(\d+)/(\d+)');
+            Match? match = regex.firstMatch(marks);
+            if (match != null) {
+              int obtainedMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
+              totalSum += obtainedMarks;
+            }
+          }
+        }
+
+        return totalSum.toString();
+      } else {
+        return '0';
+      }
+    } catch (e) {
+      print('Error fetching resultMap: $e');
+      return '0';
+    }
+  }
+
+  Future<String> fetchStudentTotalMarksSum(
+      String studentID, String subject) async {
+    try {
+      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolId)
+          .collection('Students')
+          .doc(studentID)
+          .get();
+
+      if (studentDoc.exists) {
+        Map<String, dynamic> resultMap = studentDoc['resultMap'];
+        int totalSum = 0;
+
+        var subjectResults = resultMap[subject] ?? {};
+
+        for (var examType in examsList) {
+          var marks = subjectResults[examType] ?? '-';
+          if (marks is String) {
+            RegExp regex = RegExp(r'\d+/(\d+)');
+            Match? match = regex.firstMatch(marks);
+            if (match != null) {
+              int totalMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
+              totalSum += totalMarks;
+            }
+          }
+        }
+
+        return totalSum.toString();
+      } else {
+        return '0';
+      }
+    } catch (e) {
+      print('Error fetching resultMap: $e');
+      return '0';
+    }
+  }
 }
 
 void main() async {
@@ -84,12 +160,10 @@ class MyApp extends StatelessWidget {
 class Result extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Retrieve arguments
     final arguments = Get.arguments as Map<String, dynamic>;
     final Student student = arguments['student'];
     final String schoolId = arguments['schoolId'];
 
-    // Initialize the ResultController with schoolId
     final ResultController controller = Get.put(ResultController(schoolId));
     controller.setStudent(student);
 
@@ -108,13 +182,6 @@ class Result extends StatelessWidget {
             ),
           );
         } else {
-          // Debug prints to check data
-          print('Student: ${controller.student.value}');
-          print('Exams List: ${controller.examsList}');
-          print('Subjects List: ${controller.subjectsList}');
-          print('Result Map: ${controller.resultMap}');
-          print('School ID: $schoolId');
-
           double screenHeight = MediaQuery.of(context).size.height;
           double screenWidth = MediaQuery.of(context).size.width;
 
@@ -151,79 +218,152 @@ class Result extends StatelessWidget {
                       child: Obx(() {
                         List<String> exams = controller.examsList;
                         List<String> subjects = controller.subjectsList;
-                        Map<String, Map<String, String>> resultMap = controller.resultMap;
+                        Map<String, Map<String, String>> resultMap =
+                            controller.resultMap;
 
-                        return DataTable(
-                          columns: [
-                            DataColumn(
-                              label: Text(
-                                'Subjects',
-                                style: TextStyle(
-                                  fontSize: resultFontSize,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            ...exams.map((exam) => DataColumn(
-                                  label: Text(
-                                    exam,
-                                    style: TextStyle(
-                                      fontSize: resultFontSize,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                )),
-                            DataColumn(
-                              label: Text(
-                                'Total',
-                                style: TextStyle(
-                                  fontSize: resultFontSize,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Grade',
-                                style: TextStyle(
-                                  fontSize: resultFontSize,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                          rows: subjects.map(
-                            (subject) => DataRow(
-                              color: MaterialStateColor.resolveWith(
-                                  (states) => AppColors.appOrange),
-                              cells: [
-                                DataCell(Text(
-                                  subject,
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: DataTable(
+                            columns: [
+                              DataColumn(
+                                label: Text(
+                                  'Subjects',
                                   style: TextStyle(
                                     fontSize: resultFontSize,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                )),
-                                ...exams.map((exam) => DataCell(Text(
-                                      resultMap[subject]?[exam] ?? '-',
+                                ),
+                              ),
+                              ...exams.map((exam) => DataColumn(
+                                    label: Text(
+                                      exam,
                                       style: TextStyle(
                                         fontSize: resultFontSize,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                    ))),
-                                DataCell(Text(
-                                  '-', // Placeholder for Total
+                                    ),
+                                  )),
+                              DataColumn(
+                                label: Text(
+                                  'Obtained Marks',
                                   style: TextStyle(
                                     fontSize: resultFontSize,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                )),
-                                DataCell(Text(
-                                  '-', // Placeholder for Grade
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Total Marks',
                                   style: TextStyle(
                                     fontSize: resultFontSize,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                )),
-                              ],
-                            ),
-                          ).toList(),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Grade',
+                                  style: TextStyle(
+                                    fontSize: resultFontSize,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            rows: subjects
+                                .map(
+                                  (subject) => DataRow(
+                                    color: MaterialStateColor.resolveWith(
+                                        (states) => AppColors.appOrange),
+                                    cells: [
+                                      DataCell(Text(
+                                        subject,
+                                        style: TextStyle(
+                                          fontSize: resultFontSize,
+                                        ),
+                                      )),
+                                      ...exams.map((exam) => DataCell(Text(
+                                            resultMap[subject]?[exam] ?? '-',
+                                            style: TextStyle(
+                                              fontSize: resultFontSize,
+                                            ),
+                                          ))),
+                                      DataCell(FutureBuilder<String>(
+                                        future:
+                                            controller.fetchTotalObtainedMarks(
+                                                controller
+                                                    .student.value.studentID,
+                                                subject),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Text(
+                                              '-',
+                                              style: TextStyle(
+                                                fontSize: resultFontSize,
+                                              ),
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                              'Error',
+                                              style: TextStyle(
+                                                fontSize: resultFontSize,
+                                              ),
+                                            );
+                                          } else {
+                                            return Text(
+                                              snapshot.data ?? '0',
+                                              style: TextStyle(
+                                                fontSize: resultFontSize,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      )),
+                                      DataCell(FutureBuilder<String>(
+                                        future: controller
+                                            .fetchStudentTotalMarksSum(
+                                                controller
+                                                    .student.value.studentID,
+                                                subject),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Text(
+                                              '-',
+                                              style: TextStyle(
+                                                fontSize: resultFontSize,
+                                              ),
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                              'Error',
+                                              style: TextStyle(
+                                                fontSize: resultFontSize,
+                                              ),
+                                            );
+                                          } else {
+                                            return Text(
+                                              snapshot.data ?? '0',
+                                              style: TextStyle(
+                                                fontSize: resultFontSize,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      )),
+                                      DataCell(Text(
+                                        calculateGrade(
+                                            resultMap[subject] ?? {}),
+                                        style: Font_Styles.dataTableRows(
+                                            context, resultFontSize),
+                                      )),
+                                    ],
+                                  ),
+                                )
+                                .toList(),
+                          ),
                         );
                       }),
                     ),
@@ -235,5 +375,39 @@ class Result extends StatelessWidget {
         }
       }),
     );
+  }
+
+  String calculateGrade(Map<String, String> subjectResults) {
+    int totalMarks = 0;
+    int obtainedMarks = 0;
+
+    subjectResults.forEach((exam, marks) {
+      if (marks.contains('/')) {
+        var parts = marks.split('/');
+        if (parts.length == 2) {
+          obtainedMarks += int.tryParse(parts[0]) ?? 0;
+          totalMarks += int.tryParse(parts[1]) ?? 0;
+        }
+      }
+    });
+
+    if (totalMarks == 0) {
+      return '-';
+    }
+
+    double percentage = (obtainedMarks / totalMarks) * 100;
+    if (percentage >= 90) {
+      return 'A+';
+    } else if (percentage >= 80) {
+      return 'A';
+    } else if (percentage >= 70) {
+      return 'B';
+    } else if (percentage >= 60) {
+      return 'C';
+    } else if (percentage >= 50) {
+      return 'D';
+    } else {
+      return 'F';
+    }
   }
 }
