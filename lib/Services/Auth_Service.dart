@@ -91,10 +91,6 @@ static Future<void> logout(BuildContext context) async {
 
       String uid = userCredential.user?.uid ?? '';
 
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'role': 'teacher',
-      });
-
     } on FirebaseAuthException catch (e) {
       Get.snackbar('Registration Error', e.message ?? 'An error occurred');
     } catch (e) {
