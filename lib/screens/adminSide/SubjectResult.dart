@@ -50,7 +50,6 @@ class SubjectResultController extends GetxController {
         Map<String, dynamic> resultMap = studentDoc['resultMap'];
         int totalSum = 0;
 
-        // Get the results for the selected subject
         var subjectResults = resultMap[selectedSubject.value] ?? {};
 
         for (var examType in examsList) {
@@ -87,6 +86,7 @@ class SubjectResultController extends GetxController {
         Map<String, dynamic> resultMap = studentDoc['resultMap'];
         int totalSum = 0;
 
+        // Get the results for the selected subject
         var subjectResults = resultMap[selectedSubject.value] ?? {};
 
         for (var examType in examsList) {
