@@ -36,7 +36,7 @@ class ViewAttendController extends GetxController {
   }
 
   void filterAttendance() {
-    final subjectAttendance = student.value?.attendance[selectedSubject.value] as Map<String, String>?;
+    final subjectAttendance = student.value?.attendance[selectedSubject.value];
     attendance.value = subjectAttendance?.entries
         .where((entry) => entry.key.startsWith(selectedMonth.value))
         .toMap((entry) => MapEntry(entry.key, entry.value)) ?? {};

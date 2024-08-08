@@ -1107,7 +1107,13 @@ static Future<List<Student>> getStudentsOfASpecificClass(
   static Future<List<Announcement>?> fetchAdminAnnouncements(
       String schoolID) async {
     print('Fetching admin announcements');
-    try {
+    DateTime now = DateTime.now();
+
+    DateTime sevendaysAgo = now.subtract(Duration(days: 7));
+
+    Timestamp sevendaysTime = Timestamp.fromDate(sevendaysAgo);
+
+  try {
       CollectionReference schoolsRef =
           FirebaseFirestore.instance.collection('Schools');
 
@@ -1125,6 +1131,7 @@ static Future<List<Student>> getStudentsOfASpecificClass(
 
       QuerySnapshot announcementsSnapshot = await announcementsRef
           .where('AnnouncementBy', isEqualTo: 'Admin')
+          .where('AnnouncementDate', isGreaterThanOrEqualTo: sevendaysTime)
           .get();
 
       List<Announcement> announcements = announcementsSnapshot.docs.map((doc) {
@@ -1149,6 +1156,12 @@ static Future<List<Student>> getStudentsOfASpecificClass(
 
   static Future<List<Announcement>?> fetchStudentAnnouncements(
       String schoolID, String studentID) async {
+
+      DateTime now = DateTime.now();
+
+    DateTime sevendaysAgo = now.subtract(Duration(days: 7));
+
+    Timestamp sevendaysTime = Timestamp.fromDate(sevendaysAgo);
     try {
       CollectionReference schoolsRef =
           FirebaseFirestore.instance.collection('Schools');
@@ -1166,7 +1179,9 @@ static Future<List<Student>> getStudentsOfASpecificClass(
           schoolDocRef.collection('Announcements');
 
       QuerySnapshot announcementsSnapshot =
-          await announcementsRef.where('StudentID', isEqualTo: studentID).get();
+          await announcementsRef.where('StudentID', isEqualTo: studentID).
+          where('AnnouncementDate', isGreaterThanOrEqualTo: sevendaysTime)
+          .get();
 
       List<Announcement> announcements = announcementsSnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;

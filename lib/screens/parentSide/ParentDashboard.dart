@@ -297,6 +297,11 @@ class ParentDashboard extends StatelessWidget {
                                         children: [
                                           Padding(
                                             padding: EdgeInsets.fromLTRB(
+                                                15, 10, 0, 0),
+                                            child: Text('Last 7 days'),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.fromLTRB(
                                                 15, 0, 0, 0),
                                             child: Row(
                                               children: [

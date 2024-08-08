@@ -5,7 +5,6 @@ import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
 
 class AttendanceController extends GetxController {
   TextEditingController datepicker = TextEditingController();

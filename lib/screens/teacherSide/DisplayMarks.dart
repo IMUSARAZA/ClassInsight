@@ -4,7 +4,6 @@ import 'package:classinsight/models/TeacherModel.dart';
 import 'package:classinsight/screens/teacherSide/MarksScreen.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
