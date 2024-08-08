@@ -58,81 +58,81 @@ class ResultController extends GetxController {
     }
   }
 
-  Future<String> fetchTotalObtainedMarks(
-      String studentID, String subject) async {
-    try {
-      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
-          .collection('Schools')
-          .doc(schoolId)
-          .collection('Students')
-          .doc(studentID)
-          .get();
+  // Future<String> fetchTotalObtainedMarks(
+  //     String studentID, String subject) async {
+  //   try {
+  //     DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+  //         .collection('Schools')
+  //         .doc(schoolId)
+  //         .collection('Students')
+  //         .doc(studentID)
+  //         .get();
 
-      if (studentDoc.exists) {
-        Map<String, dynamic> resultMap = studentDoc['resultMap'];
-        int totalSum = 0;
+  //     if (studentDoc.exists) {
+  //       Map<String, dynamic> resultMap = studentDoc['resultMap'];
+  //       int totalSum = 0;
 
-        var subjectResults = resultMap[subject] ?? {};
+  //       var subjectResults = resultMap[subject] ?? {};
 
-        for (var examType in examsList) {
-          var marks = subjectResults[examType] ?? '-';
-          if (marks is String) {
-            RegExp regex = RegExp(r'(\d+)/(\d+)');
-            Match? match = regex.firstMatch(marks);
-            if (match != null) {
-              int obtainedMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
-              totalSum += obtainedMarks;
-            }
-          }
-        }
+  //       for (var examType in examsList) {
+  //         var marks = subjectResults[examType] ?? '-';
+  //         if (marks is String) {
+  //           RegExp regex = RegExp(r'(\d+)/(\d+)');
+  //           Match? match = regex.firstMatch(marks);
+  //           if (match != null) {
+  //             int obtainedMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
+  //             totalSum += obtainedMarks;
+  //           }
+  //         }
+  //       }
 
-        return totalSum.toString();
-      } else {
-        return '0';
-      }
-    } catch (e) {
-      print('Error fetching resultMap: $e');
-      return '0';
-    }
-  }
+  //       return totalSum.toString();
+  //     } else {
+  //       return '0';
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching resultMap: $e');
+  //     return '0';
+  //   }
+  // }
 
-  Future<String> fetchStudentTotalMarksSum(
-      String studentID, String subject) async {
-    try {
-      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
-          .collection('Schools')
-          .doc(schoolId)
-          .collection('Students')
-          .doc(studentID)
-          .get();
+  // Future<String> fetchStudentTotalMarksSum(
+  //     String studentID, String subject) async {
+  //   try {
+  //     DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+  //         .collection('Schools')
+  //         .doc(schoolId)
+  //         .collection('Students')
+  //         .doc(studentID)
+  //         .get();
 
-      if (studentDoc.exists) {
-        Map<String, dynamic> resultMap = studentDoc['resultMap'];
-        int totalSum = 0;
+  //     if (studentDoc.exists) {
+  //       Map<String, dynamic> resultMap = studentDoc['resultMap'];
+  //       int totalSum = 0;
 
-        var subjectResults = resultMap[subject] ?? {};
+  //       var subjectResults = resultMap[subject] ?? {};
 
-        for (var examType in examsList) {
-          var marks = subjectResults[examType] ?? '-';
-          if (marks is String) {
-            RegExp regex = RegExp(r'\d+/(\d+)');
-            Match? match = regex.firstMatch(marks);
-            if (match != null) {
-              int totalMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
-              totalSum += totalMarks;
-            }
-          }
-        }
+  //       for (var examType in examsList) {
+  //         var marks = subjectResults[examType] ?? '-';
+  //         if (marks is String) {
+  //           RegExp regex = RegExp(r'\d+/(\d+)');
+  //           Match? match = regex.firstMatch(marks);
+  //           if (match != null) {
+  //             int totalMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
+  //             totalSum += totalMarks;
+  //           }
+  //         }
+  //       }
 
-        return totalSum.toString();
-      } else {
-        return '0';
-      }
-    } catch (e) {
-      print('Error fetching resultMap: $e');
-      return '0';
-    }
-  }
+  //       return totalSum.toString();
+  //     } else {
+  //       return '0';
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching resultMap: $e');
+  //     return '0';
+  //   }
+  // }
 }
 
 void main() async {
@@ -243,33 +243,33 @@ class Result extends StatelessWidget {
                                       ),
                                     ),
                                   )),
-                              DataColumn(
-                                label: Text(
-                                  'Obtained Marks',
-                                  style: TextStyle(
-                                    fontSize: resultFontSize,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Total Marks',
-                                  style: TextStyle(
-                                    fontSize: resultFontSize,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Grade',
-                                  style: TextStyle(
-                                    fontSize: resultFontSize,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
+                              // DataColumn(
+                              //   label: Text(
+                              //     'Obtained Marks',
+                              //     style: TextStyle(
+                              //       fontSize: resultFontSize,
+                              //       fontWeight: FontWeight.bold,
+                              //     ),
+                              //   ),
+                              // ),
+                              // DataColumn(
+                              //   label: Text(
+                              //     'Total Marks',
+                              //     style: TextStyle(
+                              //       fontSize: resultFontSize,
+                              //       fontWeight: FontWeight.bold,
+                              //     ),
+                              //   ),
+                              // ),
+                              // DataColumn(
+                              //   label: Text(
+                              //     'Grade',
+                              //     style: TextStyle(
+                              //       fontSize: resultFontSize,
+                              //       fontWeight: FontWeight.bold,
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                             rows: subjects
                                 .map(
@@ -289,76 +289,76 @@ class Result extends StatelessWidget {
                                               fontSize: resultFontSize,
                                             ),
                                           ))),
-                                      DataCell(FutureBuilder<String>(
-                                        future:
-                                            controller.fetchTotalObtainedMarks(
-                                                controller
-                                                    .student.value.studentID,
-                                                subject),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return Text(
-                                              '-',
-                                              style: TextStyle(
-                                                fontSize: resultFontSize,
-                                              ),
-                                            );
-                                          } else if (snapshot.hasError) {
-                                            return Text(
-                                              'Error',
-                                              style: TextStyle(
-                                                fontSize: resultFontSize,
-                                              ),
-                                            );
-                                          } else {
-                                            return Text(
-                                              snapshot.data ?? '0',
-                                              style: TextStyle(
-                                                fontSize: resultFontSize,
-                                              ),
-                                            );
-                                          }
-                                        },
-                                      )),
-                                      DataCell(FutureBuilder<String>(
-                                        future: controller
-                                            .fetchStudentTotalMarksSum(
-                                                controller
-                                                    .student.value.studentID,
-                                                subject),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return Text(
-                                              '-',
-                                              style: TextStyle(
-                                                fontSize: resultFontSize,
-                                              ),
-                                            );
-                                          } else if (snapshot.hasError) {
-                                            return Text(
-                                              'Error',
-                                              style: TextStyle(
-                                                fontSize: resultFontSize,
-                                              ),
-                                            );
-                                          } else {
-                                            return Text(
-                                              snapshot.data ?? '0',
-                                              style: TextStyle(
-                                                fontSize: resultFontSize,
-                                              ),
-                                            );
-                                          }
-                                        },
-                                      )),
-                                      DataCell(Text(
-                                        calculateGrade(
-                                            resultMap[subject] ?? {}),
-                                        style: Font_Styles.dataTableRows(
-                                            context, resultFontSize),
-                                      )),
+                                      // DataCell(FutureBuilder<String>(
+                                      //   future:
+                                      //       controller.fetchTotalObtainedMarks(
+                                      //           controller
+                                      //               .student.value.studentID,
+                                      //           subject),
+                                      //   builder: (context, snapshot) {
+                                      //     if (snapshot.connectionState ==
+                                      //         ConnectionState.waiting) {
+                                      //       return Text(
+                                      //         '-',
+                                      //         style: TextStyle(
+                                      //           fontSize: resultFontSize,
+                                      //         ),
+                                      //       );
+                                      //     } else if (snapshot.hasError) {
+                                      //       return Text(
+                                      //         'Error',
+                                      //         style: TextStyle(
+                                      //           fontSize: resultFontSize,
+                                      //         ),
+                                      //       );
+                                      //     } else {
+                                      //       return Text(
+                                      //         snapshot.data ?? '0',
+                                      //         style: TextStyle(
+                                      //           fontSize: resultFontSize,
+                                      //         ),
+                                      //       );
+                                      //     }
+                                      //   },
+                                      // )),
+                                      // DataCell(FutureBuilder<String>(
+                                      //   future: controller
+                                      //       .fetchStudentTotalMarksSum(
+                                      //           controller
+                                      //               .student.value.studentID,
+                                      //           subject),
+                                      //   builder: (context, snapshot) {
+                                      //     if (snapshot.connectionState ==
+                                      //         ConnectionState.waiting) {
+                                      //       return Text(
+                                      //         '-',
+                                      //         style: TextStyle(
+                                      //           fontSize: resultFontSize,
+                                      //         ),
+                                      //       );
+                                      //     } else if (snapshot.hasError) {
+                                      //       return Text(
+                                      //         'Error',
+                                      //         style: TextStyle(
+                                      //           fontSize: resultFontSize,
+                                      //         ),
+                                      //       );
+                                      //     } else {
+                                      //       return Text(
+                                      //         snapshot.data ?? '0',
+                                      //         style: TextStyle(
+                                      //           fontSize: resultFontSize,
+                                      //         ),
+                                      //       );
+                                      //     }
+                                      //   },
+                                      // )),
+                                      // DataCell(Text(
+                                      //   calculateGrade(
+                                      //       resultMap[subject] ?? {}),
+                                      //   style: Font_Styles.dataTableRows(
+                                      //       context, resultFontSize),
+                                      // )),
                                     ],
                                   ),
                                 )
@@ -377,37 +377,37 @@ class Result extends StatelessWidget {
     );
   }
 
-  String calculateGrade(Map<String, String> subjectResults) {
-    int totalMarks = 0;
-    int obtainedMarks = 0;
+  // String calculateGrade(Map<String, String> subjectResults) {
+  //   int totalMarks = 0;
+  //   int obtainedMarks = 0;
 
-    subjectResults.forEach((exam, marks) {
-      if (marks.contains('/')) {
-        var parts = marks.split('/');
-        if (parts.length == 2) {
-          obtainedMarks += int.tryParse(parts[0]) ?? 0;
-          totalMarks += int.tryParse(parts[1]) ?? 0;
-        }
-      }
-    });
+  //   subjectResults.forEach((exam, marks) {
+  //     if (marks.contains('/')) {
+  //       var parts = marks.split('/');
+  //       if (parts.length == 2) {
+  //         obtainedMarks += int.tryParse(parts[0]) ?? 0;
+  //         totalMarks += int.tryParse(parts[1]) ?? 0;
+  //       }
+  //     }
+  //   });
 
-    if (totalMarks == 0) {
-      return '-';
-    }
+  //   if (totalMarks == 0) {
+  //     return '-';
+  //   }
 
-    double percentage = (obtainedMarks / totalMarks) * 100;
-    if (percentage >= 90) {
-      return 'A+';
-    } else if (percentage >= 80) {
-      return 'A';
-    } else if (percentage >= 70) {
-      return 'B';
-    } else if (percentage >= 60) {
-      return 'C';
-    } else if (percentage >= 50) {
-      return 'D';
-    } else {
-      return 'F';
-    }
-  }
+  //   double percentage = (obtainedMarks / totalMarks) * 100;
+  //   if (percentage >= 90) {
+  //     return 'A+';
+  //   } else if (percentage >= 80) {
+  //     return 'A';
+  //   } else if (percentage >= 70) {
+  //     return 'B';
+  //   } else if (percentage >= 60) {
+  //     return 'C';
+  //   } else if (percentage >= 50) {
+  //     return 'D';
+  //   } else {
+  //     return 'F';
+  //   }
+  // }
 }

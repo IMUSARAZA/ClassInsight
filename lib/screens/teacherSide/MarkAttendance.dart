@@ -107,7 +107,7 @@ class MarkAttendance extends StatelessWidget {
               {
                 return AlertDialog(
                   title: Text("Attendance"),
-                  content: Text('Are you sure you want to submit the attendance for ${controller.selectedClass} Subject: ${controller.selectedClass.value}?'),
+                  content: Text('Are you sure you want to submit the attendance for ${controller.selectedClass} Subject: ${controller.subject.value}?'),
                   actions: [
                     TextButton(
                       onPressed: (){

@@ -33,7 +33,7 @@ class TeacherDashboardController extends GetxController {
       print('I am in if');
       teacher.value = arguments[0] as Teacher?;
       school.value = arguments[1] as School?;
-      
+
       if (teacher.value != null && school.value != null) {
         cacheData(school.value!, teacher.value!);
       }
@@ -109,7 +109,7 @@ class TeacherDashboardController extends GetxController {
         if (snapshot.exists) {
           Teacher updatedTeacher = Teacher.fromJson(snapshot.data()!);
           teacher.value = updatedTeacher;
-          cacheData(school.value!, updatedTeacher); 
+          cacheData(school.value!, updatedTeacher);
           fetchClasses();
         }
       });
@@ -122,14 +122,12 @@ class TeacherDashboardController extends GetxController {
         if (snapshot.exists) {
           School updatedSchool = School.fromJson(snapshot.data()!);
           school.value = updatedSchool;
-          cacheData(updatedSchool, teacher.value!); 
+          cacheData(updatedSchool, teacher.value!);
         }
       });
     }
   }
 }
-
-
 
 class TeacherDashboard extends StatelessWidget {
   TeacherDashboard({super.key});
@@ -234,87 +232,100 @@ class TeacherDashboard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-  padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-  child: Text(
-    'Class',
-    style: TextStyle(
-      color: Colors.black,
-      fontSize: 15,
-    ),
-  ),
-),
-Obx(
-  () => Padding(
-    padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
-    child: DropdownButtonFormField<String>(
-      value: _controller.classesList.contains(_controller.selectedClass.value) ? _controller.selectedClass.value : null,
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.black),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: AppColors.appLightBlue, width: 2.0),
-        ),
-      ),
-      items: _controller.classesList.map((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: (String? newValue) {
-        _controller.selectedClass.value = newValue ?? '';
-        _controller.updateSubjects(newValue ?? '');
-      },
-    ),
-  ),
-),
-SizedBox(height: screenHeight * 0.01),
-Padding(
-  padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-  child: Text(
-    'Subject',
-    style: TextStyle(
-      color: Colors.black,
-      fontSize: 15,
-    ),
-  ),
-),
-Obx(
-  () => Padding(
-    padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
-    child: DropdownButtonFormField<String>(
-      value: _controller.subjectsList.contains(_controller.selectedSubject.value) ? _controller.selectedSubject.value : null,
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.black),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: AppColors.appLightBlue, width: 2.0),
-        ),
-      ),
-      items: _controller.subjectsList.map((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: (String? newValue) {
-        _controller.selectedSubject.value = newValue ?? '';
-      },
-    ),
-  ),
-),
+                            padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+                            child: Text(
+                              'Class',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          Obx(
+                            () => Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
+                              child: DropdownButtonFormField<String>(
+                                value: _controller.classesList.contains(
+                                        _controller.selectedClass.value)
+                                    ? _controller.selectedClass.value
+                                    : null,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.black),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                        color: AppColors.appLightBlue,
+                                        width: 2.0),
+                                  ),
+                                ),
+                                items:
+                                    _controller.classesList.map((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  _controller.selectedClass.value =
+                                      newValue ?? '';
+                                  _controller.updateSubjects(newValue ?? '');
+                                },
+                              ),
+                            ),
+                          ),
                           SizedBox(height: screenHeight * 0.01),
-                          
-                          Obx(() =>
-                          _controller.selectedClass.value == _controller.teacher.value!.classTeacher ?
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+                            child: Text(
+                              'Subject',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          Obx(
+                            () => Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
+                              child: DropdownButtonFormField<String>(
+                                value: _controller.subjectsList.contains(
+                                        _controller.selectedSubject.value)
+                                    ? _controller.selectedSubject.value
+                                    : null,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.black),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                        color: AppColors.appLightBlue,
+                                        width: 2.0),
+                                  ),
+                                ),
+                                items: _controller.subjectsList
+                                    .map((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  _controller.selectedSubject.value =
+                                      newValue ?? '';
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenHeight * 0.01),
                           Center(
                             child: GestureDetector(
                               onTap: () {
@@ -363,7 +374,7 @@ Obx(
                                 ),
                               ),
                             ),
-                          ):Container()),
+                          ),
                           SizedBox(height: screenHeight * 0.03),
                           Center(
                             child: GestureDetector(

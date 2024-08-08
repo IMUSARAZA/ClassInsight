@@ -41,79 +41,79 @@ class SubjectResultController extends GetxController {
   }
 
   
-  Future<String> fetchTotalObtainedMarks(String studentID) async {
-    try {
-      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
-          .collection('Schools')
-          .doc(schoolId)
-          .collection('Students')
-          .doc(studentID)
-          .get();
+  // Future<String> fetchTotalObtainedMarks(String studentID) async {
+  //   try {
+  //     DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+  //         .collection('Schools')
+  //         .doc(schoolId)
+  //         .collection('Students')
+  //         .doc(studentID)
+  //         .get();
 
-      if (studentDoc.exists) {
-        Map<String, dynamic> resultMap = studentDoc['resultMap'];
-        int totalSum = 0;
+  //     if (studentDoc.exists) {
+  //       Map<String, dynamic> resultMap = studentDoc['resultMap'];
+  //       int totalSum = 0;
 
-        var subjectResults = resultMap[selectedSubject.value] ?? {};
+  //       var subjectResults = resultMap[selectedSubject.value] ?? {};
 
-        for (var examType in examsList) {
-          var marks = subjectResults[examType] ?? '-';
-          if (marks is String) {
-            RegExp regex = RegExp(r'(\d+)/(\d+)');
-            Match? match = regex.firstMatch(marks);
-            if (match != null) {
-              int obtainedMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
-              totalSum += obtainedMarks;
-            }
-          }
-        }
+  //       for (var examType in examsList) {
+  //         var marks = subjectResults[examType] ?? '-';
+  //         if (marks is String) {
+  //           RegExp regex = RegExp(r'(\d+)/(\d+)');
+  //           Match? match = regex.firstMatch(marks);
+  //           if (match != null) {
+  //             int obtainedMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
+  //             totalSum += obtainedMarks;
+  //           }
+  //         }
+  //       }
 
-        return totalSum.toString();
-      } else {
-        return '0';
-      }
-    } catch (e) {
-      print('Error fetching resultMap: $e');
-      return '0';
-    }
-  }
-    Future<String> fetchStudentTotalMarksSum(String studentID) async {
-    try {
-      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
-          .collection('Schools')
-          .doc(schoolId)
-          .collection('Students')
-          .doc(studentID)
-          .get();
+  //       return totalSum.toString();
+  //     } else {
+  //       return '0';
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching resultMap: $e');
+  //     return '0';
+  //   }
+  // }
+  //   Future<String> fetchStudentTotalMarksSum(String studentID) async {
+  //   try {
+  //     DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+  //         .collection('Schools')
+  //         .doc(schoolId)
+  //         .collection('Students')
+  //         .doc(studentID)
+  //         .get();
 
-      if (studentDoc.exists) {
-        Map<String, dynamic> resultMap = studentDoc['resultMap'];
-        int totalSum = 0;
+  //     if (studentDoc.exists) {
+  //       Map<String, dynamic> resultMap = studentDoc['resultMap'];
+  //       int totalSum = 0;
 
-        // Get the results for the selected subject
-        var subjectResults = resultMap[selectedSubject.value] ?? {};
+  //       // Get the results for the selected subject
+  //       var subjectResults = resultMap[selectedSubject.value] ?? {};
 
-        for (var examType in examsList) {
-          var marks = subjectResults[examType] ?? '-';
-          if (marks is String) {
-            RegExp regex = RegExp(r'\d+/(\d+)');
-            Match? match = regex.firstMatch(marks);
-            if (match != null) {
-              int totalMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
-              totalSum += totalMarks;
-            }
-          }
-        }
+  //       for (var examType in examsList) {
+  //         var marks = subjectResults[examType] ?? '-';
+  //         if (marks is String) {
+  //           RegExp regex = RegExp(r'\d+/(\d+)');
+  //           Match? match = regex.firstMatch(marks);
+  //           if (match != null) {
+  //             int totalMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
+  //             totalSum += totalMarks;
+  //           }
+  //         }
+  //       }
 
-        return totalSum.toString();
-      } else {
-        return '0';
-      }
-    } catch (e) {
-      print('Error fetching resultMap: $e');
-      return '0';
-    }
-  }
+  //       return totalSum.toString();
+  //     } else {
+  //       return '0';
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching resultMap: $e');
+  //     return '0';
+  //   }
+  // }
 
   Future<Map<String, String>> fetchStudentResults(String studentID) async {
     Map<String, Map<String, String>>? studentResult =
@@ -353,24 +353,24 @@ class SubjectResult extends StatelessWidget {
                                                 context, screenWidth * 0.04),
                                           ),
                                         ),
-                                      DataColumn(
-                                        label: Text(
-                                          'Obtained Marks',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      DataColumn(
-                                        label: Text(
-                                          'Total Marks',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
+                                      // DataColumn(
+                                      //   label: Text(
+                                      //     'Obtained Marks',
+                                      //     style: TextStyle(
+                                      //       fontSize: 16,
+                                      //       fontWeight: FontWeight.bold,
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                      // DataColumn(
+                                      //   label: Text(
+                                      //     'Total Marks',
+                                      //     style: TextStyle(
+                                      //       fontSize: 16,
+                                      //       fontWeight: FontWeight.bold,
+                                      //     ),
+                                      //   ),
+                                      // ),
                                     ],
                                     rows: students.map((student) {
                                       return DataRow(
@@ -414,44 +414,44 @@ class SubjectResult extends StatelessWidget {
                                                 },
                                               );
                                             })),
-                                            DataCell(
-                                      FutureBuilder<String>(
-                                        future:
-                                            controller.fetchTotalObtainedMarks(
-                                                student.studentID),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return Text('');
-                                          } else if (snapshot.hasError) {
-                                            return Text('Error');
-                                          } else {
-                                            final totalMarksSum =
-                                                snapshot.data ?? '0';
-                                            return Text(totalMarksSum);
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                    DataCell(
-                                      FutureBuilder<String>(
-                                        future:
-                                            controller.fetchStudentTotalMarksSum(
-                                                student.studentID),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return Text('');
-                                          } else if (snapshot.hasError) {
-                                            return Text('Error');
-                                          } else {
-                                            final totalMarksSum =
-                                                snapshot.data ?? '0';
-                                            return Text(totalMarksSum);
-                                          }
-                                        },
-                                      ),
-                                    ),
+                                    //         DataCell(
+                                    //   FutureBuilder<String>(
+                                    //     future:
+                                    //         controller.fetchTotalObtainedMarks(
+                                    //             student.studentID),
+                                    //     builder: (context, snapshot) {
+                                    //       if (snapshot.connectionState ==
+                                    //           ConnectionState.waiting) {
+                                    //         return Text('');
+                                    //       } else if (snapshot.hasError) {
+                                    //         return Text('Error');
+                                    //       } else {
+                                    //         final totalMarksSum =
+                                    //             snapshot.data ?? '0';
+                                    //         return Text(totalMarksSum);
+                                    //       }
+                                    //     },
+                                    //   ),
+                                    // ),
+                                    // DataCell(
+                                    //   FutureBuilder<String>(
+                                    //     future:
+                                    //         controller.fetchStudentTotalMarksSum(
+                                    //             student.studentID),
+                                    //     builder: (context, snapshot) {
+                                    //       if (snapshot.connectionState ==
+                                    //           ConnectionState.waiting) {
+                                    //         return Text('');
+                                    //       } else if (snapshot.hasError) {
+                                    //         return Text('Error');
+                                    //       } else {
+                                    //         final totalMarksSum =
+                                    //             snapshot.data ?? '0';
+                                    //         return Text(totalMarksSum);
+                                    //       }
+                                    //     },
+                                    //   ),
+                                    // ),
                                         ],
                                       );
                                     }).toList(),
