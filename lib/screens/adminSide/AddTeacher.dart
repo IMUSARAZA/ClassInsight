@@ -519,11 +519,9 @@ class AddTeacher extends StatelessWidget {
                                     await Auth_Service.registerTeacher(controller.emailController.text, password, controller.school.schoolId);
                                     await Auth_Service.sendPasswordEmail(controller.emailController.text, capitalizedName, password);
 
-                                    Get.back(result: 'updated');
                                     Navigator.pop(context);
                                     Get.snackbar('Saved', 'New teacher added successfully');
                                   } catch (e) {
-                                    Get.snackbar('Error', 'Failed to add new teacher: $e');
                                   }
                                 }
                               },
@@ -546,26 +544,25 @@ class AddTeacher extends StatelessWidget {
 }
 
 String generateRandomPassword() {
-  const int passwordLength = 8;
-  const String upperCaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const String lowerCaseLetters = 'abcdefghijklmnopqrstuvwxyz';
+  const int minPasswordLength = 10;
+  const int maxPasswordLength = 12;
   const String digits = '0123456789';
   const String specialChar = '@';
-
+  
   final Random random = Random();
 
-  String password = '';
-  password += upperCaseLetters[random.nextInt(upperCaseLetters.length)];
-  password +=
-      '${digits[random.nextInt(digits.length)]}${digits[random.nextInt(digits.length)]}${digits[random.nextInt(digits.length)]}';
-  password += specialChar;
+  const String word = 'insight';
 
-  int remainingLength = passwordLength - password.length;
-  password += List.generate(remainingLength,
-          (_) => lowerCaseLetters[random.nextInt(lowerCaseLetters.length)])
+  int passwordLength = minPasswordLength + random.nextInt(maxPasswordLength - minPasswordLength + 1);
+  int remainingLength = passwordLength - word.length - 1; // Subtract length of 'insight' and '@'
+
+  String randomNumbers = List.generate(remainingLength,
+          (_) => digits[random.nextInt(digits.length)])
       .join('');
 
-  password = String.fromCharCodes(password.runes.toList()..shuffle(random));
+  String password = '$word$specialChar$randomNumbers';
+
+  print('Generated password: $password');
 
   return password;
 }

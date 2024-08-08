@@ -49,36 +49,28 @@ class Database_Service extends GetxService {
           .doc(schoolID)
           .collection('Students');
 
-      // Use the BForm_challanId as the document ID
       String bFormChallanId = student.bFormChallanId;
       DocumentReference studentDoc = studentsRef.doc(bFormChallanId);
 
-      // Use a transaction to ensure atomicity
       await FirebaseFirestore.instance.runTransaction((transaction) async {
-        // Check if the document already exists
         DocumentSnapshot docSnapshot = await transaction.get(studentDoc);
         if (docSnapshot.exists) {
-          // Instead of throwing an exception, handle it here
           ScaffoldMessenger.of(context!).showSnackBar(SnackBar(
               content: Text('A student with the same B-Form already exists.')));
-          return; // Exit the transaction early
+          return; 
         }
 
-        // Save student data with BForm_challanId as the document ID
         transaction.set(studentDoc, student.toMap());
 
-        // Get the generated document ID and assign it to StudentID field
         student.studentID = studentDoc.id;
         transaction.update(studentDoc, {
           'StudentID': student.studentID,
         });
 
-        // Fetch subjects and exam types
         List<String> subjects = await fetchSubjects(schoolID, classSection);
         List<String> examTypes =
             await fetchExamStructure(schoolID, classSection);
 
-        // Initialize resultMap
         Map<String, Map<String, dynamic>> resultMap = {};
         for (String subject in subjects) {
           resultMap[subject] = {};
@@ -87,7 +79,6 @@ class Database_Service extends GetxService {
           }
         }
 
-        // Update the document with resultMap
         transaction.update(studentDoc, {'resultMap': resultMap});
       });
 
@@ -96,7 +87,6 @@ class Database_Service extends GetxService {
       print('Error saving student: $e');
       if (e.toString().contains(
           'A student with the same BForm_challanId already exists.')) {
-        // Handle the specific error for existing student
         ScaffoldMessenger.of(context!).showSnackBar(SnackBar(
             content: Text(
                 'A student with the same BForm_challanId already exists.')));
@@ -169,29 +159,23 @@ class Database_Service extends GetxService {
   Future<void> updateOrAddMarks(String schoolID, String studentID,
       String subject, String examType, String obtainedMarks) async {
     try {
-      // Reference to the student's document
       DocumentReference studentDocRef = FirebaseFirestore.instance
           .collection('Schools')
           .doc(schoolID)
           .collection('Students')
           .doc(studentID);
 
-      // Fetch the student's document
       DocumentSnapshot studentDoc = await studentDocRef.get();
 
       if (studentDoc.exists) {
-        // Get the current resultMap
         Map<String, dynamic> resultMap = studentDoc['resultMap'] ?? {};
 
-        // Update or add the marks for the specified subject and exam type
         if (!resultMap.containsKey(subject)) {
           resultMap[subject] = {};
         }
 
-        // Update the exam type with the obtained marks
         resultMap[subject][examType] = obtainedMarks;
 
-        // Save the updated resultMap back to the student's document
         await studentDocRef.update({'resultMap': resultMap});
 
         print('Marks updated successfully.');
@@ -236,54 +220,56 @@ class Database_Service extends GetxService {
     }
   }
 
-  static Future<List<Student>> getAllStudents(String schoolId) async {
-    List<Student> students = [];
-    try {
-      QuerySnapshot schoolQuery = await FirebaseFirestore.instance
-          .collection('Schools')
-          .where('SchoolID', isEqualTo: schoolId)
-          .get();
+static Future<List<Student>> getAllStudents(String schoolId) async {
+  List<Student> students = [];
+  try {
+    QuerySnapshot schoolQuery = await FirebaseFirestore.instance
+        .collection('Schools')
+        .where('SchoolID', isEqualTo: schoolId)
+        .get();
 
-      if (schoolQuery.docs.isEmpty) {
-        return students;
-      }
-
-      String schoolDocId = schoolQuery.docs.first.id;
-
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('Schools')
-          .doc(schoolDocId)
-          .collection('Students')
-          .get();
-
-      for (var doc in querySnapshot.docs) {
-        students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
-      }
-    } catch (e) {
-      print('Error getting students: $e');
+    if (schoolQuery.docs.isEmpty) {
+      return students;
     }
-    return students;
-  }
 
-  static Future<List<Student>> getStudentsOfASpecificClass(
-      String school, String classSection) async {
-    List<Student> students = [];
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('Schools')
-          .doc(school)
-          .collection('Students')
-          .where('ClassSection', isEqualTo: classSection)
-          .get();
+    String schoolDocId = schoolQuery.docs.first.id;
 
-      for (var doc in querySnapshot.docs) {
-        students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
-      }
-    } catch (e) {
-      print('Error getting students: $e');
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Schools')
+        .doc(schoolDocId)
+        .collection('Students')
+        .get();
+
+    for (var doc in querySnapshot.docs) {
+      students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
     }
-    return students;
+  } catch (e) {
+    print('Error getting students: $e');
   }
+  return students;
+}
+
+static Future<List<Student>> getStudentsOfASpecificClass(
+    String school, String classSection) async {
+  List<Student> students = [];
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Schools')
+        .doc(school)
+        .collection('Students')
+        .where('ClassSection', isEqualTo: classSection)
+        .get();
+
+    for (var doc in querySnapshot.docs) {
+      students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
+    }
+  } catch (e) {
+    print('Error getting students: $e');
+  }
+  return students;
+}
+
+
 
   static Future<void> updateFeeStatus(String schoolId, String studentID,
       String feeStatus, String startDate, String endDate) async {
@@ -1094,28 +1080,28 @@ class Database_Service extends GetxService {
   }
 
   static Future<void> updateAttendance(
-      String schoolId, Map<String, String> studentStatusMap, String day) async {
-    try {
-      WriteBatch batch = FirebaseFirestore.instance.batch();
+      String schoolId, Map<String, String> studentStatusMap, String day, String subject) async {
+     try {
+    WriteBatch batch = FirebaseFirestore.instance.batch();
 
-      studentStatusMap.forEach((studentId, status) {
-        DocumentReference studentRef = FirebaseFirestore.instance
-            .collection('Schools')
-            .doc(schoolId)
-            .collection('Students')
-            .doc(studentId);
+    studentStatusMap.forEach((studentId, status) {
+      DocumentReference studentRef = FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolId)
+          .collection('Students')
+          .doc(studentId);
 
-        batch.update(studentRef, {'attendance.$day': status});
-      });
+      batch.update(studentRef, {'attendance.$subject.$day': status});
+    });
 
-      await batch.commit();
+    await batch.commit();
 
-      Get.back();
-      Get.snackbar('Attendance submitted', 'Date: ${day}');
-      print('Attendance updated successfully for all students');
-    } catch (e) {
-      print('Error updating attendance in bulk: $e');
-    }
+    Get.back();
+    Get.snackbar('Attendance submitted', 'Date: $day, Subject: $subject');
+    print('Attendance updated successfully for all students');
+  } catch (e) {
+    print('Error updating attendance in bulk: $e');
+  }
   }
 
   static Future<List<Announcement>?> fetchAdminAnnouncements(

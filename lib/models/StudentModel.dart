@@ -12,7 +12,7 @@ class Student {
   late String feeStartDate;
   late String feeEndDate;
   late Map<String, Map<String, String>> resultMap;
-  late Map<String, String> attendance;
+  late Map<String, Map<String, String>> attendance; 
 
   Student({
     required this.name,
@@ -28,12 +28,22 @@ class Student {
     required this.feeStartDate,
     required this.feeEndDate,
     Map<String, Map<String, String>>? resultMap,
-    Map<String, String>? attendance,
+    Map<String, Map<String, String>>? attendance, 
   }) : 
   resultMap = resultMap ?? {},
-  attendance = attendance ?? {};
+  attendance = attendance ?? {}; 
 
   factory Student.fromJson(Map<String, dynamic> json) {
+    Map<String, Map<String, String>> parseNestedMap(dynamic map) {
+      if (map == null) return {};
+      return Map<String, Map<String, String>>.from(
+        map.map((key, value) => MapEntry(
+          key,
+          Map<String, String>.from(value),
+        ))
+      );
+    }
+
     return Student(
       name: json['Name'] ?? '',
       gender: json['Gender'] ?? '',
@@ -47,8 +57,8 @@ class Student {
       feeStatus: json['FeeStatus'] ?? '',
       feeStartDate: json['FeeStartDate'] ?? '',
       feeEndDate: json['FeeEndDate'] ?? '',
-      resultMap: Map<String, Map<String, String>>.from(json['ResultMap'] ?? {}),
-      attendance: Map<String, String>.from(json['attendance'] ?? {}),
+      resultMap: parseNestedMap(json['ResultMap']),
+      attendance: parseNestedMap(json['attendance']),
     );
   }
 
@@ -67,7 +77,7 @@ class Student {
       'FeeStartDate': feeStartDate,
       'FeeEndDate': feeEndDate,
       'ResultMap': resultMap,
-      'attendance': attendance,
+      'attendance': attendance, 
     };
   }
 
@@ -86,7 +96,7 @@ class Student {
       'FeeStartDate': feeStartDate,
       'FeeEndDate': feeEndDate,
       'ResultMap': resultMap,
-      'attendance': attendance,
+      'attendance': attendance, 
     };
   }
 

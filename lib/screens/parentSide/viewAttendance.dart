@@ -7,9 +7,11 @@ import 'package:get/get.dart';
 class ViewAttendController extends GetxController {
   Rx<Student?> student = Rx<Student?>(null);
   RxString selectedMonth = ''.obs;
-  RxDouble percentage = 10.0.obs; // Example initial percentage value
+  RxString selectedSubject = ''.obs;
+  RxDouble percentage = 10.0.obs;
   DateTime date = DateTime.now();
   RxMap<String, String> attendance = <String, String>{}.obs;
+  RxList<String> subjectsList = <String>[].obs;
   RxList<String> monthsList = <String>[
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
   ].obs;
@@ -24,15 +26,20 @@ class ViewAttendController extends GetxController {
   Future<void> fetchData() async {
     student.value = Get.arguments as Student;
     if (student.value != null) {
+      subjectsList.value = student.value?.attendance.keys.toList() ?? [];
+      if (subjectsList.isNotEmpty) {
+        selectedSubject.value = subjectsList.first;
+      }
       filterAttendance();
-      calculatePercentage(); 
+      calculatePercentage();
     }
   }
 
   void filterAttendance() {
-    attendance.value = student.value!.attendance.entries
+    final subjectAttendance = student.value?.attendance[selectedSubject.value] as Map<String, String>?;
+    attendance.value = subjectAttendance?.entries
         .where((entry) => entry.key.startsWith(selectedMonth.value))
-        .toMap((entry) => MapEntry(entry.key, entry.value));
+        .toMap((entry) => MapEntry(entry.key, entry.value)) ?? {};
   }
 
   void calculatePercentage() {
@@ -44,10 +51,9 @@ class ViewAttendController extends GetxController {
   Color getColorBasedOnPercentage(double percentage) {
     if (percentage < 50) {
       return Colors.red;
-    } else if(percentage<70 && percentage >=50) {
+    } else if (percentage < 70 && percentage >= 50) {
       return AppColors.appOrange;
-    }
-    else{
+    } else {
       return AppColors.appDarkBlue;
     }
   }
@@ -55,7 +61,14 @@ class ViewAttendController extends GetxController {
   void updateSelectedMonth(String month) {
     int monthIndex = monthsList.indexOf(month) + 1;
     selectedMonth.value = "${date.year}-${monthIndex.toString().padLeft(2, '0')}";
-    fetchData();
+    filterAttendance();
+    calculatePercentage();
+  }
+
+  void updateSelectedSubject(String subject) {
+    selectedSubject.value = subject;
+    filterAttendance();
+    calculatePercentage();
   }
 }
 
@@ -64,6 +77,9 @@ extension IterableToMap<K, V> on Iterable<MapEntry<K, V>> {
     return {for (var entry in this) map(entry).key: map(entry).value};
   }
 }
+
+
+
 
 class ViewAttendance extends StatelessWidget {
   ViewAttendance({super.key});
@@ -115,6 +131,34 @@ class ViewAttendance extends StatelessWidget {
                 onChanged: (String? newValue) {
                   if (newValue != null) {
                     controller.updateSelectedMonth(newValue);
+                  }
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(screenWidth * 0.05),
+              child: DropdownButtonFormField<String>(
+                value: controller.selectedSubject.value,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.black),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: AppColors.appLightBlue, width: 2.0),
+                  ),
+                ),
+                items: controller.subjectsList.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    controller.updateSelectedSubject(newValue);
                   }
                 },
               ),
@@ -188,7 +232,7 @@ class ViewAttendance extends StatelessWidget {
                                 ],
                               );
                             }).toList(),
-                          ): Center(child: Text('No attedance for ${controller.selectedMonth}')),
+                          ): Center(child: Text('No attendance for ${controller.selectedMonth.value} and ${controller.selectedSubject.value}')),
                         );
                       }),
                     ),
@@ -202,3 +246,4 @@ class ViewAttendance extends StatelessWidget {
     );
   }
 }
+

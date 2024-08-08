@@ -333,10 +333,12 @@ class EditTeacher extends StatelessWidget {
                           Padding(
                             padding: EdgeInsets.fromLTRB(
                                 30, 0, 60, screenHeight * 0.01),
-                            child: Text(
-                              'Classes Teacher: ${controller.teacher.classTeacher}',
+                            child: Obx(
+                              () =>  Text(
+                              'Classes Teacher: ${controller.selectedClassTeacher.value}',
                               style: Font_Styles.dataTableTitle(
                                   context, controller.addStdFontSize),
+                              ),
                             ),
                           ),
                           Padding(

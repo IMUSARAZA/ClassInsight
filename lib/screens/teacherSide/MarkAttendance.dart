@@ -16,16 +16,18 @@ class AttendanceController extends GetxController {
   RxString schoolId = ''.obs;
   RxString selectedClass = ''.obs;
   RxString teacherName = ''.obs;
+  RxString subject = ''.obs;
 
   
 
   @override
   void onInit() {
     super.onInit();
-    datepicker.text = "${DateTime.now().toLocal()}".split(' ')[0]; // Initialize with current date
+    datepicker.text = "${DateTime.now().toLocal()}".split(' ')[0];
     schoolId.value = arguments[0] as String;
     selectedClass.value = arguments[1] as String;
     teacherName.value = arguments[2] as String;
+    subject.value = arguments[3] as String;
     fetchStudents();
   }
 
@@ -35,10 +37,13 @@ class AttendanceController extends GetxController {
     _initializeAttendanceForDate();
   }
 
-  void _initializeAttendanceForDate() {
+void _initializeAttendanceForDate() {
     for (var student in studentsList) {
-      if (!student.attendance.containsKey(datepicker.text)) {
-        student.attendance[datepicker.text] = ''; // Set default value if not present
+      if (!student.attendance.containsKey(subject.value)) {
+        student.attendance[subject.value] = {};
+      }
+      if (!student.attendance[subject.value]!.containsKey(datepicker.text)) {
+        student.attendance[subject.value]![datepicker.text] = '';
       }
     }
     studentsList.refresh();
@@ -46,21 +51,23 @@ class AttendanceController extends GetxController {
   }
 
   void updateRowSelection(int index, String? value) {
-    studentsList[index].attendance[datepicker.text] = value ?? '';
+    studentsList[index].attendance[subject.value]![datepicker.text] = value ?? '';
     studentsList.refresh();
     _updateHeaderValue();
   }
 
   void updateColumnSelection(String? value) {
     for (var student in studentsList) {
-      student.attendance[datepicker.text] = value ?? '';
+      student.attendance[subject.value]![datepicker.text] = value ?? '';
     }
     studentsList.refresh();
     selectedHeaderValue.value = value ?? '';
   }
 
   void _updateHeaderValue() {
-    var values = studentsList.map((student) => student.attendance[datepicker.text]).toSet();
+    var values = studentsList
+        .map((student) => student.attendance[subject.value]?[datepicker.text])
+        .toSet();
     if (values.length == 1) {
       selectedHeaderValue.value = values.first ?? '';
     } else {
@@ -68,15 +75,14 @@ class AttendanceController extends GetxController {
     }
   }
 
+
   Map<String, String> getStudentStatusMap() {
     Map<String, String> studentStatusMap = {};
     for (var student in studentsList) {
-      studentStatusMap[student.studentID] = student.attendance[datepicker.text] ?? '';
+      studentStatusMap[student.studentID] = student.attendance[subject.value]?[datepicker.text] ?? '';
     }
     return studentStatusMap;
   }
-
-
 }
 
 class MarkAttendance extends StatelessWidget {
@@ -101,7 +107,7 @@ class MarkAttendance extends StatelessWidget {
               {
                 return AlertDialog(
                   title: Text("Attendance"),
-                  content: Text('Are you sure you want to submit the attendance for ${controller.selectedClass}?'),
+                  content: Text('Are you sure you want to submit the attendance for ${controller.selectedClass} Subject: ${controller.selectedClass.value}?'),
                   actions: [
                     TextButton(
                       onPressed: (){
@@ -110,7 +116,7 @@ class MarkAttendance extends StatelessWidget {
                     child: Text('No')),
                     TextButton(
                       onPressed: () async{
-                      await Database_Service.updateAttendance(controller.schoolId.value, controller.getStudentStatusMap(), controller.datepicker.text);
+                      await Database_Service.updateAttendance(controller.schoolId.value, controller.getStudentStatusMap(), controller.datepicker.text, controller.subject.value);
                       }, 
                     child: Text('Yes')),
                   ],
@@ -237,7 +243,7 @@ class MarkAttendance extends StatelessWidget {
                             DataCell(
                               Radio<String?>(
                                 value: 'Present',
-                                groupValue: student.attendance[controller.datepicker.text] ?? '',
+                                groupValue: student.attendance[controller.subject.value]?[controller.datepicker.text] ?? '',
                                 onChanged: (value) {
                                   if (value != null) {
                                     controller.updateRowSelection(index, value);
@@ -248,7 +254,7 @@ class MarkAttendance extends StatelessWidget {
                             DataCell(
                               Radio<String?>(
                                 value: 'Absent',
-                                groupValue: student.attendance[controller.datepicker.text] ?? '',
+                                groupValue: student.attendance[controller.subject.value]?[controller.datepicker.text] ?? '',
                                 onChanged: (value) {
                                   if (value != null) {
                                     controller.updateRowSelection(index, value);
@@ -259,7 +265,7 @@ class MarkAttendance extends StatelessWidget {
                             DataCell(
                               Radio<String?>(
                                 value: 'Leave',
-                                groupValue: student.attendance[controller.datepicker.text] ?? '',
+                                groupValue: student.attendance[controller.subject.value]?[controller.datepicker.text] ?? '',
                                 onChanged: (value) {
                                   if (value != null) {
                                     controller.updateRowSelection(index, value);
@@ -349,7 +355,7 @@ class MarkAttendance extends StatelessWidget {
     );
     if (picked != null) {
       controller.datepicker.text = "${picked.toLocal()}".split(' ')[0];
-      controller.fetchStudents(); // Refresh students list with the selected date
+      controller.fetchStudents(); 
     }
   }
 }

@@ -25,8 +25,8 @@ class ParentDashboardController extends GetxController {
   Color feeColor = Colors.red;
   final GetStorage _storage = GetStorage();
   var arguments;
-  late StreamSubscription studentSubscription;
-  late StreamSubscription schoolSubscription;
+  StreamSubscription<DocumentSnapshot>? studentSubscription;
+  StreamSubscription<DocumentSnapshot>? schoolSubscription;
 
   @override
   void onInit() {
@@ -56,15 +56,17 @@ class ParentDashboardController extends GetxController {
   @override
   void onClose() {
     super.onClose();
-    studentSubscription.cancel();
-    schoolSubscription.cancel();
+    studentSubscription?.cancel();
+    schoolSubscription?.cancel();
   }
 
   void loadCachedData() {
     var cachedSchool = _storage.read('cachedSchool');
     if (cachedSchool != null) {
       school.value = School.fromJson(cachedSchool);
-      addListeners();
+      if (school.value != null) {
+        addListeners();
+      }
     }
     var cachedStudent = _storage.read('cachedStudent');
     if (cachedStudent != null) {
@@ -93,14 +95,8 @@ class ParentDashboardController extends GetxController {
   }
 
   void feeStatus() {
-    if (student.value!.feeStatus == 'paid') {
-      feedetails.value = student.value!.feeStatus +
-          ' ' +
-          '(' +
-          student.value!.feeStartDate +
-          ' ' +
-          student.value!.feeEndDate +
-          ')';
+    if (student.value != null && student.value!.feeStatus == 'paid') {
+      feedetails.value = '${student.value!.feeStatus} (${student.value!.feeStartDate} ${student.value!.feeEndDate})';
       feeColor = Colors.green;
     } else {
       feeColor = Colors.red;
@@ -108,48 +104,53 @@ class ParentDashboardController extends GetxController {
   }
 
   void fetchAnnouncements() async {
-    isLoading.value = true;
+    if (school.value != null && student.value != null) {
+      isLoading.value = true;
 
-    final adminAnnouncements = await Database_Service.fetchAdminAnnouncements(
-        school.value!.schoolId);
-    if (adminAnnouncements != null) {
-      mainAnnouncements.assignAll(adminAnnouncements);
+      final adminAnnouncements = await Database_Service.fetchAdminAnnouncements(
+          school.value!.schoolId);
+      if (adminAnnouncements != null) {
+        mainAnnouncements.assignAll(adminAnnouncements);
+      }
+
+      final studentAnnouncements = await Database_Service.fetchStudentAnnouncements(
+          school.value!.schoolId, student.value!.studentID);
+      if (studentAnnouncements != null) {
+        teacherComments.assignAll(studentAnnouncements);
+      }
+
+      isLoading.value = false;
     }
-
-    final studentAnnouncements = await Database_Service.fetchStudentAnnouncements(
-        school.value!.schoolId, student.value!.studentID);
-    if (studentAnnouncements != null) {
-      teacherComments.assignAll(studentAnnouncements);
-    }
-
-    isLoading.value = false;
   }
 
   void addListeners() {
-    studentSubscription = FirebaseFirestore.instance
-        .collection('Schools')
-        .doc(school.value!.schoolId)
-        .collection('Students')
-        .doc(student.value!.studentID)
-        .snapshots()
-        .listen((snapshot) {
-      if (snapshot.exists) {
-        student.value = Student.fromJson(snapshot.data()!);
-        feeStatus();
-      }
-    });
+    if (school.value != null && student.value != null) {
+      studentSubscription = FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(school.value!.schoolId)
+          .collection('Students')
+          .doc(student.value!.studentID)
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.exists) {
+          student.value = Student.fromJson(snapshot.data()!);
+          feeStatus();
+        }
+      });
 
-    schoolSubscription = FirebaseFirestore.instance
-        .collection('Schools')
-        .doc(school.value!.schoolId)
-        .snapshots()
-        .listen((snapshot) {
-      if (snapshot.exists) {
-        school.value = School.fromJson(snapshot.data()!);
-      }
-    });
+      schoolSubscription = FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(school.value!.schoolId)
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.exists) {
+          school.value = School.fromJson(snapshot.data()!);
+        }
+      });
+    }
   }
 }
+
 
 
 class ParentDashboard extends StatelessWidget {

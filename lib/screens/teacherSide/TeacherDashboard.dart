@@ -13,8 +13,9 @@ class TeacherDashboardController extends GetxController {
   Rx<Teacher?> teacher = Rx<Teacher?>(null);
   Rx<School?> school = Rx<School?>(null);
   final GetStorage _storage = GetStorage();
-
+  var subjectsList = <String>[].obs;
   var classesList = <String>[].obs;
+  var selectedSubject = ''.obs;
   var selectedClass = ''.obs;
   var arguments;
 
@@ -42,15 +43,20 @@ class TeacherDashboardController extends GetxController {
 
     fetchClasses();
 
+    if (classesList.isNotEmpty) {
+      selectedClass.value = classesList.first;
+      updateSubjects(selectedClass.value);
+      if (subjectsList.isNotEmpty) {
+        selectedSubject.value = subjectsList.first;
+      }
+    }
+
     setupRealTimeListeners();
   }
 
   void fetchClasses() {
     if (teacher.value != null) {
       classesList.value = teacher.value!.classes;
-      if (classesList.isNotEmpty && selectedClass.isEmpty) {
-        selectedClass.value = classesList.first;
-      }
     }
   }
 
@@ -86,6 +92,13 @@ class TeacherDashboardController extends GetxController {
     fetchClasses();
   }
 
+  void updateSubjects(String selectedClass) {
+    subjectsList.value = teacher.value!.subjects[selectedClass] ?? [];
+    if (subjectsList.isNotEmpty) {
+      selectedSubject.value = subjectsList.first;
+    }
+  }
+
   void setupRealTimeListeners() {
     if (teacher.value != null && school.value != null) {
       FirebaseFirestore.instance
@@ -115,6 +128,7 @@ class TeacherDashboardController extends GetxController {
     }
   }
 }
+
 
 
 class TeacherDashboard extends StatelessWidget {
@@ -220,48 +234,83 @@ class TeacherDashboard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-                            child: Text(
-                              'Class',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                          Obx(
-                            () => Padding(
-                              padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
-                              child: DropdownButtonFormField<String>(
-                                value: _controller.selectedClass.value,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.black),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                        color: AppColors.appLightBlue,
-                                        width: 2.0),
-                                  ),
-                                ),
-                                items:
-                                    _controller.classesList.map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  _controller.selectedClass.value =
-                                      newValue ?? '';
-                                },
-                              ),
-                            ),
-                          ),
+  padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+  child: Text(
+    'Class',
+    style: TextStyle(
+      color: Colors.black,
+      fontSize: 15,
+    ),
+  ),
+),
+Obx(
+  () => Padding(
+    padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
+    child: DropdownButtonFormField<String>(
+      value: _controller.classesList.contains(_controller.selectedClass.value) ? _controller.selectedClass.value : null,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.black),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: AppColors.appLightBlue, width: 2.0),
+        ),
+      ),
+      items: _controller.classesList.map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: (String? newValue) {
+        _controller.selectedClass.value = newValue ?? '';
+        _controller.updateSubjects(newValue ?? '');
+      },
+    ),
+  ),
+),
+SizedBox(height: screenHeight * 0.01),
+Padding(
+  padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+  child: Text(
+    'Subject',
+    style: TextStyle(
+      color: Colors.black,
+      fontSize: 15,
+    ),
+  ),
+),
+Obx(
+  () => Padding(
+    padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
+    child: DropdownButtonFormField<String>(
+      value: _controller.subjectsList.contains(_controller.selectedSubject.value) ? _controller.selectedSubject.value : null,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.black),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: AppColors.appLightBlue, width: 2.0),
+        ),
+      ),
+      items: _controller.subjectsList.map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: (String? newValue) {
+        _controller.selectedSubject.value = newValue ?? '';
+      },
+    ),
+  ),
+),
                           SizedBox(height: screenHeight * 0.01),
                           
                           Obx(() =>
@@ -272,7 +321,8 @@ class TeacherDashboard extends StatelessWidget {
                                 Get.toNamed("/MarkAttendance", arguments: [
                                   _controller.school.value!.schoolId,
                                   _controller.selectedClass.value,
-                                  _controller.teacher.value!.name
+                                  _controller.teacher.value!.name,
+                                  _controller.selectedSubject.value
                                 ]);
                               },
                               child: Container(
