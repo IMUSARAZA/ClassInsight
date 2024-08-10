@@ -16,8 +16,9 @@ class AttendanceController extends GetxController {
   RxString selectedClass = ''.obs;
   RxString teacherName = ''.obs;
   RxString subject = ''.obs;
+  var selectedSubject = ''.obs;
+  var subjectsList = <String>[].obs;
 
-  
 
   @override
   void onInit() {
@@ -26,7 +27,9 @@ class AttendanceController extends GetxController {
     schoolId.value = arguments[0] as String;
     selectedClass.value = arguments[1] as String;
     teacherName.value = arguments[2] as String;
-    subject.value = arguments[3] as String;
+    subjectsList.value = arguments[3] as List<String>;
+    selectedSubject.value = subjectsList.first;
+    subject.value = subjectsList.first;
     fetchStudents();
   }
 
@@ -131,6 +134,56 @@ class MarkAttendance extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          
+          Padding(
+                            padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+                            child: Text(
+                              'Subject',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          Obx(
+                            () => Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
+                              child: DropdownButtonFormField<String>(
+                                value: controller.subjectsList.contains(
+                                        controller.selectedSubject.value)
+                                    ? controller.selectedSubject.value
+                                    : null,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.black),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                        color: AppColors.appLightBlue,
+                                        width: 2.0),
+                                  ),
+                                ),
+                                items: controller.subjectsList
+                                    .map((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  controller.selectedSubject.value =
+                                      newValue ?? '';
+                                  controller.subject.value = newValue ?? '';
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenHeight * 0.01),
+
           Padding(
             padding: EdgeInsets.all(screenWidth * 0.05),
             child: Text('Students', style: Font_Styles.mediumHeadingBold(context, color: Colors.black)),

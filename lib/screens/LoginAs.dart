@@ -1,6 +1,9 @@
 // ignore_for_file: unused_local_variable
 
+import 'package:classinsight/Widgets/PageTransitions.dart';
 import 'package:classinsight/models/SchoolModel.dart';
+import 'package:classinsight/screens/adminSide/LoginScreen.dart';
+import 'package:classinsight/screens/parentSide/ParentLogin.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:classinsight/Widgets/BaseScreen.dart';
 import 'package:flutter/material.dart';
@@ -55,22 +58,36 @@ class LoginAs extends StatelessWidget {
     return Obx(() => TextButton(
           onPressed: parent
               ? () {
-                  Get.toNamed("/ParentLogin", arguments: school);
+                  // Get.toNamed("/ParentLogin", arguments: school);
+
+                  Go.to(() => ParentLoginScreen(), arguments: school);
                 }
               : () {
                   print('teacher clicked');
                   if (text == "Teacher") {
                     adminOrNot = false;
-                    Get.toNamed("/LoginScreen", arguments: {
+                    // Get.toNamed("/LoginScreen", arguments: {
+                    //   'school': school,
+                    //   'adminOrNot': adminOrNot,
+                    // });
+
+                    var args = {
                       'school': school,
                       'adminOrNot': adminOrNot,
-                    });
+                    };
+                    Go.to(() => LoginScreen(), arguments: args);
                   } else {
                     adminOrNot = true;
-                    Get.toNamed("/LoginScreen", arguments: {
-                      'school': school,
+                    // Get.toNamed("/LoginScreen", arguments: {
+                    //   'school': school,
+                    //   'adminOrNot': adminOrNot,
+                    // });
+
+                     var args = {
+                       'school': school,
                       'adminOrNot': adminOrNot,
-                    });
+                     };
+                    Go.to(() => LoginScreen(), arguments: args);
                   }
                 },
           style: TextButton.styleFrom(

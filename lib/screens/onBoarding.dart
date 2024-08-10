@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:classinsight/Widgets/PageTransitions.dart';
+import 'package:classinsight/screens/LoginAs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Widgets/BaseScreen.dart';
@@ -115,7 +117,8 @@ class _OnBoardingState extends State<OnBoarding> with SingleTickerProviderStateM
                         items: schoolController.schools,
                         onChanged: (item) {
                           print("CLICKED" + item!.schoolId);
-                          Get.toNamed("/loginAs", arguments: item);
+                          // Get.toNamed("/loginAs", arguments: item);
+                          Go.to(() => LoginAs(), arguments: item);
                         },
                       );
                     }
