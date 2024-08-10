@@ -11,15 +11,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  InitialBinding().dependencies(); 
+  InitialBinding().dependencies();
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     await GetStorage.init();
-  } catch (e) {
-  }
+  } catch (e) {}
   runApp(const MyApp());
 }
 
@@ -53,46 +52,44 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-  return GetMaterialApp(
-    initialBinding: InitialBinding(),
-    title: 'Class Insight',
-    color: Colors.white,
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData(
-      scaffoldBackgroundColor: Colors.white,
-      canvasColor: Colors.white,
-      brightness: Brightness.light,
-      textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
-      appBarTheme: AppBarTheme(
-        scrolledUnderElevation: 0,
-        backgroundColor: Colors.white, 
-        foregroundColor: Colors.black, 
+    return GetMaterialApp(
+      initialBinding: InitialBinding(),
+      title: 'Class Insight',
+      color: Colors.white,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
+        canvasColor: Colors.white,
+        brightness: Brightness.light,
+        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+        appBarTheme: AppBarTheme(
+          scrolledUnderElevation: 0,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+        ),
+        pageTransitionsTheme: PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          },
+        ),
+        useMaterial3: true,
       ),
-      pageTransitionsTheme: PageTransitionsTheme(
-      builders: {
-        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      },
-    ),
+      initialRoute: _getInitialLocation(user),
+      getPages: MainRoutes.routes,
+    );
+  }
 
-      useMaterial3: true,
-    ),
-    initialRoute: _getInitialLocation(user),
-    getPages: MainRoutes.routes,
-  );
-}
-
- String _getInitialLocation(User? user) {
+  String _getInitialLocation(User? user) {
     if (user != null) {
       if (isTeacherLogged) {
         return '/TeacherDashboard';
-      } else{
-       return '/AdminHome';
+      } else {
+        return '/AdminHome';
       }
     } else if (isParentLogged) {
-        return '/ParentDashboard';
-      } 
-    else {
+      return '/ParentDashboard';
+    } else {
       return '/onBoarding';
     }
   }

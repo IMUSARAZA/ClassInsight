@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 
 class AttendanceController extends GetxController {
   TextEditingController datepicker = TextEditingController();
-  TextEditingController remarkscontroller =  TextEditingController();
+  TextEditingController remarkscontroller = TextEditingController();
   RxList<Student> studentsList = RxList<Student>();
   RxString selectedHeaderValue = ''.obs;
   final arguments = Get.arguments as List;
@@ -18,7 +18,6 @@ class AttendanceController extends GetxController {
   RxString subject = ''.obs;
   var selectedSubject = ''.obs;
   var subjectsList = <String>[].obs;
-
 
   @override
   void onInit() {
@@ -34,12 +33,13 @@ class AttendanceController extends GetxController {
   }
 
   Future<void> fetchStudents() async {
-    studentsList.value = await Database_Service.getStudentsOfASpecificClass(schoolId.value, selectedClass.value);
+    studentsList.value = await Database_Service.getStudentsOfASpecificClass(
+        schoolId.value, selectedClass.value);
     print(studentsList);
     _initializeAttendanceForDate();
   }
 
-void _initializeAttendanceForDate() {
+  void _initializeAttendanceForDate() {
     for (var student in studentsList) {
       if (!student.attendance.containsKey(subject.value)) {
         student.attendance[subject.value] = {};
@@ -53,7 +53,8 @@ void _initializeAttendanceForDate() {
   }
 
   void updateRowSelection(int index, String? value) {
-    studentsList[index].attendance[subject.value]![datepicker.text] = value ?? '';
+    studentsList[index].attendance[subject.value]![datepicker.text] =
+        value ?? '';
     studentsList.refresh();
     _updateHeaderValue();
   }
@@ -77,11 +78,11 @@ void _initializeAttendanceForDate() {
     }
   }
 
-
   Map<String, String> getStudentStatusMap() {
     Map<String, String> studentStatusMap = {};
     for (var student in studentsList) {
-      studentStatusMap[student.studentID] = student.attendance[subject.value]?[datepicker.text] ?? '';
+      studentStatusMap[student.studentID] =
+          student.attendance[subject.value]?[datepicker.text] ?? '';
     }
     return studentStatusMap;
   }
@@ -99,34 +100,40 @@ class MarkAttendance extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: Text('Attendance', style: Font_Styles.labelHeadingRegular(context)),
+        title:
+            Text('Attendance', style: Font_Styles.labelHeadingRegular(context)),
         actions: [
           TextButton(
             onPressed: () async {
               showDialog(
-                context: context, 
-              builder: (context)
-              {
-                return AlertDialog(
-                  title: Text("Attendance"),
-                  content: Text('Are you sure you want to submit the attendance for ${controller.selectedClass} Subject: ${controller.subject.value}?'),
-                  actions: [
-                    TextButton(
-                      onPressed: (){
-                        Get.back();
-                      }, 
-                    child: Text('No')),
-                    TextButton(
-                      onPressed: () async{
-                      await Database_Service.updateAttendance(controller.schoolId.value, controller.getStudentStatusMap(), controller.datepicker.text, controller.subject.value);
-                      }, 
-                    child: Text('Yes')),
-                  ],
-                );
-              });
-
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("Attendance"),
+                      content: Text(
+                          'Are you sure you want to submit the attendance for ${controller.selectedClass} Subject: ${controller.subject.value}?'),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: Text('No')),
+                        TextButton(
+                            onPressed: () async {
+                              await Database_Service.updateAttendance(
+                                  controller.schoolId.value,
+                                  controller.getStudentStatusMap(),
+                                  controller.datepicker.text,
+                                  controller.subject.value);
+                            },
+                            child: Text('Yes')),
+                      ],
+                    );
+                  });
             },
-            child: Text('Submit', style: Font_Styles.labelHeadingRegular(context, color: Colors.black)),
+            child: Text('Submit',
+                style: Font_Styles.labelHeadingRegular(context,
+                    color: Colors.black)),
           ),
         ],
       ),
@@ -134,59 +141,56 @@ class MarkAttendance extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           Padding(
-                            padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
-                            child: Text(
-                              'Subject',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                          Obx(
-                            () => Padding(
-                              padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
-                              child: DropdownButtonFormField<String>(
-                                value: controller.subjectsList.contains(
-                                        controller.selectedSubject.value)
-                                    ? controller.selectedSubject.value
-                                    : null,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.black),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                        color: AppColors.appLightBlue,
-                                        width: 2.0),
-                                  ),
-                                ),
-                                items: controller.subjectsList
-                                    .map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  controller.selectedSubject.value =
-                                      newValue ?? '';
-                                  controller.subject.value = newValue ?? '';
-                                },
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: screenHeight * 0.01),
-
+            padding: EdgeInsets.fromLTRB(30, 0, 10, 5),
+            child: Text(
+              'Subject',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+              ),
+            ),
+          ),
+          Obx(
+            () => Padding(
+              padding: EdgeInsets.fromLTRB(30, 0, 30, 15),
+              child: DropdownButtonFormField<String>(
+                value: controller.subjectsList
+                        .contains(controller.selectedSubject.value)
+                    ? controller.selectedSubject.value
+                    : null,
+                decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.black),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        BorderSide(color: AppColors.appLightBlue, width: 2.0),
+                  ),
+                ),
+                items: controller.subjectsList.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  controller.selectedSubject.value = newValue ?? '';
+                  controller.subject.value = newValue ?? '';
+                },
+              ),
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.01),
           Padding(
             padding: EdgeInsets.all(screenWidth * 0.05),
-            child: Text('Students', style: Font_Styles.mediumHeadingBold(context, color: Colors.black)),
+            child: Text('Students',
+                style: Font_Styles.mediumHeadingBold(context,
+                    color: Colors.black)),
           ),
           Padding(
             padding: EdgeInsets.all(screenWidth * 0.04),
@@ -194,7 +198,9 @@ class MarkAttendance extends StatelessWidget {
               controller: controller.datepicker,
               readOnly: true,
               decoration: InputDecoration(
-                label: Text('Select Date', style: Font_Styles.labelHeadingRegular(context, color: Colors.black)),
+                label: Text('Select Date',
+                    style: Font_Styles.labelHeadingRegular(context,
+                        color: Colors.black)),
                 suffixIcon: Icon(FontAwesomeIcons.calendarDay),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -212,7 +218,9 @@ class MarkAttendance extends StatelessWidget {
           Expanded(
             child: Obx(() {
               if (controller.studentsList.isEmpty) {
-                return Center(child: Text('No students found', style: Font_Styles.labelHeadingRegular(context)));
+                return Center(
+                    child: Text('No students found',
+                        style: Font_Styles.labelHeadingRegular(context)));
               } else {
                 return SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -220,23 +228,31 @@ class MarkAttendance extends StatelessWidget {
                     scrollDirection: Axis.vertical,
                     child: DataTable(
                       sortColumnIndex: 1,
-                      dataRowColor: MaterialStateColor.resolveWith((states) => AppColors.appDarkBlue),
+                      dataRowColor: MaterialStateColor.resolveWith(
+                          (states) => AppColors.appDarkBlue),
                       columns: [
                         DataColumn(
-                          label: Text("Roll No", style: Font_Styles.labelHeadingRegular(context)),
+                          label: Text("Roll No",
+                              style: Font_Styles.labelHeadingRegular(context)),
                           numeric: true,
                         ),
                         DataColumn(
-                          label: Text("Student Name", style: Font_Styles.labelHeadingRegular(context)),
+                          label: Text("Student Name",
+                              style: Font_Styles.labelHeadingRegular(context)),
                         ),
                         DataColumn(
                           label: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("Present", style: Font_Styles.labelHeadingRegular(context)),
+                              Text("Present",
+                                  style:
+                                      Font_Styles.labelHeadingRegular(context)),
                               Radio<String?>(
                                 value: 'Present',
-                                groupValue: controller.selectedHeaderValue.value.isEmpty ? null : controller.selectedHeaderValue.value,
+                                groupValue:
+                                    controller.selectedHeaderValue.value.isEmpty
+                                        ? null
+                                        : controller.selectedHeaderValue.value,
                                 onChanged: (value) {
                                   if (value != null) {
                                     controller.updateColumnSelection(value);
@@ -250,10 +266,15 @@ class MarkAttendance extends StatelessWidget {
                           label: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("Absent", style: Font_Styles.labelHeadingRegular(context)),
+                              Text("Absent",
+                                  style:
+                                      Font_Styles.labelHeadingRegular(context)),
                               Radio<String?>(
                                 value: 'Absent',
-                                groupValue: controller.selectedHeaderValue.value.isEmpty ? null : controller.selectedHeaderValue.value,
+                                groupValue:
+                                    controller.selectedHeaderValue.value.isEmpty
+                                        ? null
+                                        : controller.selectedHeaderValue.value,
                                 onChanged: (value) {
                                   if (value != null) {
                                     controller.updateColumnSelection(value);
@@ -267,10 +288,15 @@ class MarkAttendance extends StatelessWidget {
                           label: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("Leave", style: Font_Styles.labelHeadingRegular(context)),
+                              Text("Leave",
+                                  style:
+                                      Font_Styles.labelHeadingRegular(context)),
                               Radio<String?>(
                                 value: 'Leave',
-                                groupValue: controller.selectedHeaderValue.value.isEmpty ? null : controller.selectedHeaderValue.value,
+                                groupValue:
+                                    controller.selectedHeaderValue.value.isEmpty
+                                        ? null
+                                        : controller.selectedHeaderValue.value,
                                 onChanged: (value) {
                                   if (value != null) {
                                     controller.updateColumnSelection(value);
@@ -281,9 +307,13 @@ class MarkAttendance extends StatelessWidget {
                           ),
                         ),
                         DataColumn(
-                          label:Text('Remarks',style: Font_Styles.labelHeadingRegular(context),))
+                            label: Text(
+                          'Remarks',
+                          style: Font_Styles.labelHeadingRegular(context),
+                        ))
                       ],
-                      rows: controller.studentsList.asMap().entries.map((entry) {
+                      rows:
+                          controller.studentsList.asMap().entries.map((entry) {
                         int index = entry.key;
                         Student student = entry.value;
                         // print(controller.datepicker.text);
@@ -295,7 +325,10 @@ class MarkAttendance extends StatelessWidget {
                             DataCell(
                               Radio<String?>(
                                 value: 'Present',
-                                groupValue: student.attendance[controller.subject.value]?[controller.datepicker.text] ?? '',
+                                groupValue:
+                                    student.attendance[controller.subject.value]
+                                            ?[controller.datepicker.text] ??
+                                        '',
                                 onChanged: (value) {
                                   if (value != null) {
                                     controller.updateRowSelection(index, value);
@@ -306,7 +339,10 @@ class MarkAttendance extends StatelessWidget {
                             DataCell(
                               Radio<String?>(
                                 value: 'Absent',
-                                groupValue: student.attendance[controller.subject.value]?[controller.datepicker.text] ?? '',
+                                groupValue:
+                                    student.attendance[controller.subject.value]
+                                            ?[controller.datepicker.text] ??
+                                        '',
                                 onChanged: (value) {
                                   if (value != null) {
                                     controller.updateRowSelection(index, value);
@@ -317,7 +353,10 @@ class MarkAttendance extends StatelessWidget {
                             DataCell(
                               Radio<String?>(
                                 value: 'Leave',
-                                groupValue: student.attendance[controller.subject.value]?[controller.datepicker.text] ?? '',
+                                groupValue:
+                                    student.attendance[controller.subject.value]
+                                            ?[controller.datepicker.text] ??
+                                        '',
                                 onChanged: (value) {
                                   if (value != null) {
                                     controller.updateRowSelection(index, value);
@@ -325,10 +364,11 @@ class MarkAttendance extends StatelessWidget {
                                 },
                               ),
                             ),
-
-                            DataCell(
-                             IconButton(
-                              icon: Icon(FontAwesomeIcons.bell,color: AppColors.appPink,),
+                            DataCell(IconButton(
+                              icon: Icon(
+                                FontAwesomeIcons.bell,
+                                color: AppColors.appPink,
+                              ),
                               onPressed: () async {
                                 await showAdaptiveDialog(
                                   context: context,
@@ -338,10 +378,13 @@ class MarkAttendance extends StatelessWidget {
                                       content: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Text(student.name ,style: TextStyle(fontWeight: FontWeight.bold)),
+                                          Text(student.name,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
                                           SizedBox(height: 16),
                                           TextField(
-                                            controller: controller.remarkscontroller,
+                                            controller:
+                                                controller.remarkscontroller,
                                             maxLines: 3,
                                             decoration: InputDecoration(
                                               labelText: 'Write your remarks',
@@ -353,25 +396,30 @@ class MarkAttendance extends StatelessWidget {
                                       actions: [
                                         TextButton(
                                           onPressed: () {
-                                            Get.back(); 
+                                            Get.back();
                                           },
                                           child: Text('Cancel'),
                                         ),
                                         TextButton(
                                           onPressed: () async {
-                                            String remarks = controller.remarkscontroller.text;
+                                            String remarks = controller
+                                                .remarkscontroller.text;
                                             if (remarks.isNotEmpty) {
-                                              print('Remarks for ${student.name}: $remarks');
-                                              await Database_Service.createAnnouncement(
-                                                controller.schoolId.value, 
-                                                student.studentID, 
-                                                remarks,
-                                                controller.teacherName.value, 
-                                                false);
+                                              print(
+                                                  'Remarks for ${student.name}: $remarks');
+                                              await Database_Service
+                                                  .createAnnouncement(
+                                                      controller.schoolId.value,
+                                                      student.studentID,
+                                                      remarks,
+                                                      controller
+                                                          .teacherName.value,
+                                                      false);
 
                                               Get.back();
                                             } else {
-                                              Get.snackbar('Error', 'Please enter some remarks before submitting.');
+                                              Get.snackbar('Error',
+                                                  'Please enter some remarks before submitting.');
                                             }
                                           },
                                           child: Text('Submit'),
@@ -381,9 +429,7 @@ class MarkAttendance extends StatelessWidget {
                                   },
                                 );
                               },
-                             
-                             )
-                              )
+                            ))
                           ],
                         );
                       }).toList(),
@@ -407,7 +453,7 @@ class MarkAttendance extends StatelessWidget {
     );
     if (picked != null) {
       controller.datepicker.text = "${picked.toLocal()}".split(' ')[0];
-      controller.fetchStudents(); 
+      controller.fetchStudents();
     }
   }
 }

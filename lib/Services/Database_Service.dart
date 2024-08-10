@@ -854,7 +854,7 @@ static Future<List<Student>> getStudentsOfASpecificClass(
   }
 
   static Future<void> addClass(List<String>? classes, List<String>? subjects,
-      List<String> examSystem, String schoolID) async {
+      List<String> examSystem, Map<String, String> weightage, String schoolID) async {
     try {
       QuerySnapshot schoolSnapshot = await FirebaseFirestore.instance
           .collection('Schools')
@@ -874,6 +874,7 @@ static Future<List<Student>> getStudentsOfASpecificClass(
             timetable: false,
             subjects: subjects ?? [],
             examTypes: examSystem,
+            weightage: weightage,
           );
 
           await classDoc.set(newClass.toJson());

@@ -328,7 +328,7 @@ class AddClassSections extends StatelessWidget {
                                   Column(
                                     children: [
                                       Container(
-                                        width: screenWidth * 0.6,
+                                        width: screenWidth * 0.8,
                                         height: screenHeight * 0.055,
                                         decoration: BoxDecoration(
                                           border: Border.all(color: Colors.black),
@@ -360,7 +360,7 @@ class AddClassSections extends StatelessWidget {
                                       SizedBox(height: 20,),
 
                                       Text(
-                                        "Make sure you have no teachers and students \nassigned for this class section",
+                                        "Make sure you have no teachers and students assigned for this class section",
                                         softWrap: true,
                                         style: TextStyle(color: Colors.red),
                                         ),

@@ -6,29 +6,24 @@ import 'package:classinsight/utils/fontStyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
-
-class AddExamSystemController extends GetxController{
-
+class AddExamSystemController extends GetxController {
   AdminHomeController school = Get.put(AdminHomeController());
   RxList<String> examStructure = <String>[].obs;
   TextEditingController examStructureController = TextEditingController();
   RxBool examValid = true.obs;
-  List<String>? classes;
+  List<String>? classes; // to be passed in next class
   List<String>? subjects;
 
   @override
   void onInit() {
     super.onInit();
     Map<String, dynamic>? arguments = Get.arguments;
-      classes = arguments!['classForm'];
-      subjects = arguments['subjects'];
+    classes = arguments!['classForm'];
+    subjects = arguments['subjects'];
 
-      print(classes);
-      print(subjects);
-
+    print(classes);
+    print(subjects);
   }
-  
 
   void addExamStructure() {
     if (examStructureController.text.isNotEmpty) {
@@ -42,18 +37,14 @@ class AddExamSystemController extends GetxController{
   }
 }
 
-
 // ignore: must_be_immutable
 class AddExamSystem extends StatelessWidget {
-
   AddExamSystem({Key? key}) : super(key: key);
 
-
   final AddExamSystemController controller = Get.put(AddExamSystemController());
-  
+
   double addStdFontSize = 16;
   double headingFontSize = 33;
-
 
   @override
   Widget build(BuildContext context) {
@@ -78,24 +69,24 @@ class AddExamSystem extends StatelessWidget {
     }
 
     return Scaffold(
-        backgroundColor: AppColors.appLightBlue,
-        body: SingleChildScrollView(
-          child: Container(
-            height: screenHeight,
-            width: screenWidth,
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: screenHeight * 0.10,
-                    width: screenWidth,
-                    child: AppBar(
+      backgroundColor: AppColors.appLightBlue,
+      body: SingleChildScrollView(
+        child: Container(
+          height: screenHeight,
+          width: screenWidth,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  height: screenHeight * 0.10,
+                  width: screenWidth,
+                  child: AppBar(
                     backgroundColor: AppColors.appLightBlue,
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        Get.back(); 
+                        Get.back();
                       },
                     ),
                     title: Text(
@@ -105,28 +96,24 @@ class AddExamSystem extends StatelessWidget {
                     centerTitle: true,
                     actions: <Widget>[
                       Container(
-                        width: 48.0, 
+                        width: 48.0,
                       ),
                       TextButton(
                         onPressed: () async {
-                          Database_Service.addClass(controller.classes, controller.subjects, controller.examStructure, controller.school.schoolId.value);
+                          // Extract the class name from the first element of the classes list
+                          String className = controller.classes!.first
+                              .split('-')
+                              .first;
 
-                            showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      AppColors.appLightBlue),
-                                ),
-                              );
-                            },
-                          );
-
-                          await Future.delayed(const Duration(seconds: 3));
-                          Get.offNamedUntil('/AdminHome', (route) => false);
-                          Get.snackbar("Success", "Classes added successfully");
+                          // Navigate to AddWeightage and pass all necessary arguments
+                          Get.offNamedUntil('/AddWeightage', (route) => false,
+                              arguments: {
+                                'className': className,
+                                'classes': controller.classes,
+                                'subjects': controller.subjects,
+                                'examStructure': controller.examStructure,
+                                'schoolId': controller.school.schoolId.value,
+                              });
                         },
                         child: Text(
                           "Save",
@@ -135,88 +122,87 @@ class AddExamSystem extends StatelessWidget {
                       ),
                     ],
                   ),
-                  ),
-                  Container(
-                    height: 0.05 * screenHeight,
-                    width: screenWidth,
-                    margin: const EdgeInsets.only(bottom: 10.0),
-                    child: Text(
-                      'Exam System',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: headingFontSize,
-                        fontWeight: FontWeight.w700,
-                      ),
+                ),
+                Container(
+                  height: 0.05 * screenHeight,
+                  width: screenWidth,
+                  margin: const EdgeInsets.only(bottom: 10.0),
+                  child: Text(
+                    'Exam System',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: headingFontSize,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(
-                    height: screenHeight * 0.1,
-                  ),
-                  Expanded(
-                    child: Container(
-                      width: screenWidth,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          topRight: Radius.circular(20.0),
+                ),
+                SizedBox(
+                  height: screenHeight * 0.1,
+                ),
+                Expanded(
+                  child: Container(
+                    width: screenWidth,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 4,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 4,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
+                      ],
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 40, 30, 0),
+                            child: CustomTextField(
+                              controller: controller.examStructureController,
+                              hintText: 'e.g CA/Mid/Final/Mock',
+                              labelText: 'Add name of the type of exam',
+                              isValid: true,
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.add),
+                                onPressed: () {
+                                  controller.addExamStructure();
+                                },
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
+                            child: Obx(() => Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 4.0,
+                                  children:
+                                      controller.examStructure.map((exam) {
+                                    return Chip(
+                                      label: Text(exam),
+                                      deleteIcon: const Icon(Icons.close),
+                                      onDeleted: () {
+                                        controller.removeExamStructure(exam);
+                                      },
+                                    );
+                                  }).toList(),
+                                )),
                           ),
                         ],
                       ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 40, 30, 0),
-                              child: CustomTextField(
-                                controller: controller.examStructureController,
-                                hintText: 'e.g CA/Mid/Final/Mock',
-                                labelText: 'Add name of the type of exam',
-                                isValid: true,
-                                suffixIcon: IconButton(
-                                icon: Icon(Icons.add),
-                                onPressed: () {
-                                controller.addExamStructure();
-
-                                },
-                              ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
-                              child: Obx(() => Wrap(
-                                    spacing: 8.0,
-                                    runSpacing: 4.0,
-                                    children: controller.examStructure.map((exam) {
-                                      return Chip(
-                                        label: Text(exam),
-                                        deleteIcon: const Icon(Icons.close),
-                                        onDeleted: () {
-                                          controller.removeExamStructure(exam);
-                                        },
-                                      );
-                                    }).toList(),
-                                  )),
-                            ),
-                            
-                          ],
-                        ),
-                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
+      ),
     );
   }
 }

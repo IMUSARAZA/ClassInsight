@@ -37,7 +37,7 @@ dependencies:
   firebase_core_web:
   multi_select_flutter:
   get:
-  google_fonts: ^4.0.3 
+  google_fonts: ^6.2.1 
   get_storage:
   intl:
   mailer:

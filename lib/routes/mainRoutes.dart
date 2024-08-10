@@ -6,6 +6,7 @@ import 'package:classinsight/screens/adminSide/AddExamSystem.dart';
 import 'package:classinsight/screens/adminSide/AddStudent.dart';
 import 'package:classinsight/screens/LoginAs.dart';
 import 'package:classinsight/screens/adminSide/AddSubjects.dart';
+import 'package:classinsight/screens/adminSide/AddWeightage.dart';
 import 'package:classinsight/screens/adminSide/AddTeacher.dart';
 import 'package:classinsight/screens/adminSide/AddTimetable.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
@@ -130,6 +131,10 @@ class MainRoutes {
     GetPage(
       name: "/Result",
       page: () => Result(),
+    ),
+    GetPage(
+      name: "/AddWeightage",
+      page: () => AddWeightage(),
     ),
     GetPage(
       name: "/DisplayMarks",
