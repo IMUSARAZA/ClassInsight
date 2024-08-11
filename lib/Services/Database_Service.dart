@@ -57,7 +57,7 @@ class Database_Service extends GetxService {
         if (docSnapshot.exists) {
           ScaffoldMessenger.of(context!).showSnackBar(SnackBar(
               content: Text('A student with the same B-Form already exists.')));
-          return; 
+          return;
         }
 
         transaction.set(studentDoc, student.toMap());
@@ -220,56 +220,54 @@ class Database_Service extends GetxService {
     }
   }
 
-static Future<List<Student>> getAllStudents(String schoolId) async {
-  List<Student> students = [];
-  try {
-    QuerySnapshot schoolQuery = await FirebaseFirestore.instance
-        .collection('Schools')
-        .where('SchoolID', isEqualTo: schoolId)
-        .get();
+  static Future<List<Student>> getAllStudents(String schoolId) async {
+    List<Student> students = [];
+    try {
+      QuerySnapshot schoolQuery = await FirebaseFirestore.instance
+          .collection('Schools')
+          .where('SchoolID', isEqualTo: schoolId)
+          .get();
 
-    if (schoolQuery.docs.isEmpty) {
-      return students;
+      if (schoolQuery.docs.isEmpty) {
+        return students;
+      }
+
+      String schoolDocId = schoolQuery.docs.first.id;
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolDocId)
+          .collection('Students')
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
+      }
+    } catch (e) {
+      print('Error getting students: $e');
     }
-
-    String schoolDocId = schoolQuery.docs.first.id;
-
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Schools')
-        .doc(schoolDocId)
-        .collection('Students')
-        .get();
-
-    for (var doc in querySnapshot.docs) {
-      students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
-    }
-  } catch (e) {
-    print('Error getting students: $e');
+    return students;
   }
-  return students;
-}
 
-static Future<List<Student>> getStudentsOfASpecificClass(
-    String school, String classSection) async {
-  List<Student> students = [];
-  try {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Schools')
-        .doc(school)
-        .collection('Students')
-        .where('ClassSection', isEqualTo: classSection)
-        .get();
+  static Future<List<Student>> getStudentsOfASpecificClass(
+      String school, String classSection) async {
+    List<Student> students = [];
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(school)
+          .collection('Students')
+          .where('ClassSection', isEqualTo: classSection)
+          .get();
 
-    for (var doc in querySnapshot.docs) {
-      students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
+      for (var doc in querySnapshot.docs) {
+        students.add(Student.fromJson(doc.data() as Map<String, dynamic>));
+      }
+    } catch (e) {
+      print('Error getting students: $e');
     }
-  } catch (e) {
-    print('Error getting students: $e');
+    return students;
   }
-  return students;
-}
-
-
 
   static Future<void> updateFeeStatus(String schoolId, String studentID,
       String feeStatus, String startDate, String endDate) async {
@@ -853,8 +851,12 @@ static Future<List<Student>> getStudentsOfASpecificClass(
     return schools;
   }
 
-  static Future<void> addClass(List<String>? classes, List<String>? subjects,
-      List<String> examSystem, Map<String, String> weightage, String schoolID) async {
+  static Future<void> addClass(
+      List<String>? classes,
+      List<String>? subjects,
+      List<String> examSystem,
+      Map<String, String> weightage,
+      String schoolID) async {
     try {
       QuerySnapshot schoolSnapshot = await FirebaseFirestore.instance
           .collection('Schools')
@@ -1080,29 +1082,29 @@ static Future<List<Student>> getStudentsOfASpecificClass(
     }
   }
 
-  static Future<void> updateAttendance(
-      String schoolId, Map<String, String> studentStatusMap, String day, String subject) async {
-     try {
-    WriteBatch batch = FirebaseFirestore.instance.batch();
+  static Future<void> updateAttendance(String schoolId,
+      Map<String, String> studentStatusMap, String day, String subject) async {
+    try {
+      WriteBatch batch = FirebaseFirestore.instance.batch();
 
-    studentStatusMap.forEach((studentId, status) {
-      DocumentReference studentRef = FirebaseFirestore.instance
-          .collection('Schools')
-          .doc(schoolId)
-          .collection('Students')
-          .doc(studentId);
+      studentStatusMap.forEach((studentId, status) {
+        DocumentReference studentRef = FirebaseFirestore.instance
+            .collection('Schools')
+            .doc(schoolId)
+            .collection('Students')
+            .doc(studentId);
 
-      batch.update(studentRef, {'attendance.$subject.$day': status});
-    });
+        batch.update(studentRef, {'attendance.$subject.$day': status});
+      });
 
-    await batch.commit();
+      await batch.commit();
 
-    Get.back();
-    Get.snackbar('Attendance submitted', 'Date: $day, Subject: $subject');
-    print('Attendance updated successfully for all students');
-  } catch (e) {
-    print('Error updating attendance in bulk: $e');
-  }
+      Get.back();
+      Get.snackbar('Attendance submitted', 'Date: $day, Subject: $subject');
+      print('Attendance updated successfully for all students');
+    } catch (e) {
+      print('Error updating attendance in bulk: $e');
+    }
   }
 
   static Future<List<Announcement>?> fetchAdminAnnouncements(
@@ -1114,7 +1116,7 @@ static Future<List<Student>> getStudentsOfASpecificClass(
 
     Timestamp sevendaysTime = Timestamp.fromDate(sevendaysAgo);
 
-  try {
+    try {
       CollectionReference schoolsRef =
           FirebaseFirestore.instance.collection('Schools');
 
@@ -1157,8 +1159,7 @@ static Future<List<Student>> getStudentsOfASpecificClass(
 
   static Future<List<Announcement>?> fetchStudentAnnouncements(
       String schoolID, String studentID) async {
-
-      DateTime now = DateTime.now();
+    DateTime now = DateTime.now();
 
     DateTime sevendaysAgo = now.subtract(Duration(days: 7));
 
@@ -1179,9 +1180,9 @@ static Future<List<Student>> getStudentsOfASpecificClass(
       CollectionReference announcementsRef =
           schoolDocRef.collection('Announcements');
 
-      QuerySnapshot announcementsSnapshot =
-          await announcementsRef.where('StudentID', isEqualTo: studentID).
-          where('AnnouncementDate', isGreaterThanOrEqualTo: sevendaysTime)
+      QuerySnapshot announcementsSnapshot = await announcementsRef
+          .where('StudentID', isEqualTo: studentID)
+          .where('AnnouncementDate', isGreaterThanOrEqualTo: sevendaysTime)
           .get();
 
       List<Announcement> announcements = announcementsSnapshot.docs.map((doc) {
@@ -1244,5 +1245,42 @@ static Future<List<Student>> getStudentsOfASpecificClass(
     }
 
     return uniqueSubjects;
+  }
+
+  // Method to fetch weightage for the exams
+  Future<Map<String, String>> fetchWeightage(
+      String schoolId, String classSection) async {
+    try {
+      // Get the document that contains the weightage field
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('Schools')
+          .doc(schoolId)
+          .collection('Classes')
+          .doc(classSection)
+          .get();
+
+      if (doc.exists) {
+        // Extract the weightage map from the document
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data.containsKey('weightage')) {
+          // Convert the weightage map to Map<String, String>
+          Map<String, dynamic> weightageMap =
+              data['weightage'] as Map<String, dynamic>;
+              print(weightageMap);
+          return weightageMap
+              .map((key, value) => MapEntry(key, value.toString()));
+        } else {
+          print('No weightage field found in class section: $classSection');
+          return {};
+        }
+      } else {
+        print(
+            'No document found for school ID: $schoolId and class section: $classSection');
+        return {};
+      }
+    } catch (e) {
+      print('Error fetching weightage: $e');
+      return {};
+    }
   }
 }

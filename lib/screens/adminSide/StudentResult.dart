@@ -27,6 +27,7 @@ class StudentResultController extends GetxController {
   var examsList = <String>[].obs;
   var subjectsList = <String>[].obs;
   var resultMap = <String, Map<String, String>>{}.obs;
+  var weightageMap = <String, String>{}.obs;
   var isLoading = true.obs;
   final String schoolId;
 
@@ -52,6 +53,9 @@ class StudentResultController extends GetxController {
           schoolId, student.value.classSection);
       resultMap.value = await Database_Service()
           .fetchStudentResultMap(schoolId, student.value.studentID);
+      // Fetch weightage for the class
+      weightageMap.value = await Database_Service()
+          .fetchWeightage(schoolId, student.value.classSection);
     } catch (e) {
       print('Error fetching data: $e');
     } finally {
@@ -59,106 +63,74 @@ class StudentResultController extends GetxController {
     }
   }
 
-  // Future<String> fetchTotalObtainedMarks(String studentID, String subject) async {
-  //   try {
-  //     DocumentSnapshot studentDoc = await FirebaseFirestore.instance
-  //         .collection('Schools')
-  //         .doc(schoolId)
-  //         .collection('Students')
-  //         .doc(studentID)
-  //         .get();
+  Map<String, String> calculateGrades() {
+    Map<String, String> grades = {};
 
-  //     if (studentDoc.exists) {
-  //       Map<String, dynamic> resultMap = studentDoc['resultMap'];
-  //       int totalSum = 0;
+    for (var subject in subjectsList) {
+      double subjectPercentage = 0.0;
+      var subjectResults = resultMap[subject] ?? {};
+      double totalWeightage = 0.0;
+      bool allExamsEntered = true;
 
-  //       // Get the results for the selected subject
-  //       var subjectResults = resultMap[subject] ?? {};
+      for (var exam in examsList) {
+        var score = subjectResults[exam];
+        var weightage = weightageMap[exam];
 
-  //       for (var examType in examsList) {
-  //         var marks = subjectResults[examType] ?? '-';
-  //         if (marks is String) {
-  //           RegExp regex = RegExp(r'(\d+)/(\d+)');
-  //           Match? match = regex.firstMatch(marks);
-  //           if (match != null) {
-  //             int obtainedMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
-  //             totalSum += obtainedMarks;
-  //           }
-  //         }
-  //       }
+        if (score == null || weightage == null || score == '-') {
+          allExamsEntered = false; // Missing exam data
+          break; // No need to continue if any exam data is missing
+        }
 
-  //       return totalSum.toString();
-  //     } else {
-  //       return '0';
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching resultMap: $e');
-  //     return '0';
-  //   }
-  // }
+        var parts = score.split('/');
+        if (parts.length == 2) {
+          // Ensure there are exactly two parts
+          double obtainedMarks = double.tryParse(parts[0]) ?? 0.0;
+          double totalMarks = double.tryParse(parts[1]) ?? 0.0;
 
-  // Future<String> fetchStudentTotalMarksSum(String studentID, String subject) async {
-  //   try {
-  //     DocumentSnapshot studentDoc = await FirebaseFirestore.instance
-  //         .collection('Schools')
-  //         .doc(schoolId)
-  //         .collection('Students')
-  //         .doc(studentID)
-  //         .get();
+          if (totalMarks > 0) {
+            double examPercentage = (obtainedMarks / totalMarks) * 100;
+            double examWeightage = double.tryParse(weightage) ?? 0.0;
+            subjectPercentage += (examPercentage * examWeightage) / 100;
+            totalWeightage += examWeightage;
+          }
+        }
+      }
 
-  //     if (studentDoc.exists) {
-  //       Map<String, dynamic> resultMap = studentDoc['resultMap'];
-  //       int totalSum = 0;
+      if (allExamsEntered) {
+        if (totalWeightage > 0) {
+          subjectPercentage = (subjectPercentage / totalWeightage) * 100;
+          grades[subject] = _mapPercentageToGrade(subjectPercentage);
+        } else {
+          grades[subject] = '-'; // If no weightage, return '-'
+        }
+      } else {
+        grades[subject] = '-'; // Return '-' if not all exams are entered
+      }
+    }
 
-  //       var subjectResults = resultMap[subject] ?? {};
-
-  //       for (var examType in examsList) {
-  //         var marks = subjectResults[examType] ?? '-';
-  //         if (marks is String) {
-  //           RegExp regex = RegExp(r'\d+/(\d+)');
-  //           Match? match = regex.firstMatch(marks);
-  //           if (match != null) {
-  //             int totalMarks = int.tryParse(match.group(1) ?? '0') ?? 0;
-  //             totalSum += totalMarks;
-  //           }
-  //         }
-  //       }
-
-  //       return totalSum.toString();
-  //     } else {
-  //       return '0';
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching resultMap: $e');
-  //     return '0';
-  //   }
-  // }
-}
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    runApp(MyApp());
-  } catch (e) {
-    print('Error initializing Firebase: $e');
+    return grades;
   }
-}
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: StudentResult(),
-    );
+  String _mapPercentageToGrade(double percentage) {
+    if (percentage >= 95) return 'A+';
+    if (percentage >= 90) return 'A';
+    if (percentage >= 85) return 'A-';
+    if (percentage >= 80) return 'B+';
+    if (percentage >= 75) return 'B';
+    if (percentage >= 70) return 'B-';
+    if (percentage >= 65) return 'C+';
+    if (percentage >= 60) return 'C';
+    if (percentage >= 55) return 'C-';
+    if (percentage >= 50) return 'D+';
+    if (percentage >= 45) return 'D';
+    if (percentage >= 40) return 'D-';
+    return 'F';
   }
 }
 
 class StudentResult extends StatelessWidget {
   final AdminHomeController school = Get.find();
+
   @override
   Widget build(BuildContext context) {
     final Student student =
@@ -177,11 +149,6 @@ class StudentResult extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Get.back();
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(
-            //       builder: (context) => ManageStudents()),
-            // );
           },
         ),
         title: Center(
@@ -200,6 +167,7 @@ class StudentResult extends StatelessWidget {
       body: Obx(() {
         double screenHeight = MediaQuery.of(context).size.height;
         double screenWidth = MediaQuery.of(context).size.width;
+        Map<String, String> subjectGrades = controller.calculateGrades();
 
         double resultFontSize = screenWidth < 350
             ? (screenWidth < 300 ? (screenWidth < 250 ? 11 : 14) : 14)
@@ -215,6 +183,12 @@ class StudentResult extends StatelessWidget {
             ),
           );
         } else {
+          // Debug prints to check data consistency
+          print('Exams List: ${controller.examsList}');
+          print('Subjects List: ${controller.subjectsList}');
+          print('Result Map: ${controller.resultMap}');
+          print('Weightage Map: ${controller.weightageMap}');
+
           return SingleChildScrollView(
             child: Container(
               height: screenHeight,
@@ -258,109 +232,49 @@ class StudentResult extends StatelessWidget {
                                         context, screenWidth * 0.04),
                                   ),
                                 )),
-                            // DataColumn(
-                            //   label: Text(
-                            //     'Obtained marks',
-                            //     style: Font_Styles.dataTableTitle(
-                            //         context, screenWidth * 0.04),
-                            //   ),
-                            // ),
-                            // DataColumn(
-                            //   label: Text(
-                            //     'Total marks',
-                            //     style: Font_Styles.dataTableTitle(
-                            //         context, screenWidth * 0.04),
-                            //   ),
-                            // ),
-                            // DataColumn(
-                            //   label: Text(
-                            //     'Grade',
-                            //     style: Font_Styles.dataTableTitle(
-                            //         context, screenWidth * 0.04),
-                            //   ),
-                            // ),
-                          ],
-                          rows: subjects
-                              .map(
-                                (subject) => DataRow(
-                                  color: MaterialStateColor.resolveWith(
-                                      (states) => AppColors.appOrange),
-                                  cells: [
-                                    DataCell(Text(
-                                      subject,
-                                      style: Font_Styles.dataTableRows(
-                                          context, resultFontSize),
-                                    )),
-                                    ...exams.map((exam) => DataCell(Text(
-                                          resultMap[subject]?[exam] ?? '-',
-                                          style: Font_Styles.dataTableRows(
-                                              context, resultFontSize),
-                                        ))),
-                                    // DataCell(FutureBuilder<String>(
-                                    //   future: controller.fetchTotalObtainedMarks(
-                                    //       controller.student.value.studentID,
-                                    //       subject),
-                                    //   builder: (context, snapshot) {
-                                    //     if (snapshot.connectionState ==
-                                    //         ConnectionState.waiting) {
-                                    //       return Text(
-                                    //         '-',
-                                    //         style: Font_Styles.dataTableRows(
-                                    //             context, resultFontSize),
-                                    //       );
-                                    //     } else if (snapshot.hasError) {
-                                    //       return Text(
-                                    //         'Error',
-                                    //         style: Font_Styles.dataTableRows(
-                                    //             context, resultFontSize),
-                                    //       );
-                                    //     } else {
-                                    //       return Text(
-                                    //         snapshot.data ?? '0',
-                                    //         style: Font_Styles.dataTableRows(
-                                    //             context, resultFontSize),
-                                    //       );
-                                    //     }
-                                    //   },
-                                    // )),
-                                    // DataCell(FutureBuilder<String>(
-                                    //   future:
-                                    //       controller.fetchStudentTotalMarksSum(
-                                    //           controller
-                                    //               .student.value.studentID,
-                                    //           subject),
-                                    //   builder: (context, snapshot) {
-                                    //     if (snapshot.connectionState ==
-                                    //         ConnectionState.waiting) {
-                                    //       return Text(
-                                    //         '-',
-                                    //         style: Font_Styles.dataTableRows(
-                                    //             context, resultFontSize),
-                                    //       );
-                                    //     } else if (snapshot.hasError) {
-                                    //       return Text(
-                                    //         'Error',
-                                    //         style: Font_Styles.dataTableRows(
-                                    //             context, resultFontSize),
-                                    //       );
-                                    //     } else {
-                                    //       return Text(
-                                    //         snapshot.data ?? '0',
-                                    //         style: Font_Styles.dataTableRows(
-                                    //             context, resultFontSize),
-                                    //       );
-                                    //     }
-                                    //   },
-                                    // )),
-                                    // DataCell(Text(
-                                    //   calculateGrade(resultMap[subject] ?? {}),
-                                    //   style: Font_Styles.dataTableRows(
-                                    //       context, resultFontSize),
-                                    // )),
-                                  ],
+                            DataColumn(
+                              label: Text(
+                                'Grade',
+                                style: TextStyle(
+                                  fontSize: resultFontSize,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              )
-                              .toList(),
+                              ),
+                            ),
+                          ],
+                          rows: subjects.map((subject) {
+                            // Ensure that subjectResults is always initialized
+                            var subjectResults = resultMap[subject] ?? {};
+                            var subjectGradesCells = exams.map((exam) {
+                              return DataCell(Text(
+                                subjectResults[exam] ?? '-',
+                                style: Font_Styles.dataTableRows(
+                                    context, resultFontSize),
+                              ));
+                            }).toList();
+
+                            // Calculate the grade for this subject
+                            String grade = subjectGrades[subject] ?? '-';
+
+                            // Add the grade cell to the end of the row
+                            return DataRow(
+                              color: MaterialStateProperty.all(
+                                  AppColors.appOrange),
+                              cells: [
+                                DataCell(Text(
+                                  subject,
+                                  style: Font_Styles.dataTableRows(
+                                      context, resultFontSize),
+                                )),
+                                ...subjectGradesCells,
+                                DataCell(Text(
+                                  grade,
+                                  style: Font_Styles.dataTableRows(
+                                      context, resultFontSize),
+                                )),
+                              ],
+                            );
+                          }).toList(),
                         );
                       }),
                     ),
@@ -373,38 +287,4 @@ class StudentResult extends StatelessWidget {
       }),
     );
   }
-
-  // String calculateGrade(Map<String, String> subjectResults) {
-  //   int totalMarks = 0;
-  //   int obtainedMarks = 0;
-
-  //   subjectResults.forEach((exam, marks) {
-  //     if (marks.contains('/')) {
-  //       var parts = marks.split('/');
-  //       if (parts.length == 2) {
-  //         obtainedMarks += int.tryParse(parts[0]) ?? 0;
-  //         totalMarks += int.tryParse(parts[1]) ?? 0;
-  //       }
-  //     }
-  //   });
-
-  //   if (totalMarks == 0) {
-  //     return '-';
-  //   }
-
-  //   double percentage = (obtainedMarks / totalMarks) * 100;
-  //   if (percentage >= 90) {
-  //     return 'A+';
-  //   } else if (percentage >= 80) {
-  //     return 'A';
-  //   } else if (percentage >= 70) {
-  //     return 'B';
-  //   } else if (percentage >= 60) {
-  //     return 'C';
-  //   } else if (percentage >= 50) {
-  //     return 'D';
-  //   } else {
-  //     return 'F';
-  //   }
-  // }
 }
