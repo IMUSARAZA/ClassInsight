@@ -10,6 +10,7 @@ import 'package:classinsight/utils/AppColors.dart';
 
 class AddClassSectionsController extends GetxController {
   RxnInt selectedSections = RxnInt();
+  RxString selectedDelete = ''.obs;
   RxBool textShow = false.obs;
   var textFieldValue = ''.obs;
   RxList<bool> isValidList = <bool>[].obs;
@@ -25,11 +26,29 @@ class AddClassSectionsController extends GetxController {
     fetchSections();
   }
 
-  Future<void> deleteSection(String section) async {
+  Future<void> deleteSection(String section, BuildContext context) async {
     try {
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  AppColors.appLightBlue),
+            ),
+          );
+        },
+      );
+
       await Database_Service.deleteClassByName(school.schoolName.value,section);
       sections.remove(section);
+      await Future.delayed(const Duration(seconds: 1));
+      Get.back();
+      Get.snackbar("Deleted succesfully",'Class ${section} deleted succesfully');
       fetchSections(); // Refresh the sections list after deletion
+      update();
     } catch (e) {
       print("Error deleting section: $e");
     }
@@ -95,8 +114,7 @@ class AddClassSections extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
-      body: SingleChildScrollView(
-        child: Container(
+      body:  Container(
           height: screenHeight,
           width: screenWidth,
           child: Center(
@@ -144,8 +162,8 @@ class AddClassSections extends StatelessWidget {
                           return TextButton(
                             onPressed: () {
                               if (controller.sections.isNotEmpty) {
-                                String selectedSection = controller.sections.first;
-                                controller.deleteSection(selectedSection);
+                                controller.deleteSection(controller.selectedDelete.value,context);
+                                controller.selectedDelete.value = '';
                               } else {
                                 Get.snackbar("Invalid Input", "No sections available to delete");
                               }
@@ -163,11 +181,11 @@ class AddClassSections extends StatelessWidget {
                 Center(
                   child: Container(
                     height: 0.05 * screenHeight,
-                    width: screenWidth * 0.6,
+                    width: screenWidth * 0.8,
                     margin: const EdgeInsets.only(bottom: 20.0),
                     child: Obx(
                       () => Container(
-                        width: screenWidth * 0.6,
+                        width: screenWidth * 0.8,
                         height: screenHeight * 0.055,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black),
@@ -338,21 +356,20 @@ class AddClassSections extends StatelessWidget {
                                           padding: const EdgeInsets.all(8.0),
                                           child: Obx(()=>
                                             DropdownButtonHideUnderline(
-                                              child: DropdownButton<String>(
-                                                hint: const Text("Select Section to Delete"),
-                                                value: controller.sections.isNotEmpty ? controller.sections.first : null,
-                                                onChanged: (section) {
-                                                  if (section != null) {
-                                                    controller.deleteSection(section);
-                                                  }
-                                                },
-                                                items: controller.sections
-                                                    .map((section) => DropdownMenuItem<String>(
-                                                          value: section,
-                                                          child: Text(section),
-                                                        ))
-                                                    .toList(),
-                                              ),
+                                              child: 
+                                            DropdownButton<String>(
+                                            value: controller.selectedDelete.value.isNotEmpty ? controller.selectedDelete.value : controller.sections.first,
+                                            onChanged: (item) {
+                                              controller.selectedDelete.value = item!;
+                                            },
+                                            
+                                            items: controller.sections.map<DropdownMenuItem<String>>((String value) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              );
+                                            }).toList(),
+                                          ),
                                             ),
                                           ),
                                         ),
@@ -380,7 +397,6 @@ class AddClassSections extends StatelessWidget {
           ],
         ),
       ),
-    ),
   ));
 }
 }

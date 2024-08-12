@@ -1,5 +1,4 @@
 import 'package:classinsight/Services/Database_Service.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:get/get.dart';
@@ -63,8 +62,7 @@ class AddWeightage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
-      body: SingleChildScrollView(
-        child: Container(
+      body: Container(
           height: screenHeight,
           width: screenWidth,
           child: Center(
@@ -100,7 +98,6 @@ class AddWeightage extends StatelessWidget {
                               Get.snackbar(
                                 "Error",
                                 "The total weightage must sum to 100.",
-                                snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor: Colors
                                     .red, // Set the background color to red
                                 colorText: Colors
@@ -247,7 +244,7 @@ class AddWeightage extends StatelessWidget {
                 ]),
           ),
         ),
-      ),
+      
     );
 
     // return Scaffold(

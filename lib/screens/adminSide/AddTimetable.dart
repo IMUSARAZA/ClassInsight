@@ -11,6 +11,7 @@ class AddTimetableController extends GetxController {
   RxList<String> subjects = <String>[].obs;
   RxString selectedFormat = "".obs;
   RxString selectedClass = "".obs;
+  RxBool isSaturdayOn = false.obs;
 
   RxMap<String, RxMap<String, String>> startTimes = RxMap();
   RxMap<String, RxMap<String, String>> endTimes = RxMap();
@@ -217,23 +218,42 @@ class AddTimetable extends StatelessWidget {
                     ),
                   
                 SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Saturday On/Off"),
+                    Obx(() => Switch.adaptive(
+                      value: controller.isSaturdayOn.value,
+                      onChanged: (value) {
+                        controller.isSaturdayOn.value = value;
+                      },
+                    )),
+                  ],
+                ),
 
                 if (controller.selectedFormat.value == "Fixed Schedule")
-                  Column(
-                    children: [
-                      _buildDayTable("Monday - Thursday", context),
-                      _buildDayTable("Friday", context),
-                    ],
+                  Obx(()=>
+                     Column(
+                      children: [
+                        _buildDayTable("Monday - Thursday", context),
+                        _buildDayTable("Friday", context),
+                        controller.isSaturdayOn.value ? _buildDayTable("Saturday", context) : Container()
+                      ],
+                    ),
                   ),
                 if (controller.selectedFormat.value == "Changed everyday")
-                  Column(
-                    children: [
-                      _buildDayTable("Monday", context),
-                      _buildDayTable("Tuesday", context),
-                      _buildDayTable("Wednesday", context),
-                      _buildDayTable("Thursday", context),
-                      _buildDayTable("Friday", context),
-                    ],
+                  Obx(()=>
+                     Column(
+                      children: [
+                        _buildDayTable("Monday", context),
+                        _buildDayTable("Tuesday", context),
+                        _buildDayTable("Wednesday", context),
+                        _buildDayTable("Thursday", context),
+                        _buildDayTable("Friday", context),
+                        controller.isSaturdayOn.value ? _buildDayTable("Saturday", context) : Container()
+                    
+                      ],
+                    ),
                   ),
               ],
             ),

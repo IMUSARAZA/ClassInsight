@@ -70,8 +70,7 @@ class AddExamSystem extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
-      body: SingleChildScrollView(
-        child: Container(
+      body: Container(
           height: screenHeight,
           width: screenWidth,
           child: Center(
@@ -105,8 +104,7 @@ class AddExamSystem extends StatelessWidget {
                               .split('-')
                               .first;
 
-                          // Navigate to AddWeightage and pass all necessary arguments
-                          Get.offNamedUntil('/AddWeightage', (route) => false,
+                          Get.toNamed('/AddWeightage',
                               arguments: {
                                 'className': className,
                                 'classes': controller.classes,
@@ -202,7 +200,7 @@ class AddExamSystem extends StatelessWidget {
             ),
           ),
         ),
-      ),
+      
     );
   }
 }

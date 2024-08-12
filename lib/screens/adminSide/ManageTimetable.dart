@@ -14,7 +14,7 @@ class TimetableController extends GetxController {
   var selectedClass = ''.obs;
   var selectedDay = 'Monday'.obs;
 
-  RxList<String> days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].obs;
+  RxList<String> days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday","Saturday"].obs;
 
   AdminHomeController school = Get.put(AdminHomeController());
 
