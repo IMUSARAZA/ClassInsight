@@ -41,8 +41,7 @@ class _AddSubjectState extends State<AddSubject> {
 
     return Scaffold(
         backgroundColor: AppColors.appLightBlue,
-        body: SingleChildScrollView(
-          child: Container(
+        body:Container(
             height: screenHeight,
             width: screenWidth,
             child: Center(
@@ -129,7 +128,6 @@ class _AddSubjectState extends State<AddSubject> {
               ),
             ),
           ),
-        ),
     );
   }
 }

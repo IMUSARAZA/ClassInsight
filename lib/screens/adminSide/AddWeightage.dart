@@ -62,8 +62,7 @@ class AddWeightage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.appLightBlue,
-      body: SingleChildScrollView(
-        child: Container(
+      body: Container(
           height: screenHeight,
           width: screenWidth,
           child: Center(
@@ -99,7 +98,6 @@ class AddWeightage extends StatelessWidget {
                               Get.snackbar(
                                 "Error",
                                 "The total weightage must sum to 100.",
-                                snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor: Colors
                                     .red, 
                                 colorText: Colors
@@ -245,7 +243,7 @@ class AddWeightage extends StatelessWidget {
                 ]),
           ),
         ),
-      ),
+      
     );
   }
 }
