@@ -1,4 +1,3 @@
-import 'package:classinsight/Services/Database_Service.dart';
 import 'package:classinsight/Widgets/CustomTextField.dart';
 import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
@@ -11,7 +10,7 @@ class AddExamSystemController extends GetxController {
   RxList<String> examStructure = <String>[].obs;
   TextEditingController examStructureController = TextEditingController();
   RxBool examValid = true.obs;
-  List<String>? classes; // to be passed in next class
+  List<String>? classes; 
   List<String>? subjects;
 
   @override

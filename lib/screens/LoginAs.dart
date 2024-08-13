@@ -58,7 +58,6 @@ class LoginAs extends StatelessWidget {
     return Obx(() => TextButton(
           onPressed: parent
               ? () {
-                  // Get.toNamed("/ParentLogin", arguments: school);
 
                   Go.to(() => ParentLoginScreen(), arguments: school);
                 }
@@ -66,10 +65,7 @@ class LoginAs extends StatelessWidget {
                   print('teacher clicked');
                   if (text == "Teacher") {
                     adminOrNot = false;
-                    // Get.toNamed("/LoginScreen", arguments: {
-                    //   'school': school,
-                    //   'adminOrNot': adminOrNot,
-                    // });
+ 
 
                     var args = {
                       'school': school,
@@ -78,11 +74,6 @@ class LoginAs extends StatelessWidget {
                     Go.to(() => LoginScreen(), arguments: args);
                   } else {
                     adminOrNot = true;
-                    // Get.toNamed("/LoginScreen", arguments: {
-                    //   'school': school,
-                    //   'adminOrNot': adminOrNot,
-                    // });
-
                      var args = {
                        'school': school,
                       'adminOrNot': adminOrNot,

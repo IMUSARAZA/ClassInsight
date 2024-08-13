@@ -1,5 +1,6 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:classinsight/Services/Database_Service.dart';
-import 'package:classinsight/screens/adminSide/AdminHome.dart';
 import 'package:classinsight/utils/AppColors.dart';
 import 'package:classinsight/utils/fontStyles.dart';
 import 'package:get/get.dart';
@@ -11,7 +12,7 @@ class AddWeightageController extends GetxController {
   RxList<String> examStructure = <String>[].obs;
   List<String>? classes;
   var weightage = <String, String>{}.obs;
-  var schoolId = ''.obs; // Add a variable to store schoolId
+  var schoolId = ''.obs; 
 
   @override
   void onInit() {
@@ -20,10 +21,9 @@ class AddWeightageController extends GetxController {
     classes = Get.arguments['classes'];
     subjects.assignAll(Get.arguments['subjects']);
     examStructure.assignAll(Get.arguments['examStructure']);
-    schoolId.value = Get.arguments['schoolId']; // Initialize schoolId
+    schoolId.value = Get.arguments['schoolId']; 
   }
 
-  // Method to calculate total weightage
   double getTotalWeightage() {
     double total = 0.0;
     weightage.forEach((key, value) {
@@ -34,7 +34,6 @@ class AddWeightageController extends GetxController {
 }
 
 class AddWeightage extends StatelessWidget {
-  // Instantiate the controller
   final AddWeightageController controller = Get.put(AddWeightageController());
   double addStdFontSize = 16;
   double headingFontSize = 33;
@@ -77,7 +76,7 @@ class AddWeightage extends StatelessWidget {
                     child: AppBar(
                       backgroundColor: AppColors.appLightBlue,
                       leading: IconButton(
-                        icon: const Icon(Icons.arrow_back),
+                        icon: Icon(Icons.arrow_back),
                         onPressed: () {
                           Get.back();
                         },
@@ -102,22 +101,21 @@ class AddWeightage extends StatelessWidget {
                                 "The total weightage must sum to 100.",
                                 snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor: Colors
-                                    .red, // Set the background color to red
+                                    .red, 
                                 colorText: Colors
-                                    .white, // Set the text color to white for contrast
+                                    .white,
                               );
 
                               return;
                             }
 
-                            // Pass the schoolId to the Database_Service.addClass method
                             Database_Service.addClass(
                               controller.classes,
                               controller.subjects,
                               controller.examStructure,
                               controller.weightage,
                               controller
-                                  .schoolId.value, // Use the schoolId here
+                                  .schoolId.value,
                             );
 
                             showDialog(
@@ -249,132 +247,5 @@ class AddWeightage extends StatelessWidget {
         ),
       ),
     );
-
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     elevation: 0,
-    //     leading: IconButton(
-    //       icon: const Icon(Icons.arrow_back),
-    //       onPressed: () {
-    //         Get.back();
-    //       },
-    //     ),
-    //     title: Center(
-    //       child: Text(
-    //         'Weightage of exams',
-    //         style: Font_Styles.labelHeadingLight(context),
-    //       ),
-    //     ),
-    //     actions: <Widget>[
-    //       Container(
-    //         width: 48.0, // Adjust as needed
-    //       ),
-    //       TextButton(
-    //         onPressed: () async {
-    //           double totalWeightage = controller.getTotalWeightage();
-
-    //           if (totalWeightage != 100) {
-    //             Get.snackbar(
-    //               "Error",
-    //               "The total weightage must sum to 100.",
-    //               snackPosition: SnackPosition.BOTTOM,
-    //               backgroundColor:
-    //                   Colors.red, // Set the background color to red
-    //               colorText:
-    //                   Colors.white, // Set the text color to white for contrast
-    //             );
-
-    //             return;
-    //           }
-
-    //           // Pass the schoolId to the Database_Service.addClass method
-    //           Database_Service.addClass(
-    //             controller.classes,
-    //             controller.subjects,
-    //             controller.examStructure,
-    //             controller.weightage,
-    //             controller.schoolId.value, // Use the schoolId here
-    //           );
-
-    //           showDialog(
-    //             context: context,
-    //             barrierDismissible: false,
-    //             builder: (BuildContext context) {
-    //               return const Center(
-    //                 child: CircularProgressIndicator(
-    //                   valueColor:
-    //                       AlwaysStoppedAnimation<Color>(AppColors.appLightBlue),
-    //                 ),
-    //               );
-    //             },
-    //           );
-
-    //           await Future.delayed(const Duration(seconds: 3));
-    //           Get.offNamedUntil('/AdminHome', (route) => false);
-    //           Get.snackbar("Success", "Classes added successfully");
-    //         },
-    //         child: Text(
-    //           "Save",
-    //           style: Font_Styles.labelHeadingLight(context),
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    //   body: Padding(
-    //     padding: const EdgeInsets.all(16.0),
-    //     child: Expanded(
-    //       child: SingleChildScrollView(
-    //         child: Column(
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           children: [
-    //             Obx(() => Text(
-    //                   'Class: ${controller.className}',
-    //                   style: TextStyle(fontSize: 24),
-    //                 )),
-    //             SizedBox(height: 16),
-    //             Text(
-    //               'Weightage of each exam type:',
-    //               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-    //             ),
-    //             SizedBox(height: 16),
-    //             Obx(() => Column(
-    //               crossAxisAlignment: CrossAxisAlignment.center,
-    //               mainAxisAlignment: MainAxisAlignment.center,
-    //                   children: controller.examStructure.map((examType) {
-    //                     return Padding(
-    //                       padding: const EdgeInsets.symmetric(vertical: 8.0),
-    //                       child: Row(
-    //                         children: [
-    //                           Expanded(
-    //                             flex: 2,
-    //                             child: Text(
-    //                               examType,
-    //                               style: TextStyle(fontSize: 18),
-    //                             ),
-    //                           ),
-    //                           Expanded(
-    //                             flex: 3,
-    //                             child: TextField(
-    //                               decoration: InputDecoration(
-    //                                 border: OutlineInputBorder(),
-    //                                 labelText: 'Enter weightage',
-    //                               ),
-    //                               keyboardType: TextInputType.number,
-    //                               onChanged: (value) {
-    //                                 controller.weightage[examType] = value;
-    //                               },
-    //                             ),
-    //                           ),
-    //                         ],
-    //                       ),
-    //                     );
-    //                   }).toList(),
-    //                 )),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
 }

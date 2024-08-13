@@ -29,7 +29,7 @@ class AddClassSectionsController extends GetxController {
     try {
       await Database_Service.deleteClassByName(school.schoolName.value,section);
       sections.remove(section);
-      fetchSections(); // Refresh the sections list after deletion
+      fetchSections(); 
     } catch (e) {
       print("Error deleting section: $e");
     }
